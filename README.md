@@ -32,3 +32,4 @@ Para subir o código:
 
 ---
 **Nota sobre Dados:** Atualmente o sistema utiliza `localStorage`. Os dados ficam salvos localmente no navegador de cada usuário. Para compartilhamento de dados entre dispositivos, será necessário migrar para o Cloud Firestore (Firebase).
+# scaling-bassoon-SEBITAM-LIMPO
