@@ -16,63 +16,88 @@ document.addEventListener('DOMContentLoaded', () => {
         name: 'Administrador'
     };
 
-    // --- FIREBASE CONFIGURATION ---
-    // User must replace this with their actual Firebase project config
-    const firebaseConfig = {
-        apiKey: "YOUR_API_KEY",
-        authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-        projectId: "YOUR_PROJECT_ID",
-        storageBucket: "YOUR_PROJECT_ID.appspot.com",
-        messagingSenderId: "YOUR_SENDER_ID",
-        appId: "YOUR_APP_ID"
+    // --- SUPABASE CONFIGURATION ---
+    const SUPABASE_URL = "https://bgqftoqsuhcmtxnsqqsq.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJncWZ0b3FzdWhjbXR4bnNxcXNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgzMTMxNjksImV4cCI6MjA4Mzg4OTE2OX0.KFvYjkSMYTfwChRF4OJVoJSxJbJhgg6zlyzcsQcvDO4";
+
+    // Initialize Supabase Client
+    let supabase = null;
+    if (typeof netlify !== 'undefined' || typeof supabaseJS !== 'undefined' || window.supabase) {
+        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    }
+
+    // Mapping frontend collection names to Supabase table names
+    const tableMap = {
+        'sebitam-students': 'students',
+        'sebitam-teachers': 'teachers',
+        'sebitam-admins': 'admins',
+        'sebitam-secretaries': 'secretaries'
     };
 
-    // Initialize Firebase
-    if (typeof firebase !== 'undefined') {
-        firebase.initializeApp(firebaseConfig);
+    // Mapping frontend fields to Supabase fields (for students)
+    function mapToSupabase(item, collectionName) {
+        if (tableMap[collectionName] === 'students') {
+            return {
+                full_name: item.fullName,
+                module: parseInt(item.module),
+                grade: parseInt(item.grade),
+                plan: item.plan,
+                email: item.email,
+                phone: item.phone,
+                subject_grades: item.subjectGrades || {},
+                subject_freqs: item.subjectFreqs || {}
+            };
+        }
+        return item; // For others, assume direct mapping or handle as needed
     }
-    const db = (typeof firebase !== 'undefined') ? firebase.firestore() : null;
 
-    // Database Helpers (Abstraction layer for Firestore)
+    function mapFromSupabase(item, collectionName) {
+        if (tableMap[collectionName] === 'students') {
+            return {
+                id: item.id,
+                fullName: item.full_name,
+                module: item.module,
+                grade: item.grade,
+                plan: item.plan,
+                email: item.email,
+                phone: item.phone,
+                subjectGrades: item.subject_grades,
+                subjectFreqs: item.subject_freqs
+            };
+        }
+        return item;
+    }
+
+    // Database Helpers (Abstraction layer for Supabase)
     async function dbGet(collectionName) {
-        if (!db) return JSON.parse(localStorage.getItem(collectionName) || '[]');
+        const table = tableMap[collectionName] || collectionName;
+        if (!supabase) return JSON.parse(localStorage.getItem(collectionName) || '[]');
         try {
-            const snapshot = await db.collection(collectionName).get();
-            return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            const { data, error } = await supabase.from(table).select('*');
+            if (error) throw error;
+            return data.map(item => mapFromSupabase(item, collectionName));
         } catch (e) {
-            console.error("Error fetching from Firebase:", e);
+            console.error("Error fetching from Supabase:", e);
             return JSON.parse(localStorage.getItem(collectionName) || '[]');
         }
     }
 
-    async function dbSave(collectionName, data) {
-        if (!db) {
-            localStorage.setItem(collectionName, JSON.stringify(data));
-            return;
-        }
-        try {
-            // This is a simple implementation: push the entire array
-            // Optimization: In a real app, save individual docs
-            const batch = db.batch();
-            // Clear existing for this simple sync or handle updates
-            // For now, we'll implement a more focused approach in the specific functions
-        } catch (e) {
-            localStorage.setItem(collectionName, JSON.stringify(data));
-        }
-    }
-
     async function dbAddItem(collectionName, item) {
-        if (!db) {
+        const table = tableMap[collectionName] || collectionName;
+        if (!supabase) {
             const list = await dbGet(collectionName);
             list.push(item);
             localStorage.setItem(collectionName, JSON.stringify(list));
             return;
         }
-        await db.collection(collectionName).add(item);
+        const mapped = mapToSupabase(item, collectionName);
+        const { error } = await supabase.from(table).insert([mapped]);
+        if (error) console.error("Error adding to Supabase:", error);
     }
 
     async function dbUpdateItem(collectionName, id, updates) {
-        if (!db) {
+        const table = tableMap[collectionName] || collectionName;
+        if (!supabase) {
             const list = await dbGet(collectionName);
             const idx = list.findIndex(i => i.id == id);
             if (idx !== -1) {
@@ -81,17 +106,21 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             return;
         }
-        await db.collection(collectionName).doc(id.toString()).set(updates, { merge: true });
+        const mapped = mapToSupabase(updates, collectionName);
+        const { error } = await supabase.from(table).update(mapped).eq('id', id);
+        if (error) console.error("Error updating in Supabase:", error);
     }
 
     async function dbDeleteItem(collectionName, id) {
-        if (!db) {
+        const table = tableMap[collectionName] || collectionName;
+        if (!supabase) {
             const list = await dbGet(collectionName);
             const filtered = list.filter(i => i.id != id);
             localStorage.setItem(collectionName, JSON.stringify(filtered));
             return;
         }
-        await db.collection(collectionName).doc(id.toString()).delete();
+        const { error } = await supabase.from(table).delete().eq('id', id);
+        if (error) console.error("Error deleting from Supabase:", error);
     }
 
     // Role Mapping
