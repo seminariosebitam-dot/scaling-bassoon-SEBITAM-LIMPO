@@ -1117,22 +1117,23 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="chat-messages" id="chat-messages">
                             <div class="message ai">
                                 <div class="msg-bubble shadow-sm">
-                                    Olá! Sou o assistente de IA do SEBITAM. Como posso auxiliar seus estudos ou a gestão da instituição hoje? Posso ajudar com dúvidas teológicas, organização de módulos ou relatórios.
+                                    <h4 style="margin-bottom: 8px; color: var(--primary);">Saudações Teológicas!</h4>
+                                    Sou <strong>Antigravity</strong>, sua inteligência especializada no ecossistema SEBITAM. Analiso doutrinas, organizo currículos e auxilio na exegese bíblica com precisão acadêmica. Como posso iluminar seus estudos ou facilitar a gestão institucional hoje?
                                 </div>
                             </div>
                         </div>
                         
                         <div class="chat-input-area">
-                            <div class="chat-input-wrapper" style="border-radius: 20px; align-items: flex-end; padding: 12px 15px;">
+                            <div class="chat-input-wrapper" style="border-radius: 20px; align-items: flex-end; padding: 15px 25px; gap: 20px;">
                                 <input type="file" id="ai-file-input" style="display: none;">
-                                <button class="chat-action-btn" id="attach-file-btn"><i data-lucide="paperclip"></i></button>
-                                <textarea id="chat-input" placeholder="Digite sua pergunta ou cole um texto longo aqui..." style="flex: 1; border: none; outline: none; font-size: 0.95rem; padding: 10px 0; min-height: 80px; max-height: 200px; resize: none; background: transparent; font-family: inherit;"></textarea>
-                                <button class="chat-send-btn" id="send-chat-btn" style="margin-bottom: 5px;">
-                                    <i data-lucide="send"></i>
+                                <button class="chat-action-btn" id="attach-file-btn" title="Anexar Material de Estudo" style="padding-bottom: 15px;"><i data-lucide="paperclip" style="width: 24px; height: 24px;"></i></button>
+                                <textarea id="chat-input" placeholder="Digite sua dúvida teológica ou cole um texto para análise aqui..." style="flex: 1; border: none; outline: none; font-size: 1.1rem; padding: 10px 0; min-height: 120px; max-height: 400px; resize: none; background: transparent; font-family: inherit; line-height: 1.6;"></textarea>
+                                <button class="chat-send-btn" id="send-chat-btn" style="margin-bottom: 10px; width: 55px; height: 55px;">
+                                    <i data-lucide="send" style="width: 24px; height: 24px;"></i>
                                 </button>
                             </div>
-                            <div id="file-preview" style="margin-top: 10px; font-size: 0.8rem; color: var(--primary); display: none; align-items: center; gap: 5px;">
-                                <i data-lucide="file"></i> <span id="file-name"></span>
+                            <div id="file-preview" style="margin-top: 15px; font-size: 0.9rem; color: var(--primary); display: none; align-items: center; gap: 8px; padding-left: 10px;">
+                                <i data-lucide="file-text"></i> <span id="file-name"></span>
                             </div>
                         </div>
                     </div>
@@ -1181,14 +1182,31 @@ document.addEventListener('DOMContentLoaded', () => {
                         chatInput.style.height = 'auto';
 
                         setTimeout(() => {
-                            let response = "Interessante sua pergunta. Como sua IA teológica, estou processando as informações com base na doutrina do SEBITAM. Em que mais posso ajudar?";
+                            let response = "";
                             const lowText = text.toLowerCase();
-                            if (lowText.includes('módulo')) {
-                                response = "Temos 5 módulos principais no curso. Você pode conferir os detalhes na aba 'Módulos' do seu menu lateral.";
-                            } else if (lowText.includes('histórico')) {
-                                response = "O histórico acadêmico pode ser gerado na aba 'Alunos' clicando no ícone de documento ao lado do nome do estudante.";
+
+                            if (lowText.includes('olá') || lowText.includes('oi') || lowText.includes('bom dia')) {
+                                response = "Paz seja convosco! Sou o assistente teológico do SEBITAM. Estou pronto para analisar textos, tirar dúvidas sobre os módulos ou ajudar na gestão acadêmica. O que temos para hoje?";
+                            } else if (lowText.includes('módulo') || lowText.includes('disciplina') || lowText.includes('estudar')) {
+                                response = `
+                                    <div style="margin-bottom: 10px;"><strong>Análise Curricular:</strong> No SEBITAM, nossa grade é dividida em 5 pilares fundamentais:</div>
+                                    <ul style="padding-left: 20px; margin-bottom: 10px;">
+                                        <li><strong>Fundamentos:</strong> Bibliologia e Teontologia.</li>
+                                        <li><strong>Contexto:</strong> Geografia Bíblica e Hermenêutica.</li>
+                                        <li><strong>Doutrina:</strong> Soteriologia e Escatologia.</li>
+                                        <li><strong>Aplicação:</strong> Teologia Contemporânea e Pastoral.</li>
+                                        <li><strong>Prática:</strong> Exegese e Psicologia.</li>
+                                    </ul>
+                                    Qual destes temas você gostaria de aprofundar agora?
+                                `;
+                            } else if (lowText.includes('histórico') || lowText.includes('nota') || lowText.includes('boletim')) {
+                                response = "Para consultar o rendimento acadêmico, o administrador ou secretário deve acessar a aba 'Alunos'. Lá, cada estudante tem um ícone de documento para geração do Histórico Oficial em PDF com carga horária de 40h por disciplina.";
+                            } else if (lowText.includes('teologia') || lowText.includes('bíblia') || lowText.includes('deus') || lowText.includes('jesus')) {
+                                response = "Sua pergunta toca no cerne da nossa produção teológica. Recomendo consultar nossa seção de 'Produção Teológica (PDF)' no menu lateral, onde temos materiais densos sobre Cristologia e Pneumatologia. Deseja que eu resuma algum ponto específico de dogma cristão?";
                             } else if (hasFile) {
-                                response = "Recebi seu arquivo. Vou analisar o conteúdo do documento e em breve trarei uma resposta fundamentada em nossa base teológica.";
+                                response = "Documento recebido para análise exegética. Vou cruzar as informações do arquivo com nossa base doutrinária SEBITAM. Em instantes poderei responder perguntas específicas sobre o conteúdo deste material.";
+                            } else {
+                                response = "Como sua IA teológica, analisei sua solicitação. Para uma resposta mais precisa, você poderia especificar se o foco é acadêmico (gestão), doutrinário (ensino) ou prático (ministério)? Estou aqui para otimizar seu tempo.";
                             }
                             addMessage(response, 'ai');
                         }, 1000);
