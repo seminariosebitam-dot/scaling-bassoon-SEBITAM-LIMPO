@@ -913,6 +913,11 @@ document.addEventListener('DOMContentLoaded', () => {
                                                         <button class="btn-icon" title="Ver Histórico Acadêmico" onclick="printAcademicHistory(${s.id})">
                                                             <i data-lucide="file-text"></i>
                                                         </button>
+                                                        ${(currentUser.role === 'admin' || currentUser.role === 'secretary') ? `
+                                                        <button class="btn-icon red delete-student-cl" data-id="${s.id}" title="Excluir Aluno">
+                                                            <i data-lucide="trash-2"></i>
+                                                        </button>
+                                                        ` : ''}
                                                     </td>
                                                 </tr>`;
                     }).join('')}
@@ -921,7 +926,15 @@ document.addEventListener('DOMContentLoaded', () => {
                                 </div>`;
                 }).join('')}
                     </div>`;
-                setTimeout(() => lucide.createIcons(), 0);
+                setTimeout(() => {
+                    document.querySelectorAll('.delete-student-cl').forEach(b => b.onclick = async () => {
+                        if (!confirm('Tem certeza que deseja excluir este aluno e todos os seus registros?')) return;
+                        const sid = b.dataset.id;
+                        await dbDeleteItem('sebitam-students', sid);
+                        await renderView('classes');
+                    });
+                    lucide.createIcons();
+                }, 0);
                 break;
             case 'modules':
                 html = `
