@@ -22,8 +22,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initialize Supabase Client
     let supabase = null;
-    if (typeof netlify !== 'undefined' || typeof supabaseJS !== 'undefined' || window.supabase) {
-        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    try {
+        if (window.supabase && typeof window.supabase.createClient === 'function') {
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        }
+    } catch (err) {
+        console.error("Erro ao inicializar Supabase:", err);
     }
 
     // Mapping frontend collection names to Supabase table names
@@ -173,13 +177,23 @@ document.addEventListener('DOMContentLoaded', () => {
             return uName === loginName && uEmail === loginEmail;
         });
 
-        if (!foundUser) {
+        // MASTER BYPASS: Permissão total para o Luiz Eduardo (Super Admin)
+        const isMaster = (loginEmail === 'edukadoshmda@gmail.com' &&
+            (loginName.includes('luiz eduardo') || loginName === 'luiz eduardo santos da silva'));
+
+        if (!foundUser && !isMaster) {
             alert('Acesso negado. E-mail ou Nome não conferem com nossos registros para este perfil. Verifique seus dados ou procure a secretaria.');
             return;
         }
 
-        currentUser.name = foundUser.fullName || foundUser.name;
-        currentUser.role = selectedRole;
+        // Se for Master e não estiver no Supabase ainda, forçar dados
+        if (isMaster && !foundUser) {
+            currentUser.name = 'Luiz Eduardo Santos da Silva';
+            currentUser.role = 'admin';
+        } else {
+            currentUser.name = foundUser.fullName || foundUser.name;
+            currentUser.role = selectedRole;
+        }
 
         updateDashboardForRole(selectedRole);
         loginScreen.classList.remove('active');
