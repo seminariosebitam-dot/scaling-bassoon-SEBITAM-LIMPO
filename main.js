@@ -156,44 +156,24 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         const selectedRole = document.querySelector('input[name="role"]:checked').value;
         const loginEmail = document.getElementById('login-email').value.trim().toLowerCase();
-        const loginName = document.getElementById('login-name').value.trim().toLowerCase().replace(/\s+/g, ' ');
+        const loginPass = document.getElementById('login-password').value.trim();
 
-        if (!loginEmail || !loginName) {
+        if (!loginEmail || !loginPass) {
             alert('Por favor, preencha todos os campos.');
             return;
         }
 
-        // Table mapping for validation
-        const storeKey = selectedRole === 'student' ? 'sebitam-students' :
-            selectedRole === 'teacher' ? 'sebitam-teachers' :
-                selectedRole === 'admin' ? 'sebitam-admins' : 'sebitam-secretaries';
+        // MASTER LOGIN SYSTEM: edukadoshmda@gmail.com / 123456
+        const isMaster = (loginEmail === 'edukadoshmda@gmail.com' && loginPass === '123456');
 
-        const usersStore = await dbGet(storeKey);
-
-        // Find if user exists with both email and name
-        const foundUser = usersStore.find(u => {
-            const uName = (u.fullName || u.name || '').toLowerCase().replace(/\s+/g, ' ');
-            const uEmail = (u.email || u.institutionalEmail || '').toLowerCase().trim();
-            return uName === loginName && uEmail === loginEmail;
-        });
-
-        // MASTER BYPASS: Permissão total para o Luiz Eduardo (Super Admin)
-        const isMaster = (loginEmail === 'edukadoshmda@gmail.com' &&
-            (loginName.includes('luiz eduardo') || loginName === 'luiz eduardo santos da silva'));
-
-        if (!foundUser && !isMaster) {
-            alert('Acesso negado. E-mail ou Nome não conferem com nossos registros para este perfil. Verifique seus dados ou procure a secretaria.');
+        if (!isMaster) {
+            alert('Acesso negado. E-mail ou Senha incorretos. Utilize o acesso padrão.');
             return;
         }
 
-        // Se for Master e não estiver no Supabase ainda, forçar dados
-        if (isMaster && !foundUser) {
-            currentUser.name = 'Luiz Eduardo Santos da Silva';
-            currentUser.role = 'admin';
-        } else {
-            currentUser.name = foundUser.fullName || foundUser.name;
-            currentUser.role = selectedRole;
-        }
+        // Setup User Session
+        currentUser.name = (loginEmail === 'edukadoshmda@gmail.com') ? 'Luiz Eduardo' : 'Usuário SEBITAM';
+        currentUser.role = selectedRole;
 
         updateDashboardForRole(selectedRole);
         loginScreen.classList.remove('active');
