@@ -914,10 +914,9 @@ document.addEventListener('DOMContentLoaded', () => {
                                                             <i data-lucide="file-text"></i>
                                                         </button>
                                                         ${(currentUser.role === 'admin' || currentUser.role === 'secretary') ? `
-                                                        <button class="btn-icon red delete-student-cl" data-id="${s.id}" title="Excluir Aluno">
+                                                        <button class="btn-icon red delete-st-class" data-id="${s.id}" title="Excluir Aluno">
                                                             <i data-lucide="trash-2"></i>
-                                                        </button>
-                                                        ` : ''}
+                                                        </button>` : ''}
                                                     </td>
                                                 </tr>`;
                     }).join('')}
@@ -927,10 +926,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 }).join('')}
                     </div>`;
                 setTimeout(() => {
-                    document.querySelectorAll('.delete-student-cl').forEach(b => b.onclick = async () => {
-                        if (!confirm('Tem certeza que deseja excluir este aluno e todos os seus registros?')) return;
-                        const sid = b.dataset.id;
-                        await dbDeleteItem('sebitam-students', sid);
+                    document.querySelectorAll('.delete-st-class').forEach(b => b.onclick = async () => {
+                        if (!confirm('Tem certeza que deseja excluir permanentemente este aluno?')) return;
+                        const uid = b.dataset.id;
+                        await dbDeleteItem('sebitam-students', uid);
                         await renderView('classes');
                     });
                     lucide.createIcons();
