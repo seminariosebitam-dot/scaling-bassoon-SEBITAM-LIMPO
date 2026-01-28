@@ -145,41 +145,42 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.className = `theme-${savedTheme}`;
     }
 
-    // Role selection change
-    document.querySelectorAll('input[name="role"]').forEach(radio => {
-        radio.addEventListener('change', () => {
-            const studentField = document.getElementById('student-name-field');
-            if (radio.value === 'student') {
-                studentField.style.display = 'flex';
-            } else {
-                studentField.style.display = 'none';
-            }
-        });
-    });
+    // Role selection change logic removed as name is now always visible
 
     // Login Logic
     loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const selectedRole = document.querySelector('input[name="role"]:checked').value;
-        const studentNameRaw = document.getElementById('student-login-name').value.trim();
+        const loginEmail = document.getElementById('login-email').value.trim().toLowerCase();
+        const loginName = document.getElementById('login-name').value.trim().toLowerCase().replace(/\s+/g, ' ');
 
-        if (selectedRole === 'student') {
-            if (!studentNameRaw) {
-                alert('Por favor, informe seu nome completo para acessar seu portal.');
-                return;
-            }
-            const studentsStore = await dbGet('sebitam-students');
-            const exists = studentsStore.some(s => s.fullName.toLowerCase().replace(/\s+/g, ' ') === studentNameRaw.toLowerCase().replace(/\s+/g, ' '));
-            if (!exists) {
-                alert('Aluno não identificado. Verifique se o nome está correto (exatamente como matriculado) ou procure a secretaria.');
-                return;
-            }
-            currentUser.name = studentNameRaw;
-        } else {
-            currentUser.name = roleDetails[selectedRole].name;
+        if (!loginEmail || !loginName) {
+            alert('Por favor, preencha todos os campos.');
+            return;
         }
 
+        // Table mapping for validation
+        const storeKey = selectedRole === 'student' ? 'sebitam-students' :
+            selectedRole === 'teacher' ? 'sebitam-teachers' :
+                selectedRole === 'admin' ? 'sebitam-admins' : 'sebitam-secretaries';
+
+        const usersStore = await dbGet(storeKey);
+
+        // Find if user exists with both email and name
+        const foundUser = usersStore.find(u => {
+            const uName = (u.fullName || u.name || '').toLowerCase().replace(/\s+/g, ' ');
+            const uEmail = (u.email || u.institutionalEmail || '').toLowerCase().trim();
+            return uName === loginName && uEmail === loginEmail;
+        });
+
+        if (!foundUser) {
+            alert('Acesso negado. E-mail ou Nome não conferem com nossos registros para este perfil. Verifique seus dados ou procure a secretaria.');
+            return;
+        }
+
+        currentUser.name = foundUser.fullName || foundUser.name;
         currentUser.role = selectedRole;
+
         updateDashboardForRole(selectedRole);
         loginScreen.classList.remove('active');
         dashboardScreen.classList.add('active');
