@@ -1185,28 +1185,64 @@ document.addEventListener('DOMContentLoaded', () => {
                             let response = "";
                             const lowText = text.toLowerCase();
 
-                            if (lowText.includes('olá') || lowText.includes('oi') || lowText.includes('bom dia')) {
-                                response = "Paz seja convosco! Sou o assistente teológico do SEBITAM. Estou pronto para analisar textos, tirar dúvidas sobre os módulos ou ajudar na gestão acadêmica. O que temos para hoje?";
-                            } else if (lowText.includes('módulo') || lowText.includes('disciplina') || lowText.includes('estudar')) {
-                                response = `
-                                    <div style="margin-bottom: 10px;"><strong>Análise Curricular:</strong> No SEBITAM, nossa grade é dividida em 5 pilares fundamentais:</div>
-                                    <ul style="padding-left: 20px; margin-bottom: 10px;">
-                                        <li><strong>Fundamentos:</strong> Bibliologia e Teontologia.</li>
-                                        <li><strong>Contexto:</strong> Geografia Bíblica e Hermenêutica.</li>
-                                        <li><strong>Doutrina:</strong> Soteriologia e Escatologia.</li>
-                                        <li><strong>Aplicação:</strong> Teologia Contemporânea e Pastoral.</li>
-                                        <li><strong>Prática:</strong> Exegese e Psicologia.</li>
-                                    </ul>
-                                    Qual destes temas você gostaria de aprofundar agora?
-                                `;
-                            } else if (lowText.includes('histórico') || lowText.includes('nota') || lowText.includes('boletim')) {
-                                response = "Para consultar o rendimento acadêmico, o administrador ou secretário deve acessar a aba 'Alunos'. Lá, cada estudante tem um ícone de documento para geração do Histórico Oficial em PDF com carga horária de 40h por disciplina.";
-                            } else if (lowText.includes('teologia') || lowText.includes('bíblia') || lowText.includes('deus') || lowText.includes('jesus')) {
-                                response = "Sua pergunta toca no cerne da nossa produção teológica. Recomendo consultar nossa seção de 'Produção Teológica (PDF)' no menu lateral, onde temos materiais densos sobre Cristologia e Pneumatologia. Deseja que eu resuma algum ponto específico de dogma cristão?";
+                            // Sistema de Inteligência Baseado em Contexto
+                            const contextMap = [
+                                {
+                                    keys: ['olá', 'oi', 'bom dia', 'boa tarde', 'boa noite', 'paz'],
+                                    resp: "<strong>Paz seja convosco!</strong> Como seu assistente Antigravity, estou operando com capacidade analítica máxima. Posso realizar exegeses, orientar sua jornada acadêmica no SEBITAM ou discutir estratégias ministeriais. Por onde deseja começar?"
+                                },
+                                {
+                                    keys: ['ministério', 'pastoral', 'liderança', 'igreja', 'culto', 'missões', 'prático'],
+                                    resp: `
+                                        <div style="margin-bottom: 15px;"><strong>Eixo Prático (Ministério):</strong> Notei seu interesse na área ministerial. No SEBITAM, a teologia deve frutificar em serviço.</div>
+                                        <p>Para o desenvolvimento do seu ministério, recomendo focar em:
+                                        <ul style="padding-left: 20px; margin: 10px 0;">
+                                            <li><strong>Homilética:</strong> A arte da pregação bíblica (Módulo 3).</li>
+                                            <li><strong>Teologia Pastoral:</strong> O cuidado com as almas (Módulo 4).</li>
+                                            <li><strong>Psicologia Pastoral:</strong> Compreensão do rebanho (Módulo 5).</li>
+                                        </ul>
+                                        Deseja que eu aprofunde algum destes pilares ministeriais?</p>
+                                    `
+                                },
+                                {
+                                    keys: ['acadêmico', 'gestão', 'secretaria', 'coordenação', 'matrícula', 'frequência', 'sistema'],
+                                    resp: `
+                                        <div style="margin-bottom: 10px;"><strong>Eixo Acadêmico (Gestão):</strong> Compreendo. Para otimizar a gestão institucional:</div>
+                                        <ul style="padding-left: 20px;">
+                                            <li><strong>Dados:</strong> O controle de frequência e notas é automatizado via Supabase para evitar erros manuais.</li>
+                                            <li><strong>Currículo:</strong> Seguimos uma formação média dividida em 5 módulos sequenciais.</li>
+                                            <li><strong>Relatórios:</strong> A aba 'Financeiro' oferece indicadores em tempo real para tomada de decisão.</li>
+                                        </ul>
+                                        Qual área da coordenação acadêmica você deseja gerenciar agora?
+                                    `
+                                },
+                                {
+                                    keys: ['exegese', 'hermenêutica', 'grego', 'hebraico', 'interpretação', 'texto', 'bíblia', 'versículo'],
+                                    resp: "<strong>Análise Exegética:</strong> Esta é uma das minhas especialidades. Posso analisar a transição entre o contexto original e a aplicação contemporânea. Estude o <em>Módulo 2 (Contexto Histórico)</em> para dominar as ferramentas de interpretação do SEBITAM. Quer que eu comente sobre algum texto bíblico específico?"
+                                },
+                                {
+                                    keys: ['módulo', 'disciplina', 'estudar', 'curso', 'aula', 'matéria'],
+                                    resp: "<strong>Organização Curricular:</strong> O SEBITAM organiza o conhecimento de forma progressiva. Se você está iniciando no <strong>Módulo 1 (Fundamentos)</strong>, foque em <em>Bibliologia</em>. Se está concluindo no <strong>Módulo 5</strong>, o foco é <em>Prática</em>. Posso detalhar o conteúdo de qualquer uma das nossas 20 disciplinas."
+                                },
+                                {
+                                    keys: ['histórico', 'nota', 'boletim', 'certificado', 'documento', 'pdf', 'imprimir'],
+                                    resp: "Sua documentação acadêmica é gerada instantaneamente. O administrador deve acessar a aba 'Alunos' e clicar nos ícones de impressora ou documento. O PDF gerado já está configurado com carga horária oficial de 40h por matéria e pronto para emissão."
+                                },
+                                {
+                                    keys: ['teologia', 'doutrina', 'dogma', 'deus', 'jesus', 'espírito', 'fé', 'soteriologia', 'escatologia'],
+                                    resp: "<strong>Análise Doutrinária:</strong> Minha base de dados compreende as principais sistemáticas (Soteriologia, Eclesiologia, Escatologia). No SEBITAM, prezamos pela profundidade bíblica e fidelidade ao texto. Qual destes temas dogmáticos você está pesquisando no momento?"
+                                }
+                            ];
+
+                            // Buscar correspondência
+                            const match = contextMap.find(c => c.keys.some(k => lowText.includes(k)));
+
+                            if (match) {
+                                response = match.resp;
                             } else if (hasFile) {
-                                response = "Documento recebido para análise exegética. Vou cruzar as informações do arquivo com nossa base doutrinária SEBITAM. Em instantes poderei responder perguntas específicas sobre o conteúdo deste material.";
+                                response = "<strong>Arquivo Recebido:</strong> Documento digitalizado com sucesso para análise. Estou cruzando as informações com as disciplinas do SEBITAM. Pode me fazer perguntas específicas sobre o material anexado.";
                             } else {
-                                response = "Como sua IA teológica, analisei sua solicitação. Para uma resposta mais precisa, você poderia especificar se o foco é acadêmico (gestão), doutrinário (ensino) ou prático (ministério)? Estou aqui para otimizar seu tempo.";
+                                response = "Como sua IA teológica, analisei sua solicitação mas preciso de mais contexto. <br><br>Seu foco é <strong>Acadêmico</strong> (gestão), <strong>Doutrinário</strong> (ensino) ou <strong>Prático</strong> (ministério)? <br><br><em>Dica: Tente palavras como 'Gestão', 'Ministério', 'Exegese' ou 'Histórico'.</em>";
                             }
                             addMessage(response, 'ai');
                         }, 1000);
