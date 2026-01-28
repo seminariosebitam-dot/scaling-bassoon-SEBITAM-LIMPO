@@ -1302,6 +1302,31 @@ document.addEventListener('DOMContentLoaded', () => {
         if (savedPic) userAvatarImg.src = savedPic;
     }
 
-    // Initial view
-    renderView('overview');
+    // Super Admin Auto-Registration
+    async function checkAndRegisterSuperAdmin() {
+        if (!supabase) return;
+        const superAdminEmail = 'edukadoshmda@gmail.com';
+        const superAdminName = 'Luiz Eduardo Santos da Silva';
+
+        try {
+            const { data, error } = await supabase.from('admins').select('*').eq('email', superAdminEmail);
+            if (error) throw error;
+
+            if (data.length === 0) {
+                console.log("Registrando Super Administrador...");
+                await supabase.from('admins').insert([{
+                    name: superAdminName,
+                    email: superAdminEmail,
+                    phone: 'Gestor'
+                }]);
+            }
+        } catch (e) {
+            console.error("Erro no auto-registro:", e);
+        }
+    }
+
+    // Run check and initial view
+    checkAndRegisterSuperAdmin().then(() => {
+        renderView('overview');
+    });
 });
