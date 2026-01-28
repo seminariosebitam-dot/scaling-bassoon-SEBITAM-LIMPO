@@ -16,21 +16,28 @@ document.addEventListener('DOMContentLoaded', () => {
         name: 'Administrador'
     };
 
-    // --- SUPABASE CONFIGURATION ---
-    const SUPABASE_URL = "https://bgqftoqsuhcmtxnsqqsq.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJncWZ0b3FzdWhjbXR4bnNxcXNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgzMTMxNjksImV4cCI6MjA4Mzg4OTE2OX0.KFvYjkSMYTfwChRF4OJVoJSxJbJhgg6zlyzcsQcvDO4";
+    // --- CONFIGURAÇÃO SUPABASE ---
+    // URL do projeto
+    const SUPABASE_URL = "https://vwruogwdtbsareighmoc.supabase.co";
 
-    // Initialize Supabase Client
+    // Chave Publicável (Publishable Key) - Segura para uso no frontend
+    const SUPABASE_ANON_KEY = "sb_publishable__1Y1EwVreZS7LEaExgwrew_hIDT-ECZ";
+
+    // Inicialização do Cliente Supabase
     let supabase = null;
     try {
         if (window.supabase && typeof window.supabase.createClient === 'function') {
             supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            console.log("Supabase inicializado com sucesso.");
+        } else {
+            console.warn("SDK do Supabase não encontrado. Usando modo offline (localStorage).");
         }
     } catch (err) {
-        console.error("Erro ao inicializar Supabase:", err);
+        console.error("Erro crítico ao inicializar Supabase:", err);
     }
 
     // Mapping frontend collection names to Supabase table names
+    // Usando nomes em inglês (padrão do Supabase)
     const tableMap = {
         'sebitam-students': 'students',
         'sebitam-teachers': 'teachers',
@@ -40,33 +47,44 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Mapping frontend fields to Supabase fields (for students)
     function mapToSupabase(item, collectionName) {
-        if (tableMap[collectionName] === 'students') {
-            return {
-                full_name: item.fullName,
-                module: parseInt(item.module),
-                grade: parseInt(item.grade),
-                plan: item.plan,
-                email: item.email,
-                phone: item.phone,
-                subject_grades: item.subjectGrades || {},
-                subject_freqs: item.subjectFreqs || {}
-            };
+        if (!item) return item;
+        const mappedTable = tableMap[collectionName];
+        if (mappedTable === 'students') {
+            const mapped = {};
+            // Accept both camelCase and snake_case from incoming object
+            const fullName = item.fullName || item.full_name;
+            const moduleVal = item.module;
+            const gradeVal = item.grade;
+
+            if (fullName !== undefined) mapped.full_name = fullName;
+            if (moduleVal !== undefined) mapped.module = parseInt(moduleVal) || 1;
+            if (gradeVal !== undefined) mapped.grade = parseInt(gradeVal) || 1;
+            if (item.plan !== undefined) mapped.plan = item.plan;
+            if (item.email !== undefined) mapped.email = item.email;
+            if (item.phone !== undefined) mapped.phone = item.phone;
+            if (item.subjectGrades !== undefined) mapped.subject_grades = item.subjectGrades;
+            if (item.subjectFreqs !== undefined) mapped.subject_freqs = item.subjectFreqs;
+            if (item.paymentStatus !== undefined) mapped.payment_status = item.paymentStatus;
+            return mapped;
         }
         return item; // For others, assume direct mapping or handle as needed
     }
 
     function mapFromSupabase(item, collectionName) {
-        if (tableMap[collectionName] === 'students') {
+        if (!item) return item;
+        const mappedTable = tableMap[collectionName];
+        if (mappedTable === 'students') {
             return {
                 id: item.id,
-                fullName: item.full_name,
-                module: item.module,
-                grade: item.grade,
-                plan: item.plan,
-                email: item.email,
-                phone: item.phone,
-                subjectGrades: item.subject_grades,
-                subjectFreqs: item.subject_freqs
+                fullName: item.full_name || item.fullName || 'Aluno Sem Nome',
+                module: item.module || 1,
+                grade: item.grade || 1,
+                plan: item.plan || 'integral',
+                email: item.email || '',
+                phone: item.phone || '',
+                subjectGrades: item.subject_grades || {},
+                subjectFreqs: item.subject_freqs || {},
+                paymentStatus: item.payment_status || null
             };
         }
         return item;
@@ -77,11 +95,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const table = tableMap[collectionName] || collectionName;
         if (!supabase) return JSON.parse(localStorage.getItem(collectionName) || '[]');
         try {
+            console.log(`dbGet: Buscando dados de ${table}...`);
             const { data, error } = await supabase.from(table).select('*');
-            if (error) throw error;
+            if (error) {
+                console.error(`dbGet Erro (${table}):`, error);
+                throw error;
+            }
+            console.log(`dbGet: ${data.length} registros encontrados em ${table}`);
             return data.map(item => mapFromSupabase(item, collectionName));
         } catch (e) {
-            console.error("Error fetching from Supabase:", e);
+            console.error("Error fetching from Supabase fallback:", e);
             return JSON.parse(localStorage.getItem(collectionName) || '[]');
         }
     }
@@ -90,20 +113,33 @@ document.addEventListener('DOMContentLoaded', () => {
         const table = tableMap[collectionName] || collectionName;
         if (!supabase) {
             const list = await dbGet(collectionName);
+            // Ensure ID is present for localStorage fallback
+            if (!item.id) item.id = Date.now();
             list.push(item);
             localStorage.setItem(collectionName, JSON.stringify(list));
             return;
         }
-        const mapped = mapToSupabase(item, collectionName);
+        // For students, we let Supabase generate the ID
+        // For others, if the table has an auto-increment ID, we should remove our temporary ID
+        const itemToInsert = { ...item };
+        if (tableMap[collectionName] === 'students' || itemToInsert.id) {
+            delete itemToInsert.id;
+        }
+
+        const mapped = mapToSupabase(itemToInsert, collectionName);
         const { error } = await supabase.from(table).insert([mapped]);
-        if (error) console.error("Error adding to Supabase:", error);
+        if (error) {
+            console.error("Error adding to Supabase:", error);
+            alert("Erro ao salvar no banco de dados: " + error.message);
+            throw error;
+        }
     }
 
     async function dbUpdateItem(collectionName, id, updates) {
         const table = tableMap[collectionName] || collectionName;
         if (!supabase) {
             const list = await dbGet(collectionName);
-            const idx = list.findIndex(i => i.id == id);
+            const idx = list.findIndex(i => String(i.id) === String(id));
             if (idx !== -1) {
                 list[idx] = { ...list[idx], ...updates };
                 localStorage.setItem(collectionName, JSON.stringify(list));
@@ -111,20 +147,31 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         const mapped = mapToSupabase(updates, collectionName);
-        const { error } = await supabase.from(table).update(mapped).eq('id', id);
-        if (error) console.error("Error updating in Supabase:", error);
+        // Supabase often expects numeric IDs for integer primary keys
+        const queryId = isNaN(id) ? id : parseInt(id);
+        const { error } = await supabase.from(table).update(mapped).eq('id', queryId);
+        if (error) {
+            console.error("Error updating in Supabase:", error);
+            throw error;
+        }
     }
 
     async function dbDeleteItem(collectionName, id) {
         const table = tableMap[collectionName] || collectionName;
         if (!supabase) {
             const list = await dbGet(collectionName);
-            const filtered = list.filter(i => i.id != id);
+            const filtered = list.filter(i => String(i.id) !== String(id));
             localStorage.setItem(collectionName, JSON.stringify(filtered));
             return;
         }
-        const { error } = await supabase.from(table).delete().eq('id', id);
-        if (error) console.error("Error deleting from Supabase:", error);
+        // Use numeric ID if possible to avoid type mismatch with SERIAL columns
+        const queryId = isNaN(id) ? id : parseInt(id);
+        const { error } = await supabase.from(table).delete().eq('id', queryId);
+        if (error) {
+            console.error("Error deleting from Supabase:", error);
+            alert("Erro ao excluir do banco de dados: " + error.message);
+            throw error;
+        }
     }
 
     // Role Mapping
@@ -616,14 +663,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 `;
                 setTimeout(() => {
-                    document.querySelectorAll('.delete-staff-ov').forEach(b => b.onclick = async () => {
-                        const type = b.dataset.type;
-                        const label = type === 'admin' ? 'Administrador' : type === 'teacher' ? 'Professor' : 'Secretário';
-                        if (!confirm(`Tem certeza que deseja excluir este ${label}?`)) return;
-                        const id = b.dataset.id;
-                        const key = type === 'teacher' ? 'sebitam-teachers' : type === 'admin' ? 'sebitam-admins' : 'sebitam-secretaries';
-                        await dbDeleteItem(key, id);
-                        await renderView('overview');
+                    document.querySelectorAll('.delete-staff-ov').forEach(b => {
+                        b.onclick = async () => {
+                            const type = b.dataset.type;
+                            const id = b.dataset.id;
+                            console.log(`Deleting staff member: ${type} with id ${id}`);
+                            const label = type === 'admin' ? 'Administrador' : type === 'teacher' ? 'Professor' : 'Secretário';
+                            if (!confirm(`Tem certeza que deseja excluir este ${label}?`)) return;
+                            const key = type === 'teacher' ? 'sebitam-teachers' : type === 'admin' ? 'sebitam-admins' : 'sebitam-secretaries';
+                            await dbDeleteItem(key, id);
+                            await renderView('overview');
+                        };
                     });
                     lucide.createIcons();
                 }, 0);
@@ -840,13 +890,16 @@ document.addEventListener('DOMContentLoaded', () => {
                         b.onclick = () => renderView('users', { type: b.dataset.type });
                     });
 
-                    document.querySelectorAll('.delete-user').forEach(b => b.onclick = async () => {
-                        const utype = b.dataset.type;
-                        if (!confirm(`Tem certeza que deseja excluir este ${labelMap[utype]}?`)) return;
-                        const uid = b.dataset.id;
-                        const ukey = getStoreKey(utype);
-                        await dbDeleteItem(ukey, uid);
-                        await renderView('users', { type: utype });
+                    document.querySelectorAll('.delete-user').forEach(b => {
+                        b.onclick = async () => {
+                            const utype = b.dataset.type;
+                            const uid = b.dataset.id;
+                            console.log(`Deleting user: ${utype} with id ${uid}`);
+                            if (!confirm(`Tem certeza que deseja excluir este ${labelMap[utype]}?`)) return;
+                            const ukey = getStoreKey(utype);
+                            await dbDeleteItem(ukey, uid);
+                            await renderView('users', { type: utype });
+                        };
                     });
 
                     document.querySelectorAll('.edit-st').forEach(b => b.onclick = () => {
@@ -880,7 +933,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                         </thead>
                                         <tbody>
                                             ${inG.map(s => {
-                        const nameCap = s.fullName.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+                        const nameCap = (s.fullName || 'Sem Nome').split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
                         const planLabel = s.plan === 'integral' ? 'Integral' : s.plan === 'half' ? 'Meia' : 'Bolsa';
                         const status = s.paymentStatus || (['integral', 'scholarship'].includes(s.plan) ? 'Pago' : 'Pendente');
                         return `
@@ -926,11 +979,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 }).join('')}
                     </div>`;
                 setTimeout(() => {
-                    document.querySelectorAll('.delete-st-class').forEach(b => b.onclick = async () => {
-                        if (!confirm('Tem certeza que deseja excluir permanentemente este aluno?')) return;
-                        const uid = b.dataset.id;
-                        await dbDeleteItem('sebitam-students', uid);
-                        await renderView('classes');
+                    document.querySelectorAll('.delete-st-class').forEach(b => {
+                        b.onclick = async () => {
+                            const uid = b.dataset.id;
+                            console.log(`Deleting student from class view: id ${uid}`);
+                            if (!confirm('Tem certeza que deseja excluir permanentemente este aluno?')) return;
+                            await dbDeleteItem('sebitam-students', uid);
+                            await renderView('classes');
+                        };
                     });
                     lucide.createIcons();
                 }, 0);
@@ -1315,6 +1371,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const superAdminName = 'Luiz Eduardo Santos da Silva';
 
         try {
+            // Usando o nome correto da tabela em inglês
             const { data, error } = await supabase.from('admins').select('*').eq('email', superAdminEmail);
             if (error) throw error;
 

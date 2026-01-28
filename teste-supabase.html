@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Conexão Supabase - SEBITAM</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #1a365d;
+            margin-bottom: 10px;
+            font-size: 1.8rem;
+        }
+        .subtitle {
+            color: #64748b;
+            margin-bottom: 30px;
+            font-size: 0.9rem;
+        }
+        .test-section {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid #3b82f6;
+        }
+        .test-title {
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .status.pending { background: #fef3c7; color: #92400e; }
+        .status.success { background: #d1fae5; color: #065f46; }
+        .status.error { background: #fee2e2; color: #991b1b; }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            margin-top: 10px;
+        }
+        button:hover { background: #2563eb; transform: translateY(-2px); }
+        button:active { transform: translateY(0); }
+        .icon { font-size: 1.2rem; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Teste de Conexão Supabase</h1>
+        <p class="subtitle">Diagnóstico completo da integração SEBITAM</p>
+
+        <div class="test-section">
+            <div class="test-title">
+                <span class="icon">1️⃣</span>
+                SDK Carregado
+                <span class="status pending" id="status-sdk">Aguardando...</span>
+            </div>
+            <div class="result" id="result-sdk">Verificando se o Supabase SDK foi carregado...</div>
+        </div>
+
+        <div class="test-section">
+            <div class="test-title">
+                <span class="icon">2️⃣</span>
+                Cliente Inicializado
+                <span class="status pending" id="status-client">Aguardando...</span>
+            </div>
+            <div class="result" id="result-client">Verificando inicialização do cliente...</div>
+        </div>
+
+        <div class="test-section">
+            <div class="test-title">
+                <span class="icon">3️⃣</span>
+                Conexão com Banco
+                <span class="status pending" id="status-connection">Aguardando...</span>
+            </div>
+            <div class="result" id="result-connection">Testando conexão com o banco de dados...</div>
+        </div>
+
+        <div class="test-section">
+            <div class="test-title">
+                <span class="icon">4️⃣</span>
+                Tabelas Criadas
+                <span class="status pending" id="status-tables">Aguardando...</span>
+            </div>
+            <div class="result" id="result-tables">Verificando se as tabelas existem...</div>
+        </div>
+
+        <button onclick="runTests()">▶️ Executar Testes</button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        console.log('🔧 Teste Supabase - Iniciando...');
+        
+        const SUPABASE_URL = "https://vwruogwdtbsareighmoc.supabase.co";
+        const SUPABASE_ANON_KEY = "sb_publishable__1Y1EwVreZS7LEaExgwrew_hIDT-ECZ";
+
+        function updateStatus(test, status, message) {
+            const statusEl = document.getElementById(`status-${test}`);
+            const resultEl = document.getElementById(`result-${test}`);
+            
+            if (statusEl) {
+                statusEl.className = `status ${status}`;
+                statusEl.textContent = 
+                    status === 'success' ? '✅ OK' : status === 'error' ? '❌ Erro' : '⏳ Testando...';
+            }
+            
+            if (resultEl) {
+                resultEl.innerHTML = message;
+            }
+            
+            console.log(`[${test}] ${status}: ${message.replace(/<br>/g, ' ')}`);
+        }
+
+        async function runTests() {
+            console.log('▶️ Executando testes...');
+            
+            // Teste 1: SDK Carregado
+            updateStatus('sdk', 'pending', 'Verificando...');
+            await new Promise(r => setTimeout(r, 500));
+            
+            if (typeof window.supabase !== 'undefined' && typeof window.supabase.createClient === 'function') {
+                updateStatus('sdk', 'success', '✅ Supabase SDK carregado com sucesso!<br>Biblioteca: @supabase/supabase-js v2');
+            } else {
+                updateStatus('sdk', 'error', '❌ Supabase SDK NÃO foi carregado.<br>Verifique sua conexão com a internet e recarregue a página (F5).');
+                console.error('Supabase SDK não encontrado:', window.supabase);
+                return;
+            }
+
+            // Teste 2: Cliente Inicializado
+            updateStatus('client', 'pending', 'Inicializando cliente...');
+            await new Promise(r => setTimeout(r, 500));
+            
+            let supabaseClient;
+            try {
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                console.log('Cliente Supabase criado:', supabaseClient);
+                updateStatus('client', 'success', `✅ Cliente criado com sucesso!<br>URL: ${SUPABASE_URL}<br>Key: ${SUPABASE_ANON_KEY.substring(0, 35)}...`);
+            } catch (error) {
+                console.error('Erro ao criar cliente:', error);
+                updateStatus('client', 'error', `❌ Erro ao criar cliente:<br>${error.message}`);
+                return;
+            }
+
+            // Teste 3: Conexão com Banco
+            updateStatus('connection', 'pending', 'Testando conexão...');
+            await new Promise(r => setTimeout(r, 500));
+            
+            try {
+                const { data, error, count } = await supabaseClient.from('estudantes').select('*', { count: 'exact', head: true });
+                console.log('Teste de conexão:', { data, error, count });
+                
+                if (error) throw error;
+                updateStatus('connection', 'success', '✅ Conexão estabelecida com sucesso!<br>Banco de dados respondendo normalmente.');
+            } catch (error) {
+                console.error('Erro de conexão:', error);
+                updateStatus('connection', 'error', `❌ Erro de conexão:<br>${error.message}<br><br><strong>Possível causa:</strong> As tabelas ainda não foram criadas no Supabase.<br><br><strong>Solução:</strong> Execute o arquivo supabase-schema.sql no SQL Editor do Supabase.`);
+            }
+
+            // Teste 4: Tabelas Criadas
+            updateStatus('tables', 'pending', 'Verificando tabelas...');
+            await new Promise(r => setTimeout(r, 500));
+            
+            const tables = ['estudantes', 'professores', 'administradores', 'secretarias'];
+            let results = [];
+            let allOk = true;
+
+            for (const table of tables) {
+                try {
+                    const { data, error, count } = await supabaseClient.from(table).select('*', { count: 'exact', head: true });
+                    console.log(`Tabela ${table}:`, { error, count });
+                    
+                    if (error) throw error;
+                    results.push(`✅ <strong>${table}</strong>: OK (${count || 0} registros)`);
+                } catch (error) {
+                    console.error(`Erro na tabela ${table}:`, error);
+                    results.push(`❌ <strong>${table}</strong>: ${error.message}`);
+                    allOk = false;
+                }
+            }
+
+            if (allOk) {
+                updateStatus('tables', 'success', results.join('<br>') + '<br><br>🎉 <strong>TUDO FUNCIONANDO!</strong><br>Você pode usar o sistema normalmente.');
+            } else {
+                updateStatus('tables', 'error', results.join('<br>') + '<br><br>⚠️ <strong>AÇÃO NECESSÁRIA:</strong><br>1. Abra o Supabase Dashboard<br>2. Vá em SQL Editor<br>3. Execute o arquivo supabase-schema.sql<br>4. Recarregue esta página (F5)');
+            }
+            
+            console.log('✅ Testes concluídos!');
+        }
+
+        // Executar testes quando a página carregar
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                console.log('DOM carregado, aguardando 2 segundos...');
+                setTimeout(runTests, 2000);
+            });
+        } else {
+            console.log('DOM já carregado, executando em 2 segundos...');
+            setTimeout(runTests, 2000);
+        }
+    </script>
+</body>
+</html>
