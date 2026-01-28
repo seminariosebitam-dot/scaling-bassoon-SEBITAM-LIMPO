@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEBITAM - Sistema de Gestão</title>
+    <meta name="description"
+        content="Plataforma educacional SEBITAM - Gestão para administradores, professores e alunos.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Outfit:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+</head>
+
+<body class="theme-professional">
+    <div id="app">
+        <!-- Login Screen -->
+        <section id="login-screen" class="screen active">
+            <div class="login-container">
+                <div class="login-card">
+                    <div class="login-header">
+                        <div class="logo-area">
+                            <img src="logo.jpg" alt="SEBITAM Logo" class="main-logo">
+                        </div>
+                        <p>Selecione seu perfil e acesse sua conta</p>
+                    </div>
+
+                    <form id="login-form">
+                        <div class="role-selector">
+                            <label class="role-option">
+                                <input type="radio" name="role" value="admin" checked>
+                                <div class="role-box">
+                                    <i data-lucide="shield-check"></i>
+                                    <span>Admin</span>
+                                </div>
+                            </label>
+                            <label class="role-option">
+                                <input type="radio" name="role" value="secretary">
+                                <div class="role-box">
+                                    <i data-lucide="briefcase"></i>
+                                    <span>Secretaria</span>
+                                </div>
+                            </label>
+                            <label class="role-option">
+                                <input type="radio" name="role" value="teacher">
+                                <div class="role-box">
+                                    <i data-lucide="graduation-cap"></i>
+                                    <span>Professor</span>
+                                </div>
+                            </label>
+                            <label class="role-option">
+                                <input type="radio" name="role" value="student">
+                                <div class="role-box">
+                                    <i data-lucide="user"></i>
+                                    <span>Aluno</span>
+                                </div>
+                            </label>
+                        </div>
+
+                        <div class="input-group">
+                            <div class="input-field">
+                                <i data-lucide="mail"></i>
+                                <input type="email" placeholder="E-mail" required value="demo@sebitam.com">
+                            </div>
+                            <div class="input-field">
+                                <i data-lucide="lock"></i>
+                                <input type="password" placeholder="Senha" required value="********">
+                            </div>
+                            <div class="input-field" id="student-name-field" style="display: none;">
+                                <i data-lucide="user-check"></i>
+                                <input type="text" id="student-login-name"
+                                    placeholder="Seu Nome Completo (Ex: Luiz Eduardo)">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-primary">Entrar no Sistema</button>
+                    </form>
+
+                    <div class="theme-toggle-container">
+                        <p>Escolha um estilo visual:</p>
+                        <div class="theme-buttons">
+                            <button class="theme-btn" data-theme="man" title="Tema Homem (Elegante Escuro)">
+                                <span class="dot man"></span>
+                            </button>
+                            <button class="theme-btn" data-theme="woman" title="Tema Mulher (Elegante Claro/Rosa)">
+                                <span class="dot woman"></span>
+                            </button>
+                            <button class="theme-btn" data-theme="professional" title="Tema Profissional (Clássico)">
+                                <span class="dot professional"></span>
+                            </button>
+                            <button class="theme-btn" data-theme="elegant" title="Tema Luxo/Elegante">
+                                <span class="dot elegant"></span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dashboard Screen -->
+        <section id="dashboard-screen" class="screen">
+            <aside class="sidebar">
+                <div class="sidebar-header">
+                    <span class="sidebar-logo-text">SEBITAM</span>
+                </div>
+                <nav class="sidebar-nav">
+                    <a href="#" class="nav-item active" data-view="overview">
+                        <i data-lucide="layout-dashboard"></i>
+                        <span>Visão Geral</span>
+                    </a>
+                    <a href="#" class="nav-item role-admin role-secretary role-teacher" data-view="users">
+                        <i data-lucide="users"></i>
+                        <span>Gestão de Usuários</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1xQbSx_GCR9IqF3k-d7ESNJ8S2C4UcrIF" target="_blank"
+                        class="nav-item external-nav role-admin role-secretary role-teacher">
+                        <i data-lucide="book-open"></i>
+                        <span>Material Didático Professores</span>
+                    </a>
+                    <a href="#" class="nav-item role-admin" data-view="enrollment">
+                        <i data-lucide="user-plus"></i>
+                        <span>Cadastro (Alunos, Profs, Adm, Sec)</span>
+                    </a>
+                    <a href="#" class="nav-item role-admin role-secretary role-teacher" data-view="classes">
+                        <i data-lucide="clipboard-list"></i>
+                        <span>Alunos</span>
+                    </a>
+                    <a href="#" class="nav-item" data-view="modules">
+                        <i data-lucide="layers"></i>
+                        <span>Módulos</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1bHiOrFojPoQOcaTerk23vi-y8jtKwTd5" target="_blank"
+                        class="nav-item external-nav">
+                        <i data-lucide="image"></i>
+                        <span>Fotos & Vídeos</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/110x1MEaHbcaY7wOpIduiTobnt7Smeggj" target="_blank"
+                        class="nav-item external-nav">
+                        <i data-lucide="book-marked"></i>
+                        <span>Produção Teológica (PDF)</span>
+                    </a>
+                    <a href="https://drive.google.com/drive/folders/1HXSZPrzEdqbZiVtHmVcRwN3dODs1qASS" target="_blank"
+                        class="nav-item external-nav">
+                        <i data-lucide="folder-kanban"></i>
+                        <span>Trabalhos Alunos</span>
+                    </a>
+                    <a href="#" class="nav-item ai-special" data-view="theology-ai">
+                        <img src="ai-agent.png" alt="AI" class="nav-ai-icon">
+                        <span>IA Teológica</span>
+                    </a>
+
+                    <a href="#" class="nav-item role-admin role-secretary role-teacher" data-view="finance">
+                        <i data-lucide="wallet"></i>
+                        <span>Financeiro</span>
+                    </a>
+
+                </nav>
+                <div class="sidebar-footer">
+                    <button id="logout-btn" class="btn-logout">
+                        <i data-lucide="log-out"></i>
+                        <span>Sair</span>
+                    </button>
+                </div>
+            </aside>
+
+            <main class="main-content">
+                <header class="top-bar">
+                    <div class="search-area">
+                        <i data-lucide="search"></i>
+                        <input type="text" placeholder="Pesquisar...">
+                    </div>
+                    <div class="user-profile">
+                        <div class="user-info">
+                            <span id="user-name">Administrador</span>
+                            <small id="user-role">Admin</small>
+                        </div>
+                        <div class="avatar" id="profile-avatar-container" style="position: relative; cursor: pointer;"
+                            title="Alterar foto de perfil">
+                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="Avatar"
+                                id="user-avatar-img">
+                            <div class="avatar-upload-overlay"
+                                style="position: absolute; inset: 0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s; border-radius: 50%;">
+                                <i data-lucide="camera" style="color: white; width: 20px; height: 20px;"></i>
+                            </div>
+                            <input type="file" id="profile-upload" style="display: none;" accept="image/*">
+                        </div>
+                    </div>
+                </header>
+
+                <div class="content-body" id="dynamic-content">
+                    <!-- Dynamic Content based on role and selection -->
+                    <div class="welcome-card">
+                        <h1>Bem-vindo ao Painel SEBITAM</h1>
+                        <p>Aqui você pode gerenciar todas as operações da instituição com elegância e profissionalismo.
+                        </p>
+                    </div>
+
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon"><i data-lucide="users"></i></div>
+                            <div class="stat-value">1,240</div>
+                            <div class="stat-label">Total Alunos</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><i data-lucide="graduation-cap"></i></div>
+                            <div class="stat-value">85</div>
+                            <div class="stat-label">Professores</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><i data-lucide="book-open"></i></div>
+                            <div class="stat-value">42</div>
+                            <div class="stat-label">Cursos Ativos</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><i data-lucide="trending-up"></i></div>
+                            <div class="stat-value">R$ 45k</div>
+                            <div class="stat-label">Faturamento</div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </section>
+    </div>
+
+    <script src="main.js"></script>
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+    </script>
+</body>
+
+</html>

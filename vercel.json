@@ -1,0 +1,9 @@
+{
+  "version": 2,
+  "name": "sebitam-portal",
+  "cleanUrls": true,
+  "framework": null,
+  "installCommand": "echo 'Static Site'",
+  "buildCommand": "echo 'Ready'",
+  "outputDirectory": "."
+}
