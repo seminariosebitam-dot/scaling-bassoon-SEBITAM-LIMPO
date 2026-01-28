@@ -412,8 +412,8 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('print-grades').onclick = () => printAcademicHistory(studentId);
     }
 
-    function renderEditStudent(studentId) {
-        const students = JSON.parse(localStorage.getItem('sebitam-students') || '[]');
+    async function renderEditStudent(studentId) {
+        const students = await dbGet('sebitam-students');
         const s = students.find(item => item.id == studentId);
         if (!s) return;
 
@@ -621,15 +621,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 `;
                 setTimeout(() => {
-                    document.querySelectorAll('.delete-staff-ov').forEach(b => b.onclick = () => {
+                    document.querySelectorAll('.delete-staff-ov').forEach(b => b.onclick = async () => {
                         const type = b.dataset.type;
                         const label = type === 'admin' ? 'Administrador' : type === 'teacher' ? 'Professor' : 'Secretário';
                         if (!confirm(`Tem certeza que deseja excluir este ${label}?`)) return;
                         const id = b.dataset.id;
                         const key = type === 'teacher' ? 'sebitam-teachers' : type === 'admin' ? 'sebitam-admins' : 'sebitam-secretaries';
-                        let store = JSON.parse(localStorage.getItem(key) || '[]');
-                        localStorage.setItem(key, JSON.stringify(store.filter(x => x.id != id)));
-                        renderView('overview');
+                        await dbDeleteItem(key, id);
+                        await renderView('overview');
                     });
                     lucide.createIcons();
                 }, 0);
@@ -906,9 +905,11 @@ document.addEventListener('DOMContentLoaded', () => {
                             }
                                                     </td>
                                                     <td style="text-align: right;">
+                                                        ${currentUser.role !== 'student' ? `
                                                         <button class="btn-primary btn-small" style="width: auto; display: inline-flex; align-items: center; gap: 5px;" onclick="renderGradeEditor(${s.id})">
                                                             <i data-lucide="edit" style="width: 14px; height: 14px;"></i> Notas
                                                         </button>
+                                                        ` : ''}
                                                         <button class="btn-icon" title="Imprimir Certificado" onclick="generateCertificate(${s.id})">
                                                             <i data-lucide="printer"></i>
                                                         </button>
@@ -973,7 +974,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 `;
                 break;
             case 'finance':
-                const finStudents = JSON.parse(localStorage.getItem('sebitam-students') || '[]');
+                const finStudents = await dbGet('sebitam-students');
                 const planCounts = {
                     integral: finStudents.filter(s => s.plan === 'integral').length,
                     half: finStudents.filter(s => s.plan === 'half').length,
