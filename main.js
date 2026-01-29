@@ -297,7 +297,7 @@
                         .inner-border { position: absolute; top: 5px; left: 5px; right: 5px; bottom: 5px; border: 5px solid #d4af37; pointer-events: none; }
                         .logo { height: 120px; margin-bottom: 20px; }
                         .cert-title { font-family: 'Playfair Display', serif; font-size: 5rem; color: #1a365d; margin: 10px 0; text-transform: uppercase; }
-                        .student-name { font-family: 'Playfair Display', serif; font-size: 2.5rem; color: #d4af37; margin: 20px 0; border-bottom: 2px solid #1a365d; padding: 0 40px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 90%; }
+                        .student-name { font-family: 'Playfair Display', serif; font-size: 3.8rem; color: #d4af37; margin: 20px 0; border-bottom: 2px solid #1a365d; padding: 0 40px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 95%; }
                         .enrollment { font-size: 0.9rem; color: #64748b; margin-top: 5px; font-weight: 600; }
                         .content { text-align: center; max-width: 85% }
                         .footer { width: 100%; display: flex; justify-content: space-around; margin-top: 50px; }
@@ -312,7 +312,7 @@
                         <div class="content">
                             <p>O Seminário Bíblico Teológico da Amazônia certifica que:</p>
                             <div class="student-name">${student.fullName.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ')}</div>
-                            <div class="enrollment">Matrícula: ${student.enrollment}</div>
+
                             <p>concluiu com excelente aproveitamento todas as exigências do <strong>CURSO MÉDIO EM TEOLOGIA</strong>.</p>
                         </div>
                         <div class="footer">
