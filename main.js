@@ -17,28 +17,28 @@
         name: 'Administrador'
     };
 
-    // --- CONFIGURAÃ‡ÃƒO SUPABASE ---
+    // --- CONFIGURAÇÃO SUPABASE ---
     // URL do projeto
     const SUPABASE_URL = "https://vwruogwdtbsareighmoc.supabase.co";
 
-    // Chave PublicÃ¡vel (Publishable Key) - Segura para uso no frontend
+    // Chave Publicável (Publishable Key) - Segura para uso no frontend
     const SUPABASE_ANON_KEY = "sb_publishable__1Y1EwVreZS7LEaExgwrew_hIDT-ECZ";
 
-    // InicializaÃ§Ã£o do Cliente Supabase
+    // Inicialização do Cliente Supabase
     let supabase = null;
     try {
         if (window.supabase && typeof window.supabase.createClient === 'function') {
             supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             console.log("Supabase inicializado com sucesso.");
         } else {
-            console.warn("SDK do Supabase nÃ£o encontrado. Usando modo offline (localStorage).");
+            console.warn("SDK do Supabase não encontrado. Usando modo offline (localStorage).");
         }
     } catch (err) {
-        console.error("Erro crÃ­tico ao inicializar Supabase:", err);
+        console.error("Erro crítico ao inicializar Supabase:", err);
     }
 
     // Mapping frontend collection names to Supabase table names
-    // Usando nomes em inglÃªs (padrÃ£o do Supabase)
+    // Usando nomes em inglês (padrão do Supabase)
     const tableMap = {
         'sebitam-students': 'students',
         'sebitam-teachers': 'teachers',
@@ -178,7 +178,7 @@
     // Role Mapping
     const roleDetails = {
         admin: { name: 'Diretoria SEBITAM', label: 'Administrador' },
-        secretary: { name: 'Secretaria AcadÃªmica', label: 'Secretaria' },
+        secretary: { name: 'Secretaria Acadêmica', label: 'Secretaria' },
         teacher: { name: 'Corpo Docente', label: 'Professor' },
         student: { name: 'Acesso Aluno', label: 'Aluno' }
     };
@@ -208,60 +208,21 @@
             return;
         }
 
-        let foundUser = null;
-        let foundRole = null;
-
         // Logic check: if master email, it's Luiz (Admin)
         if (loginEmail === 'edukadoshmda@gmail.com') {
-            foundUser = { name: 'Luiz Eduardo Santos da Silva' };
-            foundRole = 'admin';
+            currentUser.name = 'Luiz Eduardo';
+            currentUser.role = 'admin';
         } else {
-            // Check all tables in order of priority/probability
-            const rolesToCheck = [
-                { key: 'sebitam-admins', role: 'admin' },
-                { key: 'sebitam-secretaries', role: 'secretary' },
-                { key: 'sebitam-teachers', role: 'teacher' },
-                { key: 'sebitam-students', role: 'student' }
-            ];
-
-            for (const { key, role } of rolesToCheck) {
-                try {
-                    const users = await dbGet(key);
-                    const match = users.find(u => {
-                        const uEmail = (u.email || '').toLowerCase().trim();
-                        const uName = (u.name || u.fullName || '').toLowerCase().trim();
-                        return uEmail === loginEmail && uName === loginName.toLowerCase().trim();
-                    });
-                    if (match) {
-                        foundUser = match;
-                        foundRole = role;
-                        break;
-                    }
-                } catch (err) {
-                    console.error(`Erro ao buscar na tabela ${key}:`, err);
-                }
-            }
-        }
-
-        if (foundUser) {
-            currentUser.name = foundUser.name || foundUser.fullName;
-            currentUser.role = foundRole;
-            refreshUIPermissions(currentUser.role);
-            loginScreen.classList.remove('active');
-            dashboardScreen.classList.add('active');
-            lucide.createIcons();
-            // User exists, go to Overview
-            await renderView('overview');
-        } else {
-            // User not found, proceed to Enrollment for first-time registration
+            // Check if user exists in any of the tables, or default to Student
             currentUser.name = loginName;
-            currentUser.role = 'student'; // Default role for registration view
-            refreshUIPermissions(currentUser.role);
-            loginScreen.classList.remove('active');
-            dashboardScreen.classList.add('active');
-            lucide.createIcons();
-            await renderView('enrollment');
+            currentUser.role = 'student'; // Default role if not master
         }
+
+        refreshUIPermissions(currentUser.role);
+        loginScreen.classList.remove('active');
+        dashboardScreen.classList.add('active');
+        lucide.createIcons();
+        await renderView('enrollment');
     });
 
     // Logout Logic
@@ -299,11 +260,11 @@
     }
 
     const subjectMap = {
-        1: { title: 'MÃ³dulo 1: Fundamentos', subs: ['Bibliologia', 'Teontologia', 'IntroduÃ§Ã£o N.T', 'IntroduÃ§Ã£o A.T'] },
-        2: { title: 'MÃ³dulo 2: Contexto HistÃ³rico', subs: ['Geografia BÃ­blica', 'HermenÃªutica', 'PerÃ­odo Inter bÃ­blico', 'Ã‰tica CristÃ£'] },
-        3: { title: 'MÃ³dulo 3: Doutrinas EspecÃ­fica', subs: ['Soteriologia', 'Eclesiologia', 'Escatologia', 'HomilÃ©tica'] },
-        4: { title: 'MÃ³dulo 4: Teologia Aplicada', subs: ['Teologia ContemporÃ¢nea', 'In. T. BÃ­blica A.T', 'In. T. BÃ­blica N.T', 'Teologia Pastoral'] },
-        5: { title: 'MÃ³dulo 5: PrÃ¡tica Pastoral', subs: ['Exegese BÃ­blica', 'Psicologia Pastoral'] },
+        1: { title: 'Módulo 1: Fundamentos', subs: ['Bibliologia', 'Teontologia', 'Introdução N.T', 'Introdução A.T'] },
+        2: { title: 'Módulo 2: Contexto Histórico', subs: ['Geografia Bíblica', 'Hermenêutica', 'Período Inter bíblico', 'Ética Cristã'] },
+        3: { title: 'Módulo 3: Doutrinas Específica', subs: ['Soteriologia', 'Eclesiologia', 'Escatologia', 'Homilética'] },
+        4: { title: 'Módulo 4: Teologia Aplicada', subs: ['Teologia Contemporânea', 'In. T. Bíblica A.T', 'In. T. Bíblica N.T', 'Teologia Pastoral'] },
+        5: { title: 'Módulo 5: Prática Pastoral', subs: ['Exegese Bíblica', 'Psicologia Pastoral'] },
     };
 
     async function generateCertificate(studentId) {
@@ -311,7 +272,7 @@
         const students = await dbGet('sebitam-students');
         const student = students.find(item => String(item.id) === String(studentId));
         if (!student) {
-            alert('Erro: Aluno nÃ£o encontrado para gerar certificado (ID: ' + studentId + ')');
+            alert('Erro: Aluno não encontrado para gerar certificado (ID: ' + studentId + ')');
             return;
         }
         const printWindow = window.open('', '_blank');
@@ -340,9 +301,9 @@
                         <img src="logo.jpg" class="logo">
                         <h1 class="cert-title">Certificado</h1>
                         <div class="content">
-                            <p>O SeminÃ¡rio BÃ­blico TeolÃ³gico da AmazÃ´nia certifica que:</p>
+                            <p>O Seminário Bíblico Teológico da Amazônia certifica que:</p>
                             <div class="student-name">${student.fullName.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ')}</div>
-                            <p>concluiu com excelente aproveitamento todas as exigÃªncias do <strong>CURSO MÃ‰DIO EM TEOLOGIA</strong>.</p>
+                            <p>concluiu com excelente aproveitamento todas as exigências do <strong>CURSO MÉDIO EM TEOLOGIA</strong>.</p>
                         </div>
                         <div class="footer">
                             <div class="sig-block">SECRETÃRIA</div>
@@ -732,7 +693,10 @@
             case 'enrollment':
                 const activeType = data && data.type ? data.type : 'student';
                 html = `
-                    <div style="margin-top: 20px;"></div>
+                    <div class="view-header" style="margin-bottom: 30px;">
+                        <h2 style="font-size: 2.22rem; font-weight: 800; color: #1e293b;">Cadastro Institucional</h2>
+                        <span style="background: #2563eb; color: white; padding: 5px 12px; border-radius: 4px; font-size: 0.9rem; font-weight: 500; display: inline-block; margin-top: 5px;">Selecione o perfil que deseja cadastrar no sistema.</span>
+                    </div>
                     
                     <div class="registration-role-selector" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 35px;">
                         ${['student', 'teacher', 'admin', 'secretary'].map(type => {
@@ -878,7 +842,7 @@
                 const labelMap = { student: 'Aluno', teacher: 'Professor', admin: 'Adm', secretary: 'Secretaria' };
 
                 html = `
-                    <div style="margin-top: 10px;"></div>
+                        <div class="view-header" > <h2>GestÃ£o de UsuÃ¡rios</h2></div>
                     <div class="tabs-container" style="display:flex; gap:10px; margin-bottom:20px;">
                         <button class="tab-btn ${activeUserTab === 'student' ? 'active' : ''}" data-type="student">Alunos</button>
                         <button class="tab-btn ${activeUserTab === 'teacher' ? 'active' : ''}" data-type="teacher">Professores</button>
@@ -973,7 +937,7 @@
                     allSt = allSt.filter(s => s.fullName.toLowerCase().trim() === currentUser.name.toLowerCase().trim());
                 }
                 html = `
-                    <div style="margin-top: 10px;"></div>
+                        <div class="view-header" > <h2>Alunos</h2></div>
                             <div class="turmas-container">
                                 ${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(g => {
                     const inG = allSt.filter(s => s.grade == g);
@@ -1050,7 +1014,10 @@
                 break;
             case 'modules':
                 html = `
-                        <div style="margin-top: 10px;"></div>
+                        <div class="view-header" >
+                        <h2>MÃ³dulos do Curso</h2>
+                        <p>Acesse o material didÃ¡tico em PDF para cada disciplina.</p>
+                    </div>
                         <div class="modules-grid-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
                             ${Object.entries(subjectMap).map(([id, data]) => `
                             <div class="module-card" style="background: white; padding: 25px; border-radius: 20px; box-shadow: var(--shadow); border: 1px solid var(--border); transition: var(--transition);">
@@ -1220,7 +1187,8 @@
                 break;
             case 'theology-ai':
                 html = `
-                            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 25px;">
+                        <div class="view-header" >
+                            <div style="display: flex; align-items: center; gap: 15px;">
                                 <div class="ai-avatar-large" style="width: 60px; height: 60px; border-radius: 50%; background: rgba(37, 99, 235, 0.1); display: flex; align-items: center; justify-content: center;">
                                     <i data-lucide="bot" style="width: 32px; height: 32px; color: #2563eb;"></i>
                                 </div>
