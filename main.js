@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
+    console.log("SEBITAM v5.0 Loaded");
     // DOM Elements
     const loginForm = document.getElementById('login-form');
     const loginScreen = document.getElementById('login-screen');
@@ -270,11 +271,15 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     async function generateCertificate(studentId) {
+        console.log("Gerando certificado para ID:", studentId);
         const students = await dbGet('sebitam-students');
-        const student = students.find(item => item.id == studentId);
-        if (!student) return alert('Aluno não encontrado.');
-
+        const student = students.find(item => String(item.id) === String(studentId));
+        if (!student) {
+            alert('Erro: Aluno não encontrado para gerar certificado (ID: ' + studentId + ')');
+            return;
+        }
         const printWindow = window.open('', '_blank');
+        if (!printWindow) return alert('Por favor, libere os pop-ups para imprimir o certificado.');
         printWindow.document.write(`
             <html>
                 <head>
@@ -317,11 +322,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function printAcademicHistory(studentId) {
+        console.log("Gerando histórico para ID:", studentId);
         const students = await dbGet('sebitam-students');
-        const student = students.find(item => item.id == studentId);
-        if (!student) return alert('Aluno não encontrado.');
-
+        const student = students.find(item => String(item.id) === String(studentId));
+        if (!student) {
+            alert('Erro: Aluno não encontrado para o histórico (ID: ' + studentId + ')');
+            return;
+        }
         const printWindow = window.open('', '_blank');
+        if (!printWindow) return alert('Por favor, libere os pop-ups para ver o histórico.');
         const nameCap = student.fullName.toUpperCase();
         const date = new Date().toLocaleDateString('pt-BR');
 
@@ -405,9 +414,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function renderGradeEditor(studentId) {
+        console.log("Abrindo editor de notas para ID:", studentId);
         const students = await dbGet('sebitam-students');
-        const s = students.find(item => item.id == studentId);
-        if (!s) return;
+        const s = students.find(item => String(item.id) === String(studentId));
+        if (!s) {
+            alert('Erro: Aluno não encontrado (ID: ' + studentId + ')');
+            return;
+        }
         const moduleNum = s.module || 1;
         const subjects = subjectMap[moduleNum] ? subjectMap[moduleNum].subs : [];
         const contentBody = document.getElementById('dynamic-content');
@@ -868,21 +881,21 @@ document.addEventListener('DOMContentLoaded', () => {
                                             <td style="display: flex; gap: 6px; justify-content: flex-end; align-items: center;">
                                                 ${activeUserTab === 'student' ? `
                                                     ${currentUser.role !== 'student' ? `
-                                                        <button class="btn-icon" style="color: var(--primary); background: rgba(37, 99, 235, 0.1);" title="Lançar Notas" onclick="renderGradeEditor(${u.id})">
-                                                            <i data-lucide="edit-3"></i>
-                                                        </button>
-                                                    ` : ''}
-                                                    <button class="btn-icon" title="Imprimir Certificado" onclick="generateCertificate(${u.id})">
-                                                        <i data-lucide="printer"></i>
+                                                        <button class="btn-icon" style="color: var(--primary); background: rgba(37, 99, 235, 0.1);" title="Lançar Notas" onclick="renderGradeEditor('${u.id}')">
+                                                        <i data-lucide="edit-3"></i>
                                                     </button>
-                                                    <button class="btn-icon" title="Ver Histórico Acadêmico" onclick="printAcademicHistory(${u.id})">
-                                                        <i data-lucide="file-text"></i>
+                                                ` : ''}
+                                                <button class="btn-icon" title="Imprimir Certificado" onclick="generateCertificate('${u.id}')">
+                                                    <i data-lucide="printer"></i>
+                                                </button>
+                                                <button class="btn-icon" title="Ver Histórico Acadêmico" onclick="printAcademicHistory('${u.id}')">
+                                                    <i data-lucide="file-text"></i>
+                                                </button>
+                                                ${currentUser.role !== 'student' ? `
+                                                    <button class="btn-icon" style="color: #64748b;" title="Editar Cadastro" onclick="renderEditStudent('${u.id}')">
+                                                        <i data-lucide="settings"></i>
                                                     </button>
-                                                    ${currentUser.role !== 'student' ? `
-                                                        <button class="btn-icon" style="color: #64748b;" title="Editar Cadastro" onclick="renderEditStudent(${u.id})">
-                                                            <i data-lucide="settings"></i>
-                                                        </button>
-                                                    ` : ''}
+                                                ` : ''}
                                                 ` : ''}
                                                 ${currentUser.role !== 'student' ? `
                                                     <button class="btn-icon red delete-user" data-id="${u.id}" data-type="${activeUserTab}" title="Excluir">
@@ -953,10 +966,10 @@ document.addEventListener('DOMContentLoaded', () => {
                                                     <td>
                                                         ${currentUser.role !== 'student' ?
                                 `<div style="display: flex; gap: 5px;">
-                                                                <button onclick="updatePaymentStatus(${s.id}, 'Pago')" class="btn-icon ${status === 'Pago' ? 'green' : ''}" title="Confirmar Pagamento" style="border: 1px solid ${status === 'Pago' ? '#22c55e' : '#cbd5e1'}; background: ${status === 'Pago' ? 'rgba(34, 197, 94, 0.1)' : 'transparent'}">
+                                                                <button onclick="updatePaymentStatus('${s.id}', 'Pago')" class="btn-icon ${status === 'Pago' ? 'green' : ''}" title="Confirmar Pagamento" style="border: 1px solid ${status === 'Pago' ? '#22c55e' : '#cbd5e1'}; background: ${status === 'Pago' ? 'rgba(34, 197, 94, 0.1)' : 'transparent'}">
                                                                     <i data-lucide="check-circle" style="width: 14px; height: 14px; color: ${status === 'Pago' ? '#22c55e' : '#64748b'};"></i>
                                                                 </button>
-                                                                <button onclick="updatePaymentStatus(${s.id}, 'Pendente')" class="btn-icon ${status === 'Pendente' ? 'red' : ''}" title="Marcar como Pendente" style="border: 1px solid ${status === 'Pendente' ? '#ef4444' : '#cbd5e1'}; background: ${status === 'Pendente' ? 'rgba(239, 68, 68, 0.1)' : 'transparent'}">
+                                                                <button onclick="updatePaymentStatus('${s.id}', 'Pendente')" class="btn-icon ${status === 'Pendente' ? 'red' : ''}" title="Marcar como Pendente" style="border: 1px solid ${status === 'Pendente' ? '#ef4444' : '#cbd5e1'}; background: ${status === 'Pendente' ? 'rgba(239, 68, 68, 0.1)' : 'transparent'}">
                                                                     <i data-lucide="alert-circle" style="width: 14px; height: 14px; color: ${status === 'Pendente' ? '#ef4444' : '#64748b'};"></i>
                                                                 </button>
                                                                 <span style="font-size: 0.75rem; font-weight: 600; color: ${status === 'Pago' ? '#16a34a' : '#dc2626'}; margin-left: 5px; align-self: center;">${status}</span>
@@ -966,14 +979,14 @@ document.addEventListener('DOMContentLoaded', () => {
                                                     </td>
                                                     <td style="text-align: right;">
                                                         ${currentUser.role !== 'student' ? `
-                                                        <button class="btn-icon" style="color: var(--primary); background: rgba(37, 99, 235, 0.1);" title="Lançar Notas" onclick="renderGradeEditor(${s.id})">
+                                                        <button class="btn-icon" style="color: var(--primary); background: rgba(37, 99, 235, 0.1);" title="Lançar Notas" onclick="renderGradeEditor('${s.id}')">
                                                             <i data-lucide="edit-3"></i>
                                                         </button>
                                                         ` : ''}
-                                                        <button class="btn-icon" title="Imprimir Certificado" onclick="generateCertificate(${s.id})">
+                                                        <button class="btn-icon" title="Imprimir Certificado" onclick="generateCertificate('${s.id}')">
                                                             <i data-lucide="printer"></i>
                                                         </button>
-                                                        <button class="btn-icon" title="Ver Histórico Acadêmico" onclick="printAcademicHistory(${s.id})">
+                                                        <button class="btn-icon" title="Ver Histórico Acadêmico" onclick="printAcademicHistory('${s.id}')">
                                                             <i data-lucide="file-text"></i>
                                                         </button>
                                                         ${currentUser.role !== 'student' ? `
