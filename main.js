@@ -607,7 +607,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                                     <i data-lucide="phone" style="width: 14px; height: 14px;"></i> <strong>${a.phone || 'Sem contato'}</strong>
                                                 </div>
                                             </div>
-                                            ${(currentUser.role === 'admin' || currentUser.role === 'secretary') ? `
+                                            ${(currentUser.role === 'admin' || currentUser.role === 'secretary' || currentUser.role === 'teacher') ? `
                                             <button class="btn-icon red delete-staff-ov" data-id="${a.id}" data-type="admin" title="Excluir" style="padding: 4px; width: 28px; height: 28px;">
                                                 <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
                                             </button>` : ''}
@@ -632,7 +632,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                                     <i data-lucide="phone" style="width: 14px; height: 14px;"></i> <strong>${s.phone || 'Sem contato'}</strong>
                                                 </div>
                                             </div>
-                                            ${(currentUser.role === 'admin' || currentUser.role === 'secretary') ? `
+                                            ${(currentUser.role === 'admin' || currentUser.role === 'secretary' || currentUser.role === 'teacher') ? `
                                             <button class="btn-icon red delete-staff-ov" data-id="${s.id}" data-type="secretary" title="Excluir" style="padding: 4px; width: 28px; height: 28px;">
                                                 <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
                                             </button>` : ''}
@@ -657,7 +657,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                                     <i data-lucide="phone" style="width: 14px; height: 14px;"></i> <strong>${t.phone || 'Sem contato'}</strong>
                                                 </div>
                                             </div>
-                                            ${(currentUser.role === 'admin' || currentUser.role === 'secretary') ? `
+                                            ${(currentUser.role === 'admin' || currentUser.role === 'secretary' || currentUser.role === 'teacher') ? `
                                             <button class="btn-icon red delete-staff-ov" data-id="${t.id}" data-type="teacher" title="Excluir" style="padding: 4px; width: 28px; height: 28px;">
                                                 <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
                                             </button>` : ''}
