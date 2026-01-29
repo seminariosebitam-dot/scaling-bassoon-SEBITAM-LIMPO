@@ -1352,8 +1352,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function updatePaymentStatus(studentId, status) {
-        await dbUpdateItem('sebitam-students', studentId, { paymentStatus: status });
-        await renderView('classes');
+        try {
+            console.log(`Atualizando pagamento: ID ${studentId} para ${status}`);
+            await dbUpdateItem('sebitam-students', studentId, { paymentStatus: status });
+            console.log("Pagamento atualizado com sucesso!");
+            alert(`Status de pagamento alterado para: ${status}`);
+            await renderView('classes');
+        } catch (err) {
+            console.error("Erro ao atualizar pagamento:", err);
+            alert("Erro ao atualizar pagamento: " + err.message);
+        }
     }
 
     // Export functions to window for onclick handlers
