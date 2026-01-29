@@ -30,47 +30,22 @@
                         <div class="logo-area">
                             <img src="logo.jpg" alt="SEBITAM Logo" class="main-logo">
                         </div>
-                        <p>Selecione seu perfil e acesse sua conta</p>
+                        <h2 class="welcome-title">Seja bem vindo</h2>
                     </div>
 
                     <form id="login-form">
-                        <div class="role-selector-simple">
-                            <label class="role-option-simple">
-                                <input type="radio" name="role" value="admin" checked>
-                                <span>Administrador</span>
-                            </label>
-                            <label class="role-option-simple">
-                                <input type="radio" name="role" value="secretary">
-                                <span>Secretaria</span>
-                            </label>
-                            <label class="role-option-simple">
-                                <input type="radio" name="role" value="teacher">
-                                <span>Professor</span>
-                            </label>
-                            <label class="role-option-simple">
-                                <input type="radio" name="role" value="student">
-                                <span>Aluno</span>
-                            </label>
-                        </div>
-
                         <div class="input-group">
-                            <div class="input-field" id="email-field">
+                            <div class="input-field">
                                 <i data-lucide="mail"></i>
-                                <input type="email" id="login-email" placeholder="E-mail (edukadoshmda@gmail.com)"
-                                    required>
+                                <input type="email" id="login-email" placeholder="Seu E-mail" required>
                             </div>
-                            <div class="input-field" id="password-field">
-                                <i data-lucide="lock"></i>
-                                <input type="password" id="login-password" placeholder="Senha" required>
-                            </div>
-                            <div class="input-field" id="student-name-field"
-                                style="display: none; border: 1px solid var(--primary);">
-                                <input type="text" id="login-student-name"
-                                    placeholder="Digite seu Nome Completo (Aluno)">
+                            <div class="input-field">
+                                <i data-lucide="user"></i>
+                                <input type="text" id="login-name" placeholder="Seu Nome Completo" required>
                             </div>
                         </div>
 
-                        <button type="submit" class="btn-primary">Entrar no Sistema</button>
+                        <button type="submit" class="btn-primary">Acessar Sistema</button>
                     </form>
 
                     <div class="theme-toggle-container">

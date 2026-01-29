@@ -224,37 +224,25 @@ document.addEventListener('DOMContentLoaded', () => {
     // Login Logic
     loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const selectedRole = document.querySelector('input[name="role"]:checked').value;
         const loginEmail = document.getElementById('login-email').value.trim().toLowerCase();
-        const loginPass = document.getElementById('login-password').value.trim();
+        const loginName = document.getElementById('login-name').value.trim();
 
-        // ALL users now use the master login system
-        if (!loginEmail || !loginPass) {
+        if (!loginEmail || !loginName) {
             alert('Por favor, preencha todos os campos.');
             return;
         }
 
-        const isMaster = (loginEmail === 'edukadoshmda@gmail.com' && loginPass === '123456');
-
-        if (!isMaster) {
-            alert('Acesso negado. E-mail ou Senha incorretos. Utilize o acesso padrão.');
-            return;
-        }
-
-        // Setup User Session
-        if (selectedRole === 'student') {
-            const stName = document.getElementById('login-student-name').value.trim();
-            if (!stName) {
-                alert('Alunos: Por favor, informe seu nome completo para acessar seu boletim.');
-                return;
-            }
-            currentUser.name = stName;
+        // Logic check: if master email, it's Luiz (Admin)
+        if (loginEmail === 'edukadoshmda@gmail.com') {
+            currentUser.name = 'Luiz Eduardo';
+            currentUser.role = 'admin';
         } else {
-            currentUser.name = (loginEmail === 'edukadoshmda@gmail.com') ? 'Luiz Eduardo' : 'Usuário SEBITAM';
+            // Check if user exists in any of the tables, or default to Student
+            currentUser.name = loginName;
+            currentUser.role = 'student'; // Default role if not master
         }
-        currentUser.role = selectedRole;
 
-        refreshUIPermissions(selectedRole);
+        refreshUIPermissions(currentUser.role);
         loginScreen.classList.remove('active');
         dashboardScreen.classList.add('active');
         lucide.createIcons();
