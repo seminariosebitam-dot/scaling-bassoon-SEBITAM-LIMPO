@@ -222,7 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
         currentUser.name = (loginEmail === 'edukadoshmda@gmail.com') ? 'Luiz Eduardo' : 'Usuário SEBITAM';
         currentUser.role = selectedRole;
 
-        updateDashboardForRole(selectedRole);
+        refreshUIPermissions(selectedRole);
         loginScreen.classList.remove('active');
         dashboardScreen.classList.add('active');
         lucide.createIcons();
@@ -247,19 +247,25 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    function updateDashboardForRole(role) {
+    function refreshUIPermissions(role) {
+        console.log("Applying UI Permissions for role:", role);
         userNameEl.textContent = currentUser.name;
         userRoleEl.textContent = roleDetails[role].label;
+
         const allNavs = document.querySelectorAll('.nav-item');
         allNavs.forEach(nav => {
-            nav.style.display = 'flex';
             const view = nav.dataset.view;
-            if (role === 'student') {
-                if (['users', 'teachers', 'finance', 'enrollment'].includes(view)) {
-                    nav.style.display = 'none';
-                }
+            // First, reset all to flex
+            nav.style.setProperty('display', 'flex', 'important');
+
+            // Apply restrictions only for students
+            if (role === 'student' && ['users', 'teachers', 'finance', 'enrollment'].includes(view)) {
+                nav.style.setProperty('display', 'none', 'important');
             }
         });
+
+        // Re-trigger lucide to ensure icons show on updated elements
+        if (window.lucide) window.lucide.createIcons();
     }
 
     const subjectMap = {
