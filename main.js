@@ -1189,8 +1189,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 html = `
                         < div class="view-header" >
                             <div style="display: flex; align-items: center; gap: 15px;">
-                                <div class="ai-avatar-large">
-                                    <img src="ai-agent.png" alt="IA">
+                                <div class="ai-avatar-large" style="width: 60px; height: 60px; border-radius: 50%; background: rgba(37, 99, 235, 0.1); display: flex; align-items: center; justify-content: center;">
+                                    <i data-lucide="bot" style="width: 32px; height: 32px; color: #2563eb;"></i>
                                 </div>
                                 <div>
                                     <h2 style="margin:0;">Antigravity - IA Teológica</h2>
@@ -1369,29 +1369,11 @@ document.addEventListener('DOMContentLoaded', () => {
     window.updatePaymentStatus = updatePaymentStatus;
     window.renderEditStudent = renderEditStudent;
 
-    // Profile Photo Upload Logic
+    // Profile Icon Logic (Simplified as images are removed)
     const avatarContainer = document.getElementById('profile-avatar-container');
-    const profileUpload = document.getElementById('profile-upload');
-    const userAvatarImg = document.getElementById('user-avatar-img');
-
-    if (avatarContainer && profileUpload) {
-        avatarContainer.onclick = () => profileUpload.click();
-        profileUpload.onchange = (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    userAvatarImg.src = event.target.result;
-                    // Optional: Save to localStorage for persistence across sessions
-                    localStorage.setItem('sebitam-profile-pic', event.target.result);
-                };
-                reader.readAsDataURL(file);
-            }
-        };
-
-        // Load saved profile pic on startup
-        const savedPic = localStorage.getItem('sebitam-profile-pic');
-        if (savedPic) userAvatarImg.src = savedPic;
+    if (avatarContainer) {
+        avatarContainer.title = "Perfil do Usuário";
+        // No upload logic needed as requested to remove images and keep only icons
     }
 
     // Super Admin Auto-Registration
