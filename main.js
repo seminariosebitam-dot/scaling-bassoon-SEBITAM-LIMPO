@@ -222,7 +222,7 @@
         loginScreen.classList.remove('active');
         dashboardScreen.classList.add('active');
         lucide.createIcons();
-        await renderView('enrollment');
+        await renderView('overview');
     });
 
     // Logout Logic
@@ -813,6 +813,10 @@
                             const key = type === 'student' ? 'sebitam-students' : type === 'teacher' ? 'sebitam-teachers' : type === 'admin' ? 'sebitam-admins' : 'sebitam-secretaries';
                             await dbAddItem(key, val);
                             alert('Cadastrado com sucesso!');
+                            // Atualizar estado ativo da barra lateral
+                            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+                            const overviewNav = document.querySelector('.nav-item[data-view="overview"]');
+                            if (overviewNav) overviewNav.classList.add('active');
                             await renderView('overview');
                         };
                     };
