@@ -546,7 +546,7 @@
                         </div>
                     </div>
                     <div class="form-actions">
-                        <button type="submit" class="btn-primary" style="margin-bottom: 0;">Salvar AlteraÃ§Ãµes</button>
+                        <button type="submit" class="btn-primary" style="margin-bottom: 0;">Salvar Alterações</button>
                     </div>
                 </form>
             </div>
@@ -866,7 +866,7 @@
                                     <th>Nome</th>
                                     <th>${activeUserTab === 'student' ? 'Turma' : 'Cargo'}</th>
                                     ${activeUserTab === 'student' ? '<th>Plano</th><th>Financeiro</th>' : '<th>E-mail</th><th>Telefone</th>'}
-                                    <th class="text-right">AÃ§Ãµes</th>
+                                    <th class="text-right">Ações</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -961,7 +961,7 @@
                                                 <th>Aluno</th>
                                                 <th>Plano</th>
                                                 <th>Financeiro</th>
-                                                <th class="text-right" style="text-align: right;">AÃ§Ãµes</th>
+                                                <th class="text-right" style="text-align: right;">Ações</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -1113,7 +1113,7 @@
                     </div>
 
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; margin-bottom: 40px;">
-                        <!-- GrÃ¡fico de Planos -->
+                        <!-- Gráfico de Planos -->
                         <div class="stat-card" style="display: block; height: auto; background: white; padding: 25px; border-radius: 20px; box-shadow: var(--shadow); border: 1px solid var(--border);">
                             <h3 style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px; font-weight: 700;">
                                 <i data-lucide="pie-chart" style="color: var(--primary);"></i> Distribuição por Plano
@@ -1128,7 +1128,7 @@
                             </div>
                         </div>
 
-                        <!-- GrÃ¡fico de Pagamentos -->
+                        <!-- Gráfico de Pagamentos -->
                         <div class="stat-card" style="display: block; height: auto; background: white; padding: 25px; border-radius: 20px; box-shadow: var(--shadow); border: 1px solid var(--border);">
                             <h3 style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px; font-weight: 700;">
                                 <i data-lucide="dollar-sign" style="color: var(--primary);"></i> Status de Adimplência
