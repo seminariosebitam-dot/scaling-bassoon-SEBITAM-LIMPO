@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("SEBITAM v5.0 Loaded");
+    console.log("SEBITAM v5.1 Loaded (SSH Enabled)");
     // DOM Elements
     const loginForm = document.getElementById('login-form');
     const loginScreen = document.getElementById('login-screen');
