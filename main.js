@@ -435,18 +435,18 @@
         contentBody.innerHTML = `
             <div class="view-header">
                 <button class="btn-primary" id="back-to-classes" style="width: auto; margin-bottom: 20px; display: flex; align-items: center; gap: 8px;"><i data-lucide="arrow-left"></i> Voltar</button>
-                <h2>${currentUser.role === 'student' ? 'Meu Boletim' : 'LanÃ§amento de Notas'}: ${s.fullName.toUpperCase()}</h2>
+                <h2>${currentUser.role === 'student' ? 'Meu Boletim' : 'Lançamento de Notas'}: ${s.fullName.toUpperCase()}</h2>
             </div>
             <div class="form-container">
                 <table class="data-table">
-                    <thead><tr><th>Disciplina</th><th>MÃ³dulo</th><th>Nota</th><th>Freq %</th></tr></thead>
+                    <thead><tr><th>Disciplina</th><th>Módulo</th><th>Nota</th><th>Freq %</th></tr></thead>
                     <tbody>
                         ${Object.entries(subjectMap).map(([mNum, mData]) => `
                             <tr style="background: #f1f5f9; font-weight: bold;"><td colspan="4">${mData.title}</td></tr>
                             ${mData.subs.map(sub => `
                                 <tr>
                                     <td>${sub}</td>
-                                    <td style="font-size: 0.8rem; color: var(--text-muted);">MÃ³dulo ${mNum}</td>
+                                    <td style="font-size: 0.8rem; color: var(--text-muted);">Módulo ${mNum}</td>
                                     <td><input type="number" class="table-input subject-grade" data-subject="${sub}" value="${(s.subjectGrades && s.subjectGrades[sub]) || ''}" step="0.1" min="0" max="10" ${currentUser.role === 'student' ? 'disabled' : ''}></td>
                                     <td><input type="number" class="table-input subject-freq" data-subject="${sub}" value="${(s.subjectFreqs && s.subjectFreqs[sub]) || '100'}" min="0" max="100" ${currentUser.role === 'student' ? 'disabled' : ''}></td>
                                 </tr>
@@ -456,7 +456,7 @@
                 </table>
                 <div class="form-actions" style="margin-top:20px; display:flex; gap:10px;">
                     ${currentUser.role !== 'student' ? '<button id="save-grades" class="btn-primary">Salvar Boletim</button>' : ''}
-                    <button id="print-grades" class="btn-primary" style="background:var(--secondary)">Imprimir HistÃ³rico</button>
+                    <button id="print-grades" class="btn-primary" style="background:var(--secondary)">Imprimir Histórico</button>
                 </div>
             </div>
         `;
@@ -498,15 +498,15 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label>MÃ³dulo Atual</label>
+                            <label>Módulo Atual</label>
                             <div class="input-field">
                                 <i data-lucide="layers"></i>
                                 <select name="module" style="padding-left: 48px;">
-                                    <option value="1" ${s.module == '1' ? 'selected' : ''}>MÃ³dulo 1: Fundamentos</option>
-                                    <option value="2" ${s.module == '2' ? 'selected' : ''}>MÃ³dulo 2: Contexto HistÃ³rico</option>
-                                    <option value="3" ${s.module == '3' ? 'selected' : ''}>MÃ³dulo 3: Doutrinas EspecÃ­fica</option>
-                                    <option value="4" ${s.module == '4' ? 'selected' : ''}>MÃ³dulo 4: Teologia Aplicada</option>
-                                    <option value="5" ${s.module == '5' ? 'selected' : ''}>MÃ³dulo 5: PrÃ¡tica Pastoral</option>
+                                    <option value="1" ${s.module == '1' ? 'selected' : ''}>Módulo 1: Fundamentos</option>
+                                    <option value="2" ${s.module == '2' ? 'selected' : ''}>Módulo 2: Contexto Histórico</option>
+                                    <option value="3" ${s.module == '3' ? 'selected' : ''}>Módulo 3: Doutrinas Específica</option>
+                                    <option value="4" ${s.module == '4' ? 'selected' : ''}>Módulo 4: Teologia Aplicada</option>
+                                    <option value="5" ${s.module == '5' ? 'selected' : ''}>Módulo 5: Prática Pastoral</option>
                                 </select>
                             </div>
                         </div>
@@ -577,7 +577,7 @@
                 const countSt = students.length;
 
                 html = `
-                    <div class="welcome-card"><h1 style="color: white !important;">OlÃ¡, ${currentUser.name}!</h1><p>Bem-vindo ao centro de comando SEBITAM. Aqui estÃ¡ o resumo atualizado da instituiÃ§Ã£o.</p></div>
+                    <div class="welcome-card"><h1 style="color: white !important;">Olá, ${currentUser.name}!</h1><p>Bem-vindo ao centro de comando SEBITAM. Aqui está o resumo atualizado da instituição.</p></div>
                     <div class="stats-grid">
                         <div class="stat-card">
                             <div class="stat-icon"><i data-lucide="users"></i></div>
@@ -592,12 +592,12 @@
                         <div class="stat-card">
                             <div class="stat-icon"><i data-lucide="layers"></i></div>
                             <div class="stat-value">5</div>
-                            <div class="stat-label">MÃ³dulos Ativos</div>
+                            <div class="stat-label">Módulos Ativos</div>
                         </div>
                         <div class="stat-card">
                             <div class="stat-icon"><i data-lucide="trending-up"></i></div>
                             <div class="stat-value">98%</div>
-                            <div class="stat-label">MÃ©dia de FrequÃªncia</div>
+                            <div class="stat-label">Média de Frequência</div>
                         </div>
                     </div>
 
@@ -639,7 +639,7 @@
                                 <h3 style="font-size: 1.1rem; font-weight: 700;">Secretaria</h3>
                             </div>
                             <div style="width: 100%;">
-                                ${listSecs.length === 0 ? '<p style="font-size: 0.9rem; color: var(--text-muted);">Nenhum secretÃ¡rio cadastrado.</p>' :
+                                 ${listSecs.length === 0 ? '<p style="font-size: 0.9rem; color: var(--text-muted);">Nenhum secretário cadastrado.</p>' :
                         listSecs.map(s => `
                                         <div style="margin-bottom: 15px; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px; display: flex; justify-content: space-between; align-items: flex-start;">
                                             <div>
@@ -771,12 +771,12 @@
                                                 </select>
                                             </div>
                                         </div>
-                                        <div class="form-group">
-                                            <label style="font-weight: 700; color: #334155; margin-bottom: 8px; display: block; font-size: 0.9rem;">MÃ³dulo (1 a 5)</label>
+                                         <div class="form-group">
+                                            <label style="font-weight: 700; color: #334155; margin-bottom: 8px; display: block; font-size: 0.9rem;">Módulo (1 a 5)</label>
                                             <div class="input-field" style="position: relative;">
                                                 <i data-lucide="layers" style="position: absolute; left: 16px; top: 12px; width: 18px; color: #1e293b;"></i>
                                                 <select name="module" style="width: 100%; padding: 12px 12px 12px 45px; border-radius: 10px; border: 1.5px solid #f1f5f9; background: white;">
-                                                    <option value="1">MÃ³dulo 1</option><option value="2">MÃ³dulo 2</option><option value="3">MÃ³dulo 3</option><option value="4">MÃ³dulo 4</option><option value="5">MÃ³dulo 5</option>
+                                                    <option value="1">Módulo 1</option><option value="2">Módulo 2</option><option value="3">Módulo 3</option><option value="4">Módulo 4</option><option value="5">Módulo 5</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -852,7 +852,7 @@
                 const labelMap = { student: 'Aluno', teacher: 'Professor', admin: 'Adm', secretary: 'Secretaria' };
 
                 html = `
-                        <div class="view-header" > <h2>GestÃ£o de UsuÃ¡rios</h2></div>
+                        <div class="view-header" > <h2>Gestão de Usuários</h2></div>
                     <div class="tabs-container" style="display:flex; gap:10px; margin-bottom:20px;">
                         <button class="tab-btn ${activeUserTab === 'student' ? 'active' : ''}" data-type="student">Alunos</button>
                         <button class="tab-btn ${activeUserTab === 'teacher' ? 'active' : ''}" data-type="teacher">Professores</button>
@@ -891,14 +891,14 @@
                                                 <td style="font-size: 0.85rem;">${phone}</td>
                                             `}
                                             <td style="display: flex; gap: 6px; justify-content: flex-end; align-items: center;">
-                                                ${activeUserTab === 'student' ? `
-                                                        <button class="btn-icon" style="color: var(--primary); background: rgba(37, 99, 235, 0.1);" title="${currentUser.role === 'student' ? 'Ver Meu Boletim' : 'LanÃ§ar Notas'}" onclick="renderGradeEditor('${u.id}')">
+                                                 ${activeUserTab === 'student' ? `
+                                                        <button class="btn-icon" style="color: var(--primary); background: rgba(37, 99, 235, 0.1);" title="${currentUser.role === 'student' ? 'Ver Meu Boletim' : 'Lançar Notas'}" onclick="renderGradeEditor('${u.id}')">
                                                         <i data-lucide="${currentUser.role === 'student' ? 'eye' : 'edit-3'}"></i>
                                                     </button>
                                                 <button class="btn-icon" title="Imprimir Certificado" onclick="generateCertificate('${u.id}')">
                                                     <i data-lucide="printer"></i>
                                                 </button>
-                                                <button class="btn-icon" title="Ver HistÃ³rico AcadÃªmico" onclick="printAcademicHistory('${u.id}')">
+                                                <button class="btn-icon" title="Ver Histórico Acadêmico" onclick="printAcademicHistory('${u.id}')">
                                                     <i data-lucide="file-text"></i>
                                                 </button>
                                                 ${currentUser.role !== 'student' ? `
@@ -988,13 +988,13 @@
                             }
                                                     </td>
                                                     <td style="text-align: right;">
-                                                        <button class="btn-icon" style="color: var(--primary); background: rgba(37, 99, 235, 0.1);" title="${currentUser.role === 'student' ? 'Ver Meu Boletim' : 'LanÃ§ar Notas'}" onclick="renderGradeEditor('${s.id}')">
+                                                         <button class="btn-icon" style="color: var(--primary); background: rgba(37, 99, 235, 0.1);" title="${currentUser.role === 'student' ? 'Ver Meu Boletim' : 'Lançar Notas'}" onclick="renderGradeEditor('${s.id}')">
                                                             <i data-lucide="${currentUser.role === 'student' ? 'eye' : 'edit-3'}"></i>
                                                         </button>
                                                         <button class="btn-icon" title="Imprimir Certificado" onclick="generateCertificate('${s.id}')">
                                                             <i data-lucide="printer"></i>
                                                         </button>
-                                                        <button class="btn-icon" title="Ver HistÃ³rico AcadÃªmico" onclick="printAcademicHistory('${s.id}')">
+                                                        <button class="btn-icon" title="Ver Histórico Acadêmico" onclick="printAcademicHistory('${s.id}')">
                                                             <i data-lucide="file-text"></i>
                                                         </button>
                                                         ${currentUser.role !== 'student' ? `
@@ -1025,8 +1025,8 @@
             case 'modules':
                 html = `
                         <div class="view-header" >
-                        <h2>MÃ³dulos do Curso</h2>
-                        <p>Acesse o material didÃ¡tico em PDF para cada disciplina.</p>
+                        <h2>Módulos do Curso</h2>
+                        <p>Acesse o material didático em PDF para cada disciplina.</p>
                     </div>
                         <div class="modules-grid-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
                             ${Object.entries(subjectMap).map(([id, data]) => `
@@ -1056,13 +1056,13 @@
             case 'gallery':
                 html = `
                         <div class="view-header" >
-                        <h2>Fotos & VÃ­deos</h2>
+                        <h2>Fotos & Vídeos</h2>
                         <p>Acesse nossa galeria oficial de registros institucionais.</p>
                     </div>
                         <div class="welcome-card" style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 20px;">
                             <i data-lucide="image" style="width: 64px; height: 64px; opacity: 0.8;"></i>
                             <h3>Nossa Galeria no Drive</h3>
-                            <p>Clique no botÃ£o abaixo para visualizar todas as fotos e vÃ­deos de nossas aulas e eventos.</p>
+                            <p>Clique no botão abaixo para visualizar todas as fotos e vídeos de nossas aulas e eventos.</p>
                             <a href="https://drive.google.com/drive/folders/1bHiOrFojPoQOcaTerk23vi-y8jtKwTd5" target="_blank" class="btn-primary" style="width: auto; padding: 12px 30px; background: white; color: var(--primary); display: flex; align-items: center; gap: 10px;">
                                 <i data-lucide="external-link"></i> Abrir Galeria Oficial
                             </a>
@@ -1091,7 +1091,7 @@
                 html = `
                         <div class="view-header" >
                         <h2>Painel Financeiro</h2>
-                        <p>VisÃ£o de gestÃ£o de mensalidades e planos acadÃªmicos.</p>
+                        <p>Visão de gestão de mensalidades e planos acadêmicos.</p>
                     </div>
                     
                     <div class="stats-grid" style="margin-bottom: 30px;">
@@ -1116,7 +1116,7 @@
                         <!-- GrÃ¡fico de Planos -->
                         <div class="stat-card" style="display: block; height: auto; background: white; padding: 25px; border-radius: 20px; box-shadow: var(--shadow); border: 1px solid var(--border);">
                             <h3 style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px; font-weight: 700;">
-                                <i data-lucide="pie-chart" style="color: var(--primary);"></i> DistribuiÃ§Ã£o por Plano
+                                <i data-lucide="pie-chart" style="color: var(--primary);"></i> Distribuição por Plano
                             </h3>
                             <div style="height: 250px; width: 100%; position: relative;">
                                 <canvas id="plansChart"></canvas>
@@ -1131,13 +1131,13 @@
                         <!-- GrÃ¡fico de Pagamentos -->
                         <div class="stat-card" style="display: block; height: auto; background: white; padding: 25px; border-radius: 20px; box-shadow: var(--shadow); border: 1px solid var(--border);">
                             <h3 style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px; font-weight: 700;">
-                                <i data-lucide="dollar-sign" style="color: var(--primary);"></i> Status de AdimplÃªncia
+                                <i data-lucide="dollar-sign" style="color: var(--primary);"></i> Status de Adimplência
                             </h3>
                             <div style="height: 250px; width: 100%; position: relative;">
                                 <canvas id="paymentsChart"></canvas>
                             </div>
                             <div style="margin-top: 20px; font-size: 0.9rem; color: var(--text-muted); text-align: center;">
-                                <p>Detalhamento de recebÃ­veis e pendÃªncias mensais.</p>
+                                <p>Detalhamento de recebíveis e pendências mensais.</p>
                             </div>
                         </div>
                     </div>
@@ -1145,7 +1145,7 @@
 
                 setTimeout(() => {
                     if (typeof Chart === 'undefined') {
-                        console.error('Chart.js nÃ£o carregado.');
+                        console.error('Chart.js não carregado.');
                         return;
                     }
 
@@ -1203,8 +1203,8 @@
                                     <i data-lucide="bot" style="width: 32px; height: 32px; color: #2563eb;"></i>
                                 </div>
                                 <div>
-                                    <h2 style="margin:0;">Antigravity - IA TeolÃ³gica</h2>
-                                    <p style="margin:0; color:var(--text-muted); font-size:0.9rem;">Especialista em Teologia e GestÃ£o SEBITAM</p>
+                                    <h2 style="margin:0;">Antigravity - IA Teológica</h2>
+                                    <p style="margin:0; color:var(--text-muted); font-size:0.9rem;">Especialista em Teologia e Gestão SEBITAM</p>
                                 </div>
                             </div>
                     </div>
@@ -1213,8 +1213,8 @@
                             <div class="chat-messages" id="chat-messages">
                                 <div class="message ai">
                                     <div class="msg-bubble shadow-sm">
-                                        <h4 style="margin-bottom: 8px; color: var(--primary);">SaudaÃ§Ãµes TeolÃ³gicas!</h4>
-                                        Sou <strong>Antigravity</strong>, sua inteligÃªncia especializada no ecossistema SEBITAM. Analiso doutrinas, organizo currÃ­culos e auxilio na exegese bÃ­blica com precisÃ£o acadÃªmica. Como posso iluminar seus estudos ou facilitar a gestÃ£o institucional hoje?
+                                        <h4 style="margin-bottom: 8px; color: var(--primary);">Saudações Teológicas!</h4>
+                                        Sou <strong>Antigravity</strong>, sua inteligência especializada no ecossistema SEBITAM. Analiso doutrinas, organizo currículos e auxilio na exegese bíblica com precisão acadêmica. Como posso iluminar seus estudos ou facilitar a gestão institucional hoje?
                                     </div>
                                 </div>
                             </div>
@@ -1223,7 +1223,7 @@
                                 <div class="chat-input-wrapper" style="border-radius: 20px; align-items: flex-end; padding: 15px 25px; gap: 20px;">
                                     <input type="file" id="ai-file-input" style="display: none;">
                                         <button class="chat-action-btn" id="attach-file-btn" title="Anexar Material de Estudo" style="padding-bottom: 15px;"><i data-lucide="paperclip" style="width: 24px; height: 24px;"></i></button>
-                                        <textarea id="chat-input" placeholder="Digite sua dÃºvida teolÃ³gica ou cole um texto para anÃ¡lise aqui..." style="flex: 1; border: none; outline: none; font-size: 1.1rem; padding: 10px 0; min-height: 120px; max-height: 400px; resize: none; background: transparent; font-family: inherit; line-height: 1.6;"></textarea>
+                                        <textarea id="chat-input" placeholder="Digite sua dúvida teológica ou cole um texto para análise aqui..." style="flex: 1; border: none; outline: none; font-size: 1.1rem; padding: 10px 0; min-height: 120px; max-height: 400px; resize: none; background: transparent; font-family: inherit; line-height: 1.6;"></textarea>
                                         <button class="chat-send-btn" id="send-chat-btn" style="margin-bottom: 10px; width: 55px; height: 55px;">
                                             <i data-lucide="send" style="width: 24px; height: 24px;"></i>
                                         </button>
@@ -1284,61 +1284,61 @@
                             // Sistema de InteligÃªncia Baseado em Contexto
                             const contextMap = [
                                 {
-                                    keys: ['olÃ¡', 'oi', 'bom dia', 'boa tarde', 'boa noite', 'paz'],
-                                    resp: "<strong>Paz seja convosco!</strong> Como seu assistente Antigravity, estou operando com capacidade analÃ­tica mÃ¡xima. Posso realizar exegeses, orientar sua jornada acadÃªmica no SEBITAM ou discutir estratÃ©gias ministeriais. Por onde deseja comeÃ§ar?"
+                                    keys: ['olá', 'oi', 'bom dia', 'boa tarde', 'boa noite', 'paz'],
+                                    resp: "<strong>Paz seja convosco!</strong> Como seu assistente Antigravity, estou operando com capacidade analítica máxima. Posso realizar exegeses, orientar sua jornada acadêmica no SEBITAM ou discutir estratégias ministeriais. Por onde deseja começar?"
                                 },
                                 {
-                                    keys: ['ministÃ©rio', 'pastoral', 'lideranÃ§a', 'igreja', 'culto', 'missÃµes', 'prÃ¡tico'],
+                                    keys: ['ministério', 'pastoral', 'liderança', 'igreja', 'culto', 'missões', 'prático'],
                                     resp: `
-                        <div style="margin-bottom: 15px;"><strong>Eixo PrÃ¡tico (MinistÃ©rio):</strong> Notei seu interesse na Ã¡rea ministerial. No SEBITAM, a teologia deve frutificar em serviÃ§o.</div>
-                        <p>Para o desenvolvimento do seu ministÃ©rio, recomendo focar em:
+                        <div style="margin-bottom: 15px;"><strong>Eixo Prático (Ministério):</strong> Notei seu interesse na área ministerial. No SEBITAM, a teologia deve frutificar em serviço.</div>
+                        <p>Para o desenvolvimento do seu ministério, recomendo focar em:
                             <ul style="padding-left: 20px; margin: 10px 0;">
-                                <li><strong>HomilÃ©tica:</strong> A arte da pregaÃ§Ã£o bÃ­blica (MÃ³dulo 3).</li>
-                                <li><strong>Teologia Pastoral:</strong> O cuidado com as almas (MÃ³dulo 4).</li>
-                                <li><strong>Psicologia Pastoral:</strong> CompreensÃ£o do rebanho (MÃ³dulo 5).</li>
+                                <li><strong>Homilética:</strong> A arte da pregação bíblica (Módulo 3).</li>
+                                <li><strong>Teologia Pastoral:</strong> O cuidado com as almas (Módulo 4).</li>
+                                <li><strong>Psicologia Pastoral:</strong> Compreensão do rebanho (Módulo 5).</li>
                             </ul>
                             Deseja que eu aprofunde algum destes pilares ministeriais?</p>
                         `
                                 },
                                 {
-                                    keys: ['acadÃªmico', 'gestÃ£o', 'secretaria', 'coordenaÃ§Ã£o', 'matrÃ­cula', 'frequÃªncia', 'sistema'],
+                                    keys: ['acadêmico', 'gestão', 'secretaria', 'coordenação', 'matrícula', 'frequência', 'sistema'],
                                     resp: `
-                        <div style="margin-bottom: 10px;"><strong>Eixo AcadÃªmico (GestÃ£o):</strong> Compreendo. Para otimizar a gestÃ£o institucional:</div>
+                        <div style="margin-bottom: 10px;"><strong>Eixo Acadêmico (Gestão):</strong> Compreendo. Para otimizar a gestão institucional:</div>
                         <ul style="padding-left: 20px;">
-                            <li><strong>Dados:</strong> O controle de frequÃªncia e notas Ã© automatizado via Supabase para evitar erros manuais.</li>
-                            <li><strong>CurrÃ­culo:</strong> Seguimos uma formaÃ§Ã£o mÃ©dia dividida em 5 mÃ³dulos sequenciais.</li>
-                            <li><strong>RelatÃ³rios:</strong> A aba 'Financeiro' oferece indicadores em tempo real para tomada de decisÃ£o.</li>
+                            <li><strong>Dados:</strong> O controle de frequência e notas é automatizado via Supabase para evitar erros manuais.</li>
+                            <li><strong>Currículo:</strong> Seguimos uma formação média dividida em 5 módulos sequenciais.</li>
+                            <li><strong>Relatórios:</strong> A aba 'Financeiro' oferece indicadores em tempo real para tomada de decisão.</li>
                         </ul>
-                        Qual Ã¡rea da coordenaÃ§Ã£o acadÃªmica vocÃª deseja gerenciar agora?
+                        Qual área da coordenação acadêmica você deseja gerenciar agora?
                         `
                                 },
                                 {
-                                    keys: ['exegese', 'hermenÃªutica', 'grego', 'hebraico', 'interpretaÃ§Ã£o', 'texto', 'bÃ­blia', 'versÃ­culo'],
-                                    resp: "<strong>AnÃ¡lise ExegÃ©tica:</strong> Esta Ã© uma das minhas especialidades. Posso analisar a transiÃ§Ã£o entre o contexto original e a aplicaÃ§Ã£o contemporÃ¢nea. Estude o <em>MÃ³dulo 2 (Contexto HistÃ³rico)</em> para dominar as ferramentas de interpretaÃ§Ã£o do SEBITAM. Quer que eu comente sobre algum texto bÃ­blico especÃ­fico?"
+                                    keys: ['exegese', 'hermenêutica', 'grego', 'hebraico', 'interpretação', 'texto', 'bíblia', 'versículo'],
+                                    resp: "<strong>Análise Exegética:</strong> Esta é uma das minhas especialidades. Posso analisar a transição entre o contexto original e a aplicação contemporânea. Estude o <em>Módulo 2 (Contexto Histórico)</em> para dominar as ferramentas de interpretação do SEBITAM. Quer que eu comente sobre algum texto bíblico específico?"
                                 },
                                 {
-                                    keys: ['mÃ³dulo', 'disciplina', 'estudar', 'curso', 'aula', 'matÃ©ria'],
-                                    resp: "<strong>OrganizaÃ§Ã£o Curricular:</strong> O SEBITAM organiza o conhecimento de forma progressiva. Se vocÃª estÃ¡ iniciando no <strong>MÃ³dulo 1 (Fundamentos)</strong>, foque em <em>Bibliologia</em>. Se estÃ¡ concluindo no <strong>MÃ³dulo 5</strong>, o foco Ã© <em>PrÃ¡tica</em>. Posso detalhar o conteÃºdo de qualquer uma das nossas 20 disciplinas."
+                                    keys: ['módulo', 'disciplina', 'estudar', 'curso', 'aula', 'matéria'],
+                                    resp: "<strong>Organização Curricular:</strong> O SEBITAM organiza o conhecimento de forma progressiva. Se você está iniciando no <strong>Módulo 1 (Fundamentos)</strong>, foque em <em>Bibliologia</em>. Se está concluindo no <strong>Módulo 5</strong>, o foco é <em>Prática</em>. Posso detalhar o conteúdo de qualquer uma das nossas 20 disciplinas."
                                 },
                                 {
-                                    keys: ['histÃ³rico', 'nota', 'boletim', 'certificado', 'documento', 'pdf', 'imprimir'],
-                                    resp: "Sua documentaÃ§Ã£o acadÃªmica Ã© gerada instantaneamente. O administrador deve acessar a aba 'Alunos' e clicar nos Ã­cones de impressora ou documento. O PDF gerado jÃ¡ estÃ¡ configurado com carga horÃ¡ria oficial de 40h por matÃ©ria e pronto para emissÃ£o."
+                                    keys: ['histórico', 'nota', 'boletim', 'certificado', 'documento', 'pdf', 'imprimir'],
+                                    resp: "Sua documentação acadêmica é gerada instantaneamente. O administrador deve acessar a aba 'Alunos' e clicar nos ícones de impressora ou documento. O PDF gerado já está configurado com carga horária oficial de 40h por matéria e pronto para emissão."
                                 },
                                 {
-                                    keys: ['teologia', 'doutrina', 'dogma', 'deus', 'jesus', 'espÃ­rito', 'fÃ©', 'soteriologia', 'escatologia'],
-                                    resp: "<strong>AnÃ¡lise DoutrinÃ¡ria:</strong> Minha base de dados compreende as principais sistemÃ¡ticas (Soteriologia, Eclesiologia, Escatologia). No SEBITAM, prezamos pela profundidade bÃ­blica e fidelidade ao texto. Qual destes temas dogmÃ¡ticos vocÃª estÃ¡ pesquisando no momento?"
+                                    keys: ['teologia', 'doutrina', 'dogma', 'deus', 'jesus', 'espírito', 'fé', 'soteriologia', 'escatologia'],
+                                    resp: "<strong>Análise Doutrinária:</strong> Minha base de dados compreende as principais sistemáticas (Soteriologia, Eclesiologia, Escatologia). No SEBITAM, prezamos pela profundidade bíblica e fidelidade ao texto. Qual destes temas dogmáticos você está pesquisando no momento?"
                                 }
                             ];
 
-                            // Buscar correspondÃªncia
+                            // Buscar correspondência
                             const match = contextMap.find(c => c.keys.some(k => lowText.includes(k)));
 
                             if (match) {
                                 response = match.resp;
                             } else if (hasFile) {
-                                response = "<strong>Arquivo Recebido:</strong> Documento digitalizado com sucesso para anÃ¡lise. Estou cruzando as informaÃ§Ãµes com as disciplinas do SEBITAM. Pode me fazer perguntas especÃ­ficas sobre o material anexado.";
+                                response = "<strong>Arquivo Recebido:</strong> Documento digitalizado com sucesso para análise. Estou cruzando as informações com as disciplinas do SEBITAM. Pode me fazer perguntas específicas sobre o material anexado.";
                             } else {
-                                response = "Como sua IA teolÃ³gica, analisei sua solicitaÃ§Ã£o mas preciso de mais contexto. <br><br>Seu foco Ã© <strong>AcadÃªmico</strong> (gestÃ£o), <strong>DoutrinÃ¡rio</strong> (ensino) ou <strong>PrÃ¡tico</strong> (ministÃ©rio)? <br><br><em>Dica: Tente palavras como 'GestÃ£o', 'MinistÃ©rio', 'Exegese' ou 'HistÃ³rico'.</em>";
+                                response = "Como sua IA teológica, analisei sua solicitação mas preciso de mais contexto. <br><br>Seu foco é <strong>Acadêmico</strong> (gestão), <strong>Doutrinário</strong> (ensino) ou <strong>Prático</strong> (ministério)? <br><br><em>Dica: Tente palavras como 'Gestão', 'Ministério', 'Exegese' ou 'Histórico'.</em>";
                             }
                             addMessage(response, 'ai');
                         }, 1000);
@@ -1382,7 +1382,7 @@
     // Profile Icon Logic (Simplified as images are removed)
     const avatarContainer = document.getElementById('profile-avatar-container');
     if (avatarContainer) {
-        avatarContainer.title = "Perfil do UsuÃ¡rio";
+        avatarContainer.title = "Perfil do Usuário";
         // No upload logic needed as requested to remove images and keep only icons
     }
 
@@ -1393,7 +1393,7 @@
         const superAdminName = 'Luiz Eduardo Santos da Silva';
 
         try {
-            // Usando o nome correto da tabela em inglÃªs
+            // Usando o nome correto da tabela em inglês
             const { data, error } = await supabase.from('admins').select('*').eq('email', superAdminEmail);
             if (error) throw error;
 
