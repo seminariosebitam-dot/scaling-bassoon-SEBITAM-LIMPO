@@ -729,13 +729,42 @@ document.addEventListener('DOMContentLoaded', () => {
             case 'enrollment':
                 const activeType = data && data.type ? data.type : 'student';
                 html = `
-                    <div class="view-header"><h2>Cadastro Institucional</h2></div>
-                    <div class="tabs-container" style="display:flex; gap:10px; margin-bottom:20px;">
-                        <button class="tab-btn ${activeType === 'student' ? 'active' : ''}" data-type="student">Alunos</button>
-                        <button class="tab-btn ${activeType === 'teacher' ? 'active' : ''}" data-type="teacher">Professores</button>
-                        <button class="tab-btn ${activeType === 'admin' ? 'active' : ''}" data-type="admin">Adm</button>
-                        <button class="tab-btn ${activeType === 'secretary' ? 'active' : ''}" data-type="secretary">Secretaria</button>
+                    <div class="view-header">
+                        <h2>Cadastro Institucional</h2>
+                        <p>Selecione o perfil que deseja cadastrar no sistema.</p>
                     </div>
+                    
+                    <div class="registration-role-selector">
+                        <label class="role-option">
+                            <input type="radio" name="reg-role" value="student" ${activeType === 'student' ? 'checked' : ''}>
+                            <div class="role-box">
+                                <i data-lucide="user"></i>
+                                <span>Aluno</span>
+                            </div>
+                        </label>
+                        <label class="role-option">
+                            <input type="radio" name="reg-role" value="teacher" ${activeType === 'teacher' ? 'checked' : ''}>
+                            <div class="role-box">
+                                <i data-lucide="graduation-cap"></i>
+                                <span>Professor</span>
+                            </div>
+                        </label>
+                        <label class="role-option">
+                            <input type="radio" name="reg-role" value="admin" ${activeType === 'admin' ? 'checked' : ''}>
+                            <div class="role-box">
+                                <i data-lucide="shield-check"></i>
+                                <span>Administrador</span>
+                            </div>
+                        </label>
+                        <label class="role-option">
+                            <input type="radio" name="reg-role" value="secretary" ${activeType === 'secretary' ? 'checked' : ''}>
+                            <div class="role-box">
+                                <i data-lucide="briefcase"></i>
+                                <span>Secretária</span>
+                            </div>
+                        </label>
+                    </div>
+
                     <div id="reg-form-container"></div>
                 `;
                 setTimeout(() => {
@@ -755,16 +784,17 @@ document.addEventListener('DOMContentLoaded', () => {
                                                 </div>
                                             </div>
                                             <div class="form-group">
-                                                <label>Módulo de Ingresso</label>
+                                                <label>Telefone / WhatsApp</label>
                                                 <div class="input-field">
-                                                    <i data-lucide="layers"></i>
-                                                    <select name="module" style="padding-left: 48px;">
-                                                        <option value="1">Módulo 1: Fundamentos</option>
-                                                        <option value="2">Módulo 2: Contexto Histórico</option>
-                                                        <option value="3">Módulo 3: Doutrinas Específica</option>
-                                                        <option value="4">Módulo 4: Teologia Aplicada</option>
-                                                        <option value="5">Módulo 5: Prática Pastoral</option>
-                                                    </select>
+                                                    <i data-lucide="phone"></i>
+                                                    <input type="tel" name="phone" placeholder="(00) 00000-0000" required>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>E-mail Pessoal</label>
+                                                <div class="input-field">
+                                                    <i data-lucide="mail"></i>
+                                                    <input type="email" name="email" placeholder="aluno@email.com" required>
                                                 </div>
                                             </div>
                                             <div class="form-group">
@@ -777,28 +807,16 @@ document.addEventListener('DOMContentLoaded', () => {
                                                 </div>
                                             </div>
                                             <div class="form-group">
-                                                <label>Plano Financeiro</label>
+                                                <label>Módulo de Ingresso (1 a 5)</label>
                                                 <div class="input-field">
-                                                    <i data-lucide="credit-card"></i>
-                                                    <select name="plan" style="padding-left: 48px;">
-                                                        <option value="integral">Integral</option>
-                                                        <option value="half">Meia Mensalidade</option>
-                                                        <option value="scholarship">Bolsa Estudo</option>
+                                                    <i data-lucide="layers"></i>
+                                                    <select name="module" style="padding-left: 48px;">
+                                                        <option value="1">Módulo 1</option>
+                                                        <option value="2">Módulo 2</option>
+                                                        <option value="3">Módulo 3</option>
+                                                        <option value="4">Módulo 4</option>
+                                                        <option value="5">Módulo 5</option>
                                                     </select>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label>E-mail Pessoal</label>
-                                                <div class="input-field">
-                                                    <i data-lucide="mail"></i>
-                                                    <input type="email" name="email" placeholder="aluno@email.com" required>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label>Telefone / WhatsApp</label>
-                                                <div class="input-field">
-                                                    <i data-lucide="phone"></i>
-                                                    <input type="tel" name="phone" placeholder="(00) 00000-0000" required>
                                                 </div>
                                             </div>
                                         </div>
@@ -808,24 +826,19 @@ document.addEventListener('DOMContentLoaded', () => {
                                     </form>
                                 </div>`;
                         } else {
-                            const extraLabel = type === 'teacher' ? 'Disciplina' : type === 'admin' ? 'Cargo' : 'Setor';
+                            const roleLabel = type === 'teacher' ? 'Professor(a)' : type === 'admin' ? 'Administrador(a)' : 'Secretário(a)';
+                            const extraFieldLabel = 'Função / Cargo';
                             const extraIcon = type === 'teacher' ? 'book' : 'briefcase';
+
                             formHtml = `
                                 <div class="form-container">
                                     <form id="form-other">
                                         <div class="form-grid">
                                             <div class="form-group full-width">
-                                                <label>Nome Completo</label>
+                                                <label>Nome Completo do(a) ${roleLabel}</label>
                                                 <div class="input-field">
                                                     <i data-lucide="user"></i>
-                                                    <input type="text" name="name" placeholder="Nome" required>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label>E-mail Institucional</label>
-                                                <div class="input-field">
-                                                    <i data-lucide="mail"></i>
-                                                    <input type="email" name="email" placeholder="email@sebitam.com" required>
+                                                    <input type="text" name="name" placeholder="Nome completo" required>
                                                 </div>
                                             </div>
                                             <div class="form-group">
@@ -836,10 +849,17 @@ document.addEventListener('DOMContentLoaded', () => {
                                                 </div>
                                             </div>
                                             <div class="form-group">
-                                                <label>${extraLabel}</label>
+                                                <label>E-mail</label>
+                                                <div class="input-field">
+                                                    <i data-lucide="mail"></i>
+                                                    <input type="email" name="email" placeholder="email@exemplo.com" required>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>${extraFieldLabel}</label>
                                                 <div class="input-field">
                                                     <i data-lucide="${extraIcon}"></i>
-                                                    <input type="text" name="extra" placeholder="${extraLabel}" required>
+                                                    <input type="text" name="extra" placeholder="Ex: ${type === 'teacher' ? 'Teologia Sistemática' : 'Financeiro'}" required>
                                                 </div>
                                             </div>
                                         </div>
@@ -864,7 +884,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         };
                     };
                     renderForm(activeType);
-                    document.querySelectorAll('.tab-btn').forEach(b => b.onclick = () => renderView('enrollment', { type: b.dataset.type }));
+                    document.querySelectorAll('input[name="reg-role"]').forEach(radio => {
+                        radio.addEventListener('change', (e) => {
+                            renderForm(e.target.value);
+                        });
+                    });
                 }, 0);
                 break;
             case 'users':

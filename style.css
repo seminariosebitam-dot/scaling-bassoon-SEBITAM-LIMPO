@@ -150,53 +150,90 @@ body {
     font-size: 0.9rem;
 }
 
-/* Role Selector */
-.role-selector {
+/* Simple Role Selector for Login */
+.role-selector-simple {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
+    gap: 10px;
     margin-bottom: 24px;
 }
 
-.role-option input {
+.role-option-simple {
+    cursor: pointer;
+}
+
+.role-option-simple input {
     display: none;
 }
 
-.role-box {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 16px;
+.role-option-simple span {
+    display: block;
+    padding: 12px;
+    text-align: center;
     border: 2px solid var(--border);
     border-radius: var(--radius);
-    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
     transition: var(--transition);
-}
-
-.role-box i {
-    width: 24px;
-    height: 24px;
-    margin-bottom: 8px;
     color: var(--text-muted);
 }
 
-.role-box span {
-    font-size: 0.85rem;
-    font-weight: 500;
-}
-
-.role-option input:checked+.role-box {
+.role-option-simple input:checked+span {
     border-color: var(--primary);
-    background-color: rgba(37, 99, 235, 0.05);
-}
-
-.theme-woman .role-option input:checked+.role-box {
-    background-color: rgba(190, 24, 93, 0.05);
-}
-
-.role-option input:checked+.role-box i {
+    background: rgba(37, 99, 235, 0.05);
     color: var(--primary);
 }
+
+/* Role Selector for Registration (Enrollment) */
+.registration-role-selector {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.registration-role-selector .role-box {
+    padding: 20px;
+    background: var(--bg-card);
+    border: 2px solid var(--border);
+    border-radius: 20px;
+    transition: var(--transition);
+    text-align: center;
+}
+
+.registration-role-selector .role-option input:checked+.role-box {
+    border-color: var(--primary);
+    background: rgba(37, 99, 235, 0.05);
+    transform: translateY(-5px);
+    box-shadow: var(--shadow);
+}
+
+.registration-role-selector .role-option input:checked+.role-box i {
+    color: var(--primary);
+}
+
+.registration-role-selector .role-box i {
+    width: 32px;
+    height: 32px;
+    margin-bottom: 12px;
+    color: var(--text-muted);
+    transition: var(--transition);
+}
+
+.registration-role-selector .role-option {
+    cursor: pointer;
+}
+
+.registration-role-selector .role-option input:checked+.role-box i {
+    color: var(--primary);
+}
+
+.registration-role-selector span {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
 
 /* Input Fields */
 .input-group {
