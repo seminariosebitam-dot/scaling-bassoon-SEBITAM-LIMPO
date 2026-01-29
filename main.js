@@ -197,7 +197,17 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.className = `theme-${savedTheme}`;
     }
 
-    // Role selection change logic removed as name is now always visible
+    // Toggle Student Name Field
+    document.querySelectorAll('input[name="role"]').forEach(radio => {
+        radio.addEventListener('change', (e) => {
+            const field = document.getElementById('student-name-field');
+            if (e.target.value === 'student') {
+                field.style.display = 'block';
+            } else {
+                field.style.display = 'none';
+            }
+        });
+    });
 
     // Login Logic
     loginForm.addEventListener('submit', async (e) => {
@@ -220,7 +230,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Setup User Session
-        currentUser.name = (loginEmail === 'edukadoshmda@gmail.com') ? 'Luiz Eduardo' : 'Usuário SEBITAM';
+        if (selectedRole === 'student') {
+            const stName = document.getElementById('login-student-name').value.trim();
+            if (!stName) {
+                alert('Alunos: Por favor, informe seu nome completo para acessar seu boletim.');
+                return;
+            }
+            currentUser.name = stName;
+        } else {
+            currentUser.name = (loginEmail === 'edukadoshmda@gmail.com') ? 'Luiz Eduardo' : 'Usuário SEBITAM';
+        }
         currentUser.role = selectedRole;
 
         refreshUIPermissions(selectedRole);
@@ -234,6 +253,8 @@ document.addEventListener('DOMContentLoaded', () => {
     logoutBtn.addEventListener('click', () => {
         dashboardScreen.classList.remove('active');
         loginScreen.classList.add('active');
+        // Clear all role-specific classes from body
+        document.body.classList.remove('user-role-admin', 'user-role-secretary', 'user-role-teacher', 'user-role-student');
     });
 
     // Nav Item Clicks
@@ -428,7 +449,7 @@ document.addEventListener('DOMContentLoaded', () => {
         contentBody.innerHTML = `
             <div class="view-header">
                 <button class="btn-primary" id="back-to-classes" style="width: auto; margin-bottom: 20px; display: flex; align-items: center; gap: 8px;"><i data-lucide="arrow-left"></i> Voltar</button>
-                <h2>Lançamento de Notas: ${s.fullName.toUpperCase()}</h2>
+                <h2>${currentUser.role === 'student' ? 'Meu Boletim' : 'Lançamento de Notas'}: ${s.fullName.toUpperCase()}</h2>
             </div>
             <div class="form-container">
                 <table class="data-table">
@@ -440,29 +461,32 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <tr>
                                     <td>${sub}</td>
                                     <td style="font-size: 0.8rem; color: var(--text-muted);">Módulo ${mNum}</td>
-                                    <td><input type="number" class="table-input subject-grade" data-subject="${sub}" value="${(s.subjectGrades && s.subjectGrades[sub]) || ''}" step="0.1" min="0" max="10"></td>
-                                    <td><input type="number" class="table-input subject-freq" data-subject="${sub}" value="${(s.subjectFreqs && s.subjectFreqs[sub]) || '100'}" min="0" max="100"></td>
+                                    <td><input type="number" class="table-input subject-grade" data-subject="${sub}" value="${(s.subjectGrades && s.subjectGrades[sub]) || ''}" step="0.1" min="0" max="10" ${currentUser.role === 'student' ? 'disabled' : ''}></td>
+                                    <td><input type="number" class="table-input subject-freq" data-subject="${sub}" value="${(s.subjectFreqs && s.subjectFreqs[sub]) || '100'}" min="0" max="100" ${currentUser.role === 'student' ? 'disabled' : ''}></td>
                                 </tr>
                             `).join('')}
                         `).join('')}
                     </tbody>
                 </table>
                 <div class="form-actions" style="margin-top:20px; display:flex; gap:10px;">
-                    <button id="save-grades" class="btn-primary">Salvar Boletim</button>
+                    ${currentUser.role !== 'student' ? '<button id="save-grades" class="btn-primary">Salvar Boletim</button>' : ''}
                     <button id="print-grades" class="btn-primary" style="background:var(--secondary)">Imprimir Histórico</button>
                 </div>
             </div>
         `;
         lucide.createIcons();
         document.getElementById('back-to-classes').onclick = () => renderView('classes');
-        document.getElementById('save-grades').onclick = async () => {
-            const grades = {}, freqs = {};
-            document.querySelectorAll('.subject-grade').forEach(i => grades[i.dataset.subject] = parseFloat(i.value));
-            document.querySelectorAll('.subject-freq').forEach(i => freqs[i.dataset.subject] = parseInt(i.value));
-            await dbUpdateItem('sebitam-students', studentId, { subjectGrades: grades, subjectFreqs: freqs });
-            alert('Boletim salvo!');
-            await renderView('classes');
-        };
+        const saveBtn = document.getElementById('save-grades');
+        if (saveBtn) {
+            saveBtn.onclick = async () => {
+                const grades = {}, freqs = {};
+                document.querySelectorAll('.subject-grade').forEach(i => grades[i.dataset.subject] = parseFloat(i.value));
+                document.querySelectorAll('.subject-freq').forEach(i => freqs[i.dataset.subject] = parseInt(i.value));
+                await dbUpdateItem('sebitam-students', studentId, { subjectGrades: grades, subjectFreqs: freqs });
+                alert('Boletim salvo!');
+                await renderView('classes');
+            };
+        }
         document.getElementById('print-grades').onclick = () => printAcademicHistory(studentId);
     }
 
@@ -880,11 +904,9 @@ document.addEventListener('DOMContentLoaded', () => {
                                             <td style="font-size: 0.85rem;">${phone}</td>
                                             <td style="display: flex; gap: 6px; justify-content: flex-end; align-items: center;">
                                                 ${activeUserTab === 'student' ? `
-                                                    ${currentUser.role !== 'student' ? `
-                                                        <button class="btn-icon" style="color: var(--primary); background: rgba(37, 99, 235, 0.1);" title="Lançar Notas" onclick="renderGradeEditor('${u.id}')">
-                                                        <i data-lucide="edit-3"></i>
+                                                        <button class="btn-icon" style="color: var(--primary); background: rgba(37, 99, 235, 0.1);" title="${currentUser.role === 'student' ? 'Ver Meu Boletim' : 'Lançar Notas'}" onclick="renderGradeEditor('${u.id}')">
+                                                        <i data-lucide="${currentUser.role === 'student' ? 'eye' : 'edit-3'}"></i>
                                                     </button>
-                                                ` : ''}
                                                 <button class="btn-icon" title="Imprimir Certificado" onclick="generateCertificate('${u.id}')">
                                                     <i data-lucide="printer"></i>
                                                 </button>
@@ -978,11 +1000,9 @@ document.addEventListener('DOMContentLoaded', () => {
                             }
                                                     </td>
                                                     <td style="text-align: right;">
-                                                        ${currentUser.role !== 'student' ? `
-                                                        <button class="btn-icon" style="color: var(--primary); background: rgba(37, 99, 235, 0.1);" title="Lançar Notas" onclick="renderGradeEditor('${s.id}')">
-                                                            <i data-lucide="edit-3"></i>
+                                                        <button class="btn-icon" style="color: var(--primary); background: rgba(37, 99, 235, 0.1);" title="${currentUser.role === 'student' ? 'Ver Meu Boletim' : 'Lançar Notas'}" onclick="renderGradeEditor('${s.id}')">
+                                                            <i data-lucide="${currentUser.role === 'student' ? 'eye' : 'edit-3'}"></i>
                                                         </button>
-                                                        ` : ''}
                                                         <button class="btn-icon" title="Imprimir Certificado" onclick="generateCertificate('${s.id}')">
                                                             <i data-lucide="printer"></i>
                                                         </button>

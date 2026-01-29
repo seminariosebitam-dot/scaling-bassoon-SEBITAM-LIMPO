@@ -1549,11 +1549,13 @@ body {
 }
 
 /* Role-Based Visibility */
-body.user-role-student .role-admin,
-body.user-role-student .role-secretary,
-body.user-role-student .role-teacher {
+body.user-role-student .access-admin:not(.access-student),
+body.user-role-student .access-secretary:not(.access-student),
+body.user-role-student .access-teacher:not(.access-student) {
     display: none !important;
 }
+
+/* Hide restricted items for other roles if needed (optional, keeping it simple) */
 
 body.user-role-student .delete-user,
 body.user-role-student .delete-staff-ov,
