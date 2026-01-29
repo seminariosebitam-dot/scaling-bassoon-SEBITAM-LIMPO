@@ -865,7 +865,9 @@
                                 <tr>
                                     <th>Nome</th>
                                     <th>${activeUserTab === 'student' ? 'Turma' : 'Cargo'}</th>
-                                    ${activeUserTab === 'student' ? '<th>Plano</th><th>Financeiro</th>' : '<th>E-mail</th><th>Telefone</th>'}
+                                    <th>E-mail</th>
+                                    <th>Telefone</th>
+                                    ${activeUserTab === 'student' ? '<th>Plano</th><th>Financeiro</th>' : ''}
                                     <th class="text-right">Ações</th>
                                 </tr>
                             </thead>
@@ -883,13 +885,12 @@
                                         <tr>
                                             <td><strong>${nameCap}</strong></td>
                                             <td><span class="badge" style="background: var(--bg-main); color: var(--text-main); border: 1px solid var(--border);">${roleInfo}</span></td>
+                                            <td style="font-size: 0.85rem;">${email}</td>
+                                            <td style="font-size: 0.85rem;">${phone}</td>
                                             ${activeUserTab === 'student' ? `
                                                 <td><span class="badge ${u.plan === 'integral' ? 'plan-integral' : u.plan === 'half' ? 'plan-half' : 'plan-scholarship'}">${planLabel}</span></td>
                                                 <td><span class="badge ${status === 'Pago' ? 'active' : 'plan-half'}" style="background: ${status === 'Pago' ? '#22c55e' : '#ef4444'}; color: white; padding: 2px 8px; font-size: 0.7rem;">${status}</span></td>
-                                            ` : `
-                                                <td style="font-size: 0.85rem;">${email}</td>
-                                                <td style="font-size: 0.85rem;">${phone}</td>
-                                            `}
+                                            ` : ''}
                                             <td style="display: flex; gap: 6px; justify-content: flex-end; align-items: center;">
                                                  ${activeUserTab === 'student' ? `
                                                         <button class="btn-icon" style="color: var(--primary); background: rgba(37, 99, 235, 0.1);" title="${currentUser.role === 'student' ? 'Ver Meu Boletim' : 'Lançar Notas'}" onclick="renderGradeEditor('${u.id}')">
@@ -916,7 +917,7 @@
                                         </tr>
                                     `;
                 }).join('')}
-                                ${usersList.length === 0 ? '<tr><td colspan="5" style="text-align:center; padding: 20px;">Nenhum registro encontrado.</td></tr>' : ''}
+                                ${usersList.length === 0 ? `<tr><td colspan="${activeUserTab === 'student' ? 7 : 5}" style="text-align:center; padding: 20px;">Nenhum registro encontrado.</td></tr>` : ''}
                             </tbody>
                         </table>
                     </div>`;
