@@ -252,17 +252,10 @@ document.addEventListener('DOMContentLoaded', () => {
         userNameEl.textContent = currentUser.name;
         userRoleEl.textContent = roleDetails[role].label;
 
-        const allNavs = document.querySelectorAll('.nav-item');
-        allNavs.forEach(nav => {
-            const view = nav.dataset.view;
-            // First, reset all to flex
-            nav.style.setProperty('display', 'flex', 'important');
-
-            // Apply restrictions only for students
-            if (role === 'student' && ['users', 'teachers', 'finance', 'enrollment'].includes(view)) {
-                nav.style.setProperty('display', 'none', 'important');
-            }
-        });
+        // Remove all previous role classes from body
+        document.body.classList.remove('user-role-admin', 'user-role-secretary', 'user-role-teacher', 'user-role-student');
+        // Add current role class
+        document.body.classList.add(`user-role-${role}`);
 
         // Re-trigger lucide to ensure icons show on updated elements
         if (window.lucide) window.lucide.createIcons();

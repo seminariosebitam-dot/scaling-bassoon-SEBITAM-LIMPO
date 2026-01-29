@@ -1547,3 +1547,16 @@ body {
     height: 100%;
     object-fit: cover;
 }
+
+/* Role-Based Visibility */
+body.user-role-student .role-admin,
+body.user-role-student .role-secretary,
+body.user-role-student .role-teacher {
+    display: none !important;
+}
+
+body.user-role-student .delete-user,
+body.user-role-student .delete-staff-ov,
+body.user-role-student .delete-st-class {
+    display: none !important;
+}
