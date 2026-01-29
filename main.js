@@ -197,30 +197,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.className = `theme-${savedTheme}`;
     }
 
-    // Toggle Login Fields based on Role
-    document.querySelectorAll('input[name="role"]').forEach(radio => {
-        radio.addEventListener('change', (e) => {
-            const studentField = document.getElementById('student-name-field');
-            const emailField = document.getElementById('email-field');
-            const passwordField = document.getElementById('password-field');
-            const emailInput = document.getElementById('login-email');
-            const passwordInput = document.getElementById('login-password');
-
-            // Everyone now needs email and password
-            emailField.style.display = 'block';
-            passwordField.style.display = 'block';
-            emailInput.setAttribute('required', '');
-            passwordInput.setAttribute('required', '');
-
-            // Only students need the name field additionally
-            if (e.target.value === 'student') {
-                studentField.style.display = 'block';
-            } else {
-                studentField.style.display = 'none';
-            }
-        });
-    });
-
     // Login Logic
     loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -724,10 +700,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     <div class="registration-role-selector" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 35px;">
                         ${['student', 'teacher', 'admin', 'secretary'].map(type => {
-                            const icons = { student: 'user', teacher: 'graduation-cap', admin: 'shield-check', secretary: 'briefcase' };
-                            const labels = { student: 'Aluno', teacher: 'Professor', admin: 'Administrador', secretary: 'Secretária' };
-                            const isActive = activeType === type;
-                            return `
+                    const icons = { student: 'user', teacher: 'graduation-cap', admin: 'shield-check', secretary: 'briefcase' };
+                    const labels = { student: 'Aluno', teacher: 'Professor', admin: 'Administrador', secretary: 'Secretária' };
+                    const isActive = activeType === type;
+                    return `
                                 <label class="role-option" style="text-align: center; cursor: pointer;">
                                     <input type="radio" name="reg-role" value="${type}" ${isActive ? 'checked' : ''} style="margin-bottom: 12px; transform: scale(1.3); accent-color: #2563eb;">
                                     <div class="role-box" style="padding: 25px 10px; border: 1.5px solid ${isActive ? '#2563eb' : '#e2e8f0'}; border-radius: 15px; background: white; transition: all 0.3s; box-shadow: ${isActive ? '0 4px 15px rgba(37, 99, 235, 0.1)' : 'none'};">
@@ -736,7 +712,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                     </div>
                                 </label>
                             `;
-                        }).join('')}
+                }).join('')}
                     </div>
 
                     <div id="reg-form-container"></div>
@@ -746,7 +722,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         const container = document.getElementById('reg-form-container');
                         const roleNames = { student: 'Aluno', teacher: 'Professor(a)', admin: 'Administrador(a)', secretary: 'Secretário(a)' };
                         const nameLabel = `Nome Completo do(a) ${roleNames[type]}`;
-                        
+
                         let formHtml = `
                             <div class="form-container" style="max-width: 900px; padding: 45px; background: white; border-radius: 25px; box-shadow: 0 10px 40px rgba(0,0,0,0.04); border: 1px solid #f1f5f9; margin-top: 20px;">
                                 <form id="unified-reg-form">
@@ -781,7 +757,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                             <div class="input-field" style="position: relative;">
                                                 <i data-lucide="hash" style="position: absolute; left: 16px; top: 12px; width: 18px; color: #1e293b;"></i>
                                                 <select name="grade" style="width: 100%; padding: 12px 12px 12px 45px; border-radius: 10px; border: 1.5px solid #f1f5f9; background: white;">
-                                                    ${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => \`<option value="${n}">Turma ${n}</option>\`).join('')}
+                                                    ${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => `<option value="${n}">Turma ${n}</option>`).join('')}
                                                 </select>
                                             </div>
                                         </div>
@@ -943,8 +919,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         b.onclick = async () => {
                             const utype = b.dataset.type;
                             const uid = b.dataset.id;
-                            console.log(`Deleting user: ${ utype } with id ${ uid } `);
-                            if (!confirm(`Tem certeza que deseja excluir este ${ labelMap[utype] }?`)) return;
+                            console.log(`Deleting user: ${utype} with id ${uid} `);
+                            if (!confirm(`Tem certeza que deseja excluir este ${labelMap[utype]}?`)) return;
                             const ukey = getStoreKey(utype);
                             await dbDeleteItem(ukey, uid);
                             await renderView('users', { type: utype });
@@ -964,9 +940,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         < div class="view-header" > <h2>Alunos</h2></div >
                             <div class="turmas-container">
                                 ${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(g => {
-                                    const inG = allSt.filter(s => s.grade == g);
-                                    if (inG.length === 0) return '';
-                                    return `
+                    const inG = allSt.filter(s => s.grade == g);
+                    if (inG.length === 0) return '';
+                    return `
                                 <div class="turma-section" style="background: white; padding: 20px; border-radius: 15px; margin-bottom: 20px; box-shadow: var(--shadow);">
                                     <h3 style="margin-bottom: 15px; color: var(--primary); border-bottom: 2px solid var(--border); padding-bottom: 10px;">Turma ${g}</h3>
                                     <table class="data-table">
@@ -980,16 +956,16 @@ document.addEventListener('DOMContentLoaded', () => {
                                         </thead>
                                         <tbody>
                                             ${inG.map(s => {
-                                        const nameCap = (s.fullName || 'Sem Nome').split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
-                                        const planLabel = s.plan === 'integral' ? 'Integral' : s.plan === 'half' ? 'Meia' : 'Bolsa';
-                                        const status = s.paymentStatus || (['integral', 'scholarship'].includes(s.plan) ? 'Pago' : 'Pendente');
-                                        return `
+                        const nameCap = (s.fullName || 'Sem Nome').split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+                        const planLabel = s.plan === 'integral' ? 'Integral' : s.plan === 'half' ? 'Meia' : 'Bolsa';
+                        const status = s.paymentStatus || (['integral', 'scholarship'].includes(s.plan) ? 'Pago' : 'Pendente');
+                        return `
                                                 <tr>
                                                     <td><strong>${nameCap}</strong></td>
                                                     <td><span class="badge ${s.plan === 'integral' ? 'plan-integral' : s.plan === 'half' ? 'plan-half' : 'plan-scholarship'}">${planLabel}</span></td>
                                                     <td>
                                                         ${currentUser.role !== 'student' ?
-                                                `<div style="display: flex; gap: 5px;">
+                                `<div style="display: flex; gap: 5px;">
                                                                 <button onclick="updatePaymentStatus('${s.id}', 'Pago')" class="btn-icon ${status === 'Pago' ? 'green' : ''}" title="Confirmar Pagamento" style="border: 1px solid ${status === 'Pago' ? '#22c55e' : '#cbd5e1'}; background: ${status === 'Pago' ? 'rgba(34, 197, 94, 0.1)' : 'transparent'}">
                                                                     <i data-lucide="check-circle" style="width: 14px; height: 14px; color: ${status === 'Pago' ? '#22c55e' : '#64748b'};"></i>
                                                                 </button>
@@ -998,8 +974,8 @@ document.addEventListener('DOMContentLoaded', () => {
                                                                 </button>
                                                                 <span style="font-size: 0.75rem; font-weight: 600; color: ${status === 'Pago' ? '#16a34a' : '#dc2626'}; margin-left: 5px; align-self: center;">${status}</span>
                                                             </div>` :
-                                                `<span class="badge ${status === 'Pago' ? 'active' : 'plan-half'}" style="background: ${status === 'Pago' ? '#22c55e' : '#ef4444'}; color: white;">${status}</span>`
-                                            }
+                                `<span class="badge ${status === 'Pago' ? 'active' : 'plan-half'}" style="background: ${status === 'Pago' ? '#22c55e' : '#ef4444'}; color: white;">${status}</span>`
+                            }
                                                     </td>
                                                     <td style="text-align: right;">
                                                         <button class="btn-icon" style="color: var(--primary); background: rgba(37, 99, 235, 0.1);" title="${currentUser.role === 'student' ? 'Ver Meu Boletim' : 'Lançar Notas'}" onclick="renderGradeEditor('${s.id}')">
@@ -1017,17 +993,17 @@ document.addEventListener('DOMContentLoaded', () => {
                                                         </button>` : ''}
                                                     </td>
                                                 </tr>`;
-                                    }).join('')}
+                    }).join('')}
                                         </tbody>
                                     </table>
                                 </div>`;
-                                }).join('')}
+                }).join('')}
                             </div>`;
                 setTimeout(() => {
                     document.querySelectorAll('.delete-st-class').forEach(b => {
                         b.onclick = async () => {
                             const uid = b.dataset.id;
-                            console.log(`Deleting student from class view: id ${ uid } `);
+                            console.log(`Deleting student from class view: id ${uid} `);
                             if (!confirm('Tem certeza que deseja excluir permanentemente este aluno?')) return;
                             await dbDeleteItem('sebitam-students', uid);
                             await renderView('classes');
@@ -1261,15 +1237,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     attachBtn.onclick = () => fileInput.click();
                     fileInput.onchange = () => {
                         if (fileInput.files.length > 0) {
-                            fileNameSpan.textContent = `Arquivo: ${ fileInput.files[0].name } `;
+                            fileNameSpan.textContent = `Arquivo: ${fileInput.files[0].name} `;
                             filePreview.style.display = 'flex';
                         }
                     };
 
                     const addMessage = (text, type) => {
                         const msgDiv = document.createElement('div');
-                        msgDiv.className = `message ${ type } `;
-                        msgDiv.innerHTML = `< div class="msg-bubble shadow-sm" > ${ text }</div > `;
+                        msgDiv.className = `message ${type} `;
+                        msgDiv.innerHTML = `< div class="msg-bubble shadow-sm" > ${text}</div > `;
                         chatMessages.appendChild(msgDiv);
                         chatMessages.scrollTop = chatMessages.scrollHeight;
                         lucide.createIcons();
@@ -1281,9 +1257,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (!text && !hasFile) return;
 
                         if (hasFile) {
-                            addMessage(`[Anexo: ${ fileInput.files[0].name }]<br>${text}`, 'user');
-                        fileInput.value = '';
-                        filePreview.style.display = 'none';
+                            addMessage(`[Anexo: ${fileInput.files[0].name}]<br>${text}`, 'user');
+                            fileInput.value = '';
+                            filePreview.style.display = 'none';
                         } else {
                             addMessage(text, 'user');
                         }
@@ -1293,17 +1269,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
                         setTimeout(() => {
                             let response = "";
-                        const lowText = text.toLowerCase();
+                            const lowText = text.toLowerCase();
 
-                        // Sistema de Inteligência Baseado em Contexto
-                        const contextMap = [
-                        {
-                            keys: ['olá', 'oi', 'bom dia', 'boa tarde', 'boa noite', 'paz'],
-                        resp: "<strong>Paz seja convosco!</strong> Como seu assistente Antigravity, estou operando com capacidade analítica máxima. Posso realizar exegeses, orientar sua jornada acadêmica no SEBITAM ou discutir estratégias ministeriais. Por onde deseja começar?"
+                            // Sistema de Inteligência Baseado em Contexto
+                            const contextMap = [
+                                {
+                                    keys: ['olá', 'oi', 'bom dia', 'boa tarde', 'boa noite', 'paz'],
+                                    resp: "<strong>Paz seja convosco!</strong> Como seu assistente Antigravity, estou operando com capacidade analítica máxima. Posso realizar exegeses, orientar sua jornada acadêmica no SEBITAM ou discutir estratégias ministeriais. Por onde deseja começar?"
                                 },
-                        {
-                            keys: ['ministério', 'pastoral', 'liderança', 'igreja', 'culto', 'missões', 'prático'],
-                        resp: `
+                                {
+                                    keys: ['ministério', 'pastoral', 'liderança', 'igreja', 'culto', 'missões', 'prático'],
+                                    resp: `
                         <div style="margin-bottom: 15px;"><strong>Eixo Prático (Ministério):</strong> Notei seu interesse na área ministerial. No SEBITAM, a teologia deve frutificar em serviço.</div>
                         <p>Para o desenvolvimento do seu ministério, recomendo focar em:
                             <ul style="padding-left: 20px; margin: 10px 0;">
@@ -1314,9 +1290,9 @@ document.addEventListener('DOMContentLoaded', () => {
                             Deseja que eu aprofunde algum destes pilares ministeriais?</p>
                         `
                                 },
-                        {
-                            keys: ['acadêmico', 'gestão', 'secretaria', 'coordenação', 'matrícula', 'frequência', 'sistema'],
-                        resp: `
+                                {
+                                    keys: ['acadêmico', 'gestão', 'secretaria', 'coordenação', 'matrícula', 'frequência', 'sistema'],
+                                    resp: `
                         <div style="margin-bottom: 10px;"><strong>Eixo Acadêmico (Gestão):</strong> Compreendo. Para otimizar a gestão institucional:</div>
                         <ul style="padding-left: 20px;">
                             <li><strong>Dados:</strong> O controle de frequência e notas é automatizado via Supabase para evitar erros manuais.</li>
@@ -1326,124 +1302,124 @@ document.addEventListener('DOMContentLoaded', () => {
                         Qual área da coordenação acadêmica você deseja gerenciar agora?
                         `
                                 },
-                        {
-                            keys: ['exegese', 'hermenêutica', 'grego', 'hebraico', 'interpretação', 'texto', 'bíblia', 'versículo'],
-                        resp: "<strong>Análise Exegética:</strong> Esta é uma das minhas especialidades. Posso analisar a transição entre o contexto original e a aplicação contemporânea. Estude o <em>Módulo 2 (Contexto Histórico)</em> para dominar as ferramentas de interpretação do SEBITAM. Quer que eu comente sobre algum texto bíblico específico?"
+                                {
+                                    keys: ['exegese', 'hermenêutica', 'grego', 'hebraico', 'interpretação', 'texto', 'bíblia', 'versículo'],
+                                    resp: "<strong>Análise Exegética:</strong> Esta é uma das minhas especialidades. Posso analisar a transição entre o contexto original e a aplicação contemporânea. Estude o <em>Módulo 2 (Contexto Histórico)</em> para dominar as ferramentas de interpretação do SEBITAM. Quer que eu comente sobre algum texto bíblico específico?"
                                 },
-                        {
-                            keys: ['módulo', 'disciplina', 'estudar', 'curso', 'aula', 'matéria'],
-                        resp: "<strong>Organização Curricular:</strong> O SEBITAM organiza o conhecimento de forma progressiva. Se você está iniciando no <strong>Módulo 1 (Fundamentos)</strong>, foque em <em>Bibliologia</em>. Se está concluindo no <strong>Módulo 5</strong>, o foco é <em>Prática</em>. Posso detalhar o conteúdo de qualquer uma das nossas 20 disciplinas."
+                                {
+                                    keys: ['módulo', 'disciplina', 'estudar', 'curso', 'aula', 'matéria'],
+                                    resp: "<strong>Organização Curricular:</strong> O SEBITAM organiza o conhecimento de forma progressiva. Se você está iniciando no <strong>Módulo 1 (Fundamentos)</strong>, foque em <em>Bibliologia</em>. Se está concluindo no <strong>Módulo 5</strong>, o foco é <em>Prática</em>. Posso detalhar o conteúdo de qualquer uma das nossas 20 disciplinas."
                                 },
-                        {
-                            keys: ['histórico', 'nota', 'boletim', 'certificado', 'documento', 'pdf', 'imprimir'],
-                        resp: "Sua documentação acadêmica é gerada instantaneamente. O administrador deve acessar a aba 'Alunos' e clicar nos ícones de impressora ou documento. O PDF gerado já está configurado com carga horária oficial de 40h por matéria e pronto para emissão."
+                                {
+                                    keys: ['histórico', 'nota', 'boletim', 'certificado', 'documento', 'pdf', 'imprimir'],
+                                    resp: "Sua documentação acadêmica é gerada instantaneamente. O administrador deve acessar a aba 'Alunos' e clicar nos ícones de impressora ou documento. O PDF gerado já está configurado com carga horária oficial de 40h por matéria e pronto para emissão."
                                 },
-                        {
-                            keys: ['teologia', 'doutrina', 'dogma', 'deus', 'jesus', 'espírito', 'fé', 'soteriologia', 'escatologia'],
-                        resp: "<strong>Análise Doutrinária:</strong> Minha base de dados compreende as principais sistemáticas (Soteriologia, Eclesiologia, Escatologia). No SEBITAM, prezamos pela profundidade bíblica e fidelidade ao texto. Qual destes temas dogmáticos você está pesquisando no momento?"
+                                {
+                                    keys: ['teologia', 'doutrina', 'dogma', 'deus', 'jesus', 'espírito', 'fé', 'soteriologia', 'escatologia'],
+                                    resp: "<strong>Análise Doutrinária:</strong> Minha base de dados compreende as principais sistemáticas (Soteriologia, Eclesiologia, Escatologia). No SEBITAM, prezamos pela profundidade bíblica e fidelidade ao texto. Qual destes temas dogmáticos você está pesquisando no momento?"
                                 }
-                        ];
+                            ];
 
                             // Buscar correspondência
                             const match = contextMap.find(c => c.keys.some(k => lowText.includes(k)));
 
-                        if (match) {
-                            response = match.resp;
+                            if (match) {
+                                response = match.resp;
                             } else if (hasFile) {
-                            response = "<strong>Arquivo Recebido:</strong> Documento digitalizado com sucesso para análise. Estou cruzando as informações com as disciplinas do SEBITAM. Pode me fazer perguntas específicas sobre o material anexado.";
+                                response = "<strong>Arquivo Recebido:</strong> Documento digitalizado com sucesso para análise. Estou cruzando as informações com as disciplinas do SEBITAM. Pode me fazer perguntas específicas sobre o material anexado.";
                             } else {
-                            response = "Como sua IA teológica, analisei sua solicitação mas preciso de mais contexto. <br><br>Seu foco é <strong>Acadêmico</strong> (gestão), <strong>Doutrinário</strong> (ensino) ou <strong>Prático</strong> (ministério)? <br><br><em>Dica: Tente palavras como 'Gestão', 'Ministério', 'Exegese' ou 'Histórico'.</em>";
+                                response = "Como sua IA teológica, analisei sua solicitação mas preciso de mais contexto. <br><br>Seu foco é <strong>Acadêmico</strong> (gestão), <strong>Doutrinário</strong> (ensino) ou <strong>Prático</strong> (ministério)? <br><br><em>Dica: Tente palavras como 'Gestão', 'Ministério', 'Exegese' ou 'Histórico'.</em>";
                             }
-                        addMessage(response, 'ai');
+                            addMessage(response, 'ai');
                         }, 1000);
                     };
 
-                        sendBtn.onclick = handleSend;
+                    sendBtn.onclick = handleSend;
                     chatInput.onkeypress = (e) => {
                         if (e.key === 'Enter' && !e.shiftKey) {
                             e.preventDefault();
-                        handleSend();
+                            handleSend();
                         }
                     };
-                        lucide.createIcons();
+                    lucide.createIcons();
                 }, 0);
-                        break;
+                break;
         }
-                        if (html) contentBody.innerHTML = html;
-                        lucide.createIcons();
+        if (html) contentBody.innerHTML = html;
+        lucide.createIcons();
     }
 
-                        async function updatePaymentStatus(studentId, status) {
+    async function updatePaymentStatus(studentId, status) {
         try {
-                            console.log(`Atualizando pagamento: ID ${studentId} para ${status}`);
-                        await dbUpdateItem('sebitam-students', studentId, {paymentStatus: status });
-                        console.log("Pagamento atualizado com sucesso!");
-                        alert(`Status de pagamento alterado para: ${status}`);
-                        await renderView('classes');
+            console.log(`Atualizando pagamento: ID ${studentId} para ${status}`);
+            await dbUpdateItem('sebitam-students', studentId, { paymentStatus: status });
+            console.log("Pagamento atualizado com sucesso!");
+            alert(`Status de pagamento alterado para: ${status}`);
+            await renderView('classes');
         } catch (err) {
-                            console.error("Erro ao atualizar pagamento:", err);
-                        alert("Erro ao atualizar pagamento: " + err.message);
+            console.error("Erro ao atualizar pagamento:", err);
+            alert("Erro ao atualizar pagamento: " + err.message);
         }
     }
 
-                        // Export functions to window for onclick handlers
-                        window.renderGradeEditor = renderGradeEditor;
-                        window.generateCertificate = generateCertificate;
-                        window.printAcademicHistory = printAcademicHistory;
-                        window.updatePaymentStatus = updatePaymentStatus;
-                        window.renderEditStudent = renderEditStudent;
+    // Export functions to window for onclick handlers
+    window.renderGradeEditor = renderGradeEditor;
+    window.generateCertificate = generateCertificate;
+    window.printAcademicHistory = printAcademicHistory;
+    window.updatePaymentStatus = updatePaymentStatus;
+    window.renderEditStudent = renderEditStudent;
 
-                        // Profile Photo Upload Logic
-                        const avatarContainer = document.getElementById('profile-avatar-container');
-                        const profileUpload = document.getElementById('profile-upload');
-                        const userAvatarImg = document.getElementById('user-avatar-img');
+    // Profile Photo Upload Logic
+    const avatarContainer = document.getElementById('profile-avatar-container');
+    const profileUpload = document.getElementById('profile-upload');
+    const userAvatarImg = document.getElementById('user-avatar-img');
 
-                        if (avatarContainer && profileUpload) {
-                            avatarContainer.onclick = () => profileUpload.click();
+    if (avatarContainer && profileUpload) {
+        avatarContainer.onclick = () => profileUpload.click();
         profileUpload.onchange = (e) => {
             const file = e.target.files[0];
-                        if (file) {
+            if (file) {
                 const reader = new FileReader();
                 reader.onload = (event) => {
-                            userAvatarImg.src = event.target.result;
-                        // Optional: Save to localStorage for persistence across sessions
-                        localStorage.setItem('sebitam-profile-pic', event.target.result);
+                    userAvatarImg.src = event.target.result;
+                    // Optional: Save to localStorage for persistence across sessions
+                    localStorage.setItem('sebitam-profile-pic', event.target.result);
                 };
-                        reader.readAsDataURL(file);
+                reader.readAsDataURL(file);
             }
         };
 
-                        // Load saved profile pic on startup
-                        const savedPic = localStorage.getItem('sebitam-profile-pic');
-                        if (savedPic) userAvatarImg.src = savedPic;
+        // Load saved profile pic on startup
+        const savedPic = localStorage.getItem('sebitam-profile-pic');
+        if (savedPic) userAvatarImg.src = savedPic;
     }
 
-                        // Super Admin Auto-Registration
-                        async function checkAndRegisterSuperAdmin() {
+    // Super Admin Auto-Registration
+    async function checkAndRegisterSuperAdmin() {
         if (!supabase) return;
-                        const superAdminEmail = 'edukadoshmda@gmail.com';
-                        const superAdminName = 'Luiz Eduardo Santos da Silva';
+        const superAdminEmail = 'edukadoshmda@gmail.com';
+        const superAdminName = 'Luiz Eduardo Santos da Silva';
 
-                        try {
+        try {
             // Usando o nome correto da tabela em inglês
-            const {data, error} = await supabase.from('admins').select('*').eq('email', superAdminEmail);
-                        if (error) throw error;
+            const { data, error } = await supabase.from('admins').select('*').eq('email', superAdminEmail);
+            if (error) throw error;
 
-                        if (data.length === 0) {
-                            console.log("Registrando Super Administrador...");
-                        await supabase.from('admins').insert([{
-                            name: superAdminName,
-                        email: superAdminEmail,
-                        phone: 'Gestor'
+            if (data.length === 0) {
+                console.log("Registrando Super Administrador...");
+                await supabase.from('admins').insert([{
+                    name: superAdminName,
+                    email: superAdminEmail,
+                    phone: 'Gestor'
                 }]);
             }
         } catch (e) {
-                            console.error("Erro no auto-registro:", e);
+            console.error("Erro no auto-registro:", e);
         }
     }
 
     // Run check and initial view
     checkAndRegisterSuperAdmin().then(() => {
-                            renderView('overview');
+        renderView('overview');
     });
 });
