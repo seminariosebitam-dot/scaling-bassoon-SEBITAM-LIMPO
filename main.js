@@ -872,7 +872,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                                         <i data-lucide="edit"></i>
                                                     </button>
                                                 ` : ''}
-                                                ${(currentUser.role === 'admin' || currentUser.role === 'secretary') ? `
+                                                ${(currentUser.role === 'admin' || currentUser.role === 'secretary' || currentUser.role === 'teacher') ? `
                                                     <button class="btn-icon red delete-user" data-id="${u.id}" data-type="${activeUserTab}" title="Excluir">
                                                         <i data-lucide="trash-2"></i>
                                                     </button>
@@ -966,7 +966,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                                         <button class="btn-icon" title="Ver Histórico Acadêmico" onclick="printAcademicHistory(${s.id})">
                                                             <i data-lucide="file-text"></i>
                                                         </button>
-                                                        ${(currentUser.role === 'admin' || currentUser.role === 'secretary') ? `
+                                                        ${(currentUser.role === 'admin' || currentUser.role === 'secretary' || currentUser.role === 'teacher') ? `
                                                         <button class="btn-icon red delete-st-class" data-id="${s.id}" title="Excluir Aluno">
                                                             <i data-lucide="trash-2"></i>
                                                         </button>` : ''}
