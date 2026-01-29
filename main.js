@@ -246,7 +246,7 @@ document.addEventListener('DOMContentLoaded', () => {
         loginScreen.classList.remove('active');
         dashboardScreen.classList.add('active');
         lucide.createIcons();
-        await renderView('overview');
+        await renderView('enrollment');
     });
 
     // Logout Logic
@@ -717,40 +717,26 @@ document.addEventListener('DOMContentLoaded', () => {
             case 'enrollment':
                 const activeType = data && data.type ? data.type : 'student';
                 html = `
-                    <div class="view-header">
-                        <h2>Cadastro Institucional</h2>
-                        <p>Selecione o perfil que deseja cadastrar no sistema.</p>
+                    <div class="view-header" style="margin-bottom: 30px;">
+                        <h2 style="font-size: 2.22rem; font-weight: 800; color: #1e293b;">Cadastro Institucional</h2>
+                        <span style="background: #2563eb; color: white; padding: 5px 12px; border-radius: 4px; font-size: 0.9rem; font-weight: 500; display: inline-block; margin-top: 5px;">Selecione o perfil que deseja cadastrar no sistema.</span>
                     </div>
                     
-                    <div class="registration-role-selector">
-                        <label class="role-option">
-                            <input type="radio" name="reg-role" value="student" ${activeType === 'student' ? 'checked' : ''}>
-                            <div class="role-box">
-                                <i data-lucide="user"></i>
-                                <span>Aluno</span>
-                            </div>
-                        </label>
-                        <label class="role-option">
-                            <input type="radio" name="reg-role" value="teacher" ${activeType === 'teacher' ? 'checked' : ''}>
-                            <div class="role-box">
-                                <i data-lucide="graduation-cap"></i>
-                                <span>Professor</span>
-                            </div>
-                        </label>
-                        <label class="role-option">
-                            <input type="radio" name="reg-role" value="admin" ${activeType === 'admin' ? 'checked' : ''}>
-                            <div class="role-box">
-                                <i data-lucide="shield-check"></i>
-                                <span>Administrador</span>
-                            </div>
-                        </label>
-                        <label class="role-option">
-                            <input type="radio" name="reg-role" value="secretary" ${activeType === 'secretary' ? 'checked' : ''}>
-                            <div class="role-box">
-                                <i data-lucide="briefcase"></i>
-                                <span>Secretária</span>
-                            </div>
-                        </label>
+                    <div class="registration-role-selector" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 35px;">
+                        ${['student', 'teacher', 'admin', 'secretary'].map(type => {
+                            const icons = { student: 'user', teacher: 'graduation-cap', admin: 'shield-check', secretary: 'briefcase' };
+                            const labels = { student: 'Aluno', teacher: 'Professor', admin: 'Administrador', secretary: 'Secretária' };
+                            const isActive = activeType === type;
+                            return `
+                                <label class="role-option" style="text-align: center; cursor: pointer;">
+                                    <input type="radio" name="reg-role" value="${type}" ${isActive ? 'checked' : ''} style="margin-bottom: 12px; transform: scale(1.3); accent-color: #2563eb;">
+                                    <div class="role-box" style="padding: 25px 10px; border: 1.5px solid ${isActive ? '#2563eb' : '#e2e8f0'}; border-radius: 15px; background: white; transition: all 0.3s; box-shadow: ${isActive ? '0 4px 15px rgba(37, 99, 235, 0.1)' : 'none'};">
+                                        <i data-lucide="${icons[type]}" style="width: 24px; height: 24px; color: ${isActive ? '#2563eb' : '#64748b'}; margin-bottom: 8px;"></i>
+                                        <span style="display: block; font-weight: 600; font-size: 0.85rem; color: ${isActive ? '#1e293b' : '#64748b'};">${labels[type]}</span>
+                                    </div>
+                                </label>
+                            `;
+                        }).join('')}
                     </div>
 
                     <div id="reg-form-container"></div>
@@ -758,105 +744,78 @@ document.addEventListener('DOMContentLoaded', () => {
                 setTimeout(() => {
                     const renderForm = (type) => {
                         const container = document.getElementById('reg-form-container');
-                        let formHtml = '';
-                        if (type === 'student') {
-                            formHtml = `
-                                <div class="form-container">
-                                    <form id="form-st">
-                                        <div class="form-grid">
-                                            <div class="form-group full-width">
-                                                <label>Nome Completo do Aluno</label>
-                                                <div class="input-field">
-                                                    <i data-lucide="user"></i>
-                                                    <input type="text" name="fullName" placeholder="Ex: Luiz Eduardo Santos" required>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label>Telefone / WhatsApp</label>
-                                                <div class="input-field">
-                                                    <i data-lucide="phone"></i>
-                                                    <input type="tel" name="phone" placeholder="(00) 00000-0000" required>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label>E-mail Pessoal</label>
-                                                <div class="input-field">
-                                                    <i data-lucide="mail"></i>
-                                                    <input type="email" name="email" placeholder="aluno@email.com" required>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label>Turma (1 a 10)</label>
-                                                <div class="input-field">
-                                                    <i data-lucide="hash"></i>
-                                                    <select name="grade" style="padding-left: 48px;">
-                                                        ${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => `<option value="${n}">Turma ${n}</option>`).join('')}
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label>Módulo de Ingresso (1 a 5)</label>
-                                                <div class="input-field">
-                                                    <i data-lucide="layers"></i>
-                                                    <select name="module" style="padding-left: 48px;">
-                                                        <option value="1">Módulo 1</option>
-                                                        <option value="2">Módulo 2</option>
-                                                        <option value="3">Módulo 3</option>
-                                                        <option value="4">Módulo 4</option>
-                                                        <option value="5">Módulo 5</option>
-                                                    </select>
-                                                </div>
+                        const roleNames = { student: 'Aluno', teacher: 'Professor(a)', admin: 'Administrador(a)', secretary: 'Secretário(a)' };
+                        const nameLabel = `Nome Completo do(a) ${roleNames[type]}`;
+                        
+                        let formHtml = `
+                            <div class="form-container" style="max-width: 900px; padding: 45px; background: white; border-radius: 25px; box-shadow: 0 10px 40px rgba(0,0,0,0.04); border: 1px solid #f1f5f9; margin-top: 20px;">
+                                <form id="unified-reg-form">
+                                    <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                                        <div class="form-group full-width" style="grid-column: 1 / -1; margin-bottom: 20px;">
+                                            <label style="font-weight: 700; color: #334155; margin-bottom: 8px; display: block; font-size: 0.9rem;">${nameLabel}</label>
+                                            <div class="input-field" style="position: relative;">
+                                                <i data-lucide="user" style="position: absolute; left: 16px; top: 12px; width: 18px; color: #1e293b;"></i>
+                                                <input type="text" name="${type === 'student' ? 'fullName' : 'name'}" placeholder="Nome completo" style="width: 100%; padding: 12px 12px 12px 48px; border-radius: 10px; border: 1.5px solid #f1f5f9; background: white;" required>
                                             </div>
                                         </div>
-                                        <div class="form-actions">
-                                            <button type="submit" class="btn-primary" style="margin-bottom: 0;">Confirmar Matrícula</button>
+                                        <div class="form-group">
+                                            <label style="font-weight: 700; color: #334155; margin-bottom: 8px; display: block; font-size: 0.9rem;">Telefone / WhatsApp</label>
+                                            <div class="input-field" style="position: relative;">
+                                                <i data-lucide="phone" style="position: absolute; left: 16px; top: 12px; width: 18px; color: #1e293b;"></i>
+                                                <input type="tel" name="phone" placeholder="(00) 00000-0000" style="width: 100%; padding: 12px 12px 12px 48px; border-radius: 10px; border: 1.5px solid #f1f5f9; background: white;" required>
+                                            </div>
                                         </div>
-                                    </form>
-                                </div>`;
-                        } else {
-                            const roleLabel = type === 'teacher' ? 'Professor(a)' : type === 'admin' ? 'Administrador(a)' : 'Secretário(a)';
-                            const extraFieldLabel = 'Função / Cargo';
-                            const extraIcon = type === 'teacher' ? 'book' : 'briefcase';
+                                        <div class="form-group">
+                                            <label style="font-weight: 700; color: #334155; margin-bottom: 8px; display: block; font-size: 0.9rem;">E-mail</label>
+                                            <div class="input-field" style="position: relative;">
+                                                <i data-lucide="mail" style="position: absolute; left: 16px; top: 12px; width: 18px; color: #1e293b;"></i>
+                                                <input type="email" name="email" placeholder="email@exemplo.com" style="width: 100%; padding: 12px 12px 12px 48px; border-radius: 10px; border: 1.5px solid #f1f5f9; background: white;" required>
+                                            </div>
+                                        </div>
+                        `;
 
-                            formHtml = `
-                                <div class="form-container">
-                                    <form id="form-other">
-                                        <div class="form-grid">
-                                            <div class="form-group full-width">
-                                                <label>Nome Completo do(a) ${roleLabel}</label>
-                                                <div class="input-field">
-                                                    <i data-lucide="user"></i>
-                                                    <input type="text" name="name" placeholder="Nome completo" required>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label>Telefone / WhatsApp</label>
-                                                <div class="input-field">
-                                                    <i data-lucide="phone"></i>
-                                                    <input type="tel" name="phone" placeholder="(00) 00000-0000" required>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label>E-mail</label>
-                                                <div class="input-field">
-                                                    <i data-lucide="mail"></i>
-                                                    <input type="email" name="email" placeholder="email@exemplo.com" required>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label>${extraFieldLabel}</label>
-                                                <div class="input-field">
-                                                    <i data-lucide="${extraIcon}"></i>
-                                                    <input type="text" name="extra" placeholder="Ex: ${type === 'teacher' ? 'Teologia Sistemática' : 'Financeiro'}" required>
-                                                </div>
+                        if (type === 'student') {
+                            formHtml += `
+                                        <div class="form-group">
+                                            <label style="font-weight: 700; color: #334155; margin-bottom: 8px; display: block; font-size: 0.9rem;">Turma (1 a 10)</label>
+                                            <div class="input-field" style="position: relative;">
+                                                <i data-lucide="hash" style="position: absolute; left: 16px; top: 12px; width: 18px; color: #1e293b;"></i>
+                                                <select name="grade" style="width: 100%; padding: 12px 12px 12px 45px; border-radius: 10px; border: 1.5px solid #f1f5f9; background: white;">
+                                                    ${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => \`<option value="${n}">Turma ${n}</option>\`).join('')}
+                                                </select>
                                             </div>
                                         </div>
-                                        <div class="form-actions">
-                                            <button type="submit" class="btn-primary" style="margin-bottom: 0;">Salvar Cadastro</button>
+                                        <div class="form-group">
+                                            <label style="font-weight: 700; color: #334155; margin-bottom: 8px; display: block; font-size: 0.9rem;">Módulo (1 a 5)</label>
+                                            <div class="input-field" style="position: relative;">
+                                                <i data-lucide="layers" style="position: absolute; left: 16px; top: 12px; width: 18px; color: #1e293b;"></i>
+                                                <select name="module" style="width: 100%; padding: 12px 12px 12px 45px; border-radius: 10px; border: 1.5px solid #f1f5f9; background: white;">
+                                                    <option value="1">Módulo 1</option><option value="2">Módulo 2</option><option value="3">Módulo 3</option><option value="4">Módulo 4</option><option value="5">Módulo 5</option>
+                                                </select>
+                                            </div>
                                         </div>
-                                    </form>
-                                </div>`;
+                            `;
+                        } else {
+                            const extraIcon = type === 'teacher' ? 'graduation-cap' : (type === 'admin' ? 'shield-check' : 'briefcase');
+                            formHtml += `
+                                        <div class="form-group full-width" style="grid-column: 1 / -1; margin-top: 10px;">
+                                            <label style="font-weight: 700; color: #334155; margin-bottom: 8px; display: block; font-size: 0.9rem;">Função / Cargo</label>
+                                            <div class="input-field" style="position: relative;">
+                                                <i data-lucide="${extraIcon}" style="position: absolute; left: 16px; top: 12px; width: 18px; color: #1e293b;"></i>
+                                                <input type="text" name="extra" placeholder="Ex: Financeiro" style="width: 100%; padding: 12px 12px 12px 48px; border-radius: 10px; border: 1.5px solid #f1f5f9; background: white;" required>
+                                            </div>
+                                        </div>
+                            `;
                         }
+
+                        formHtml += `
+                                    </div>
+                                    <div class="form-actions" style="border:none; margin-top: 40px;">
+                                        <button type="submit" class="btn-primary" style="background: #2563eb; width: auto; padding: 15px 40px; border-radius: 10px; font-weight: 700; font-size: 1rem; color: white; border: none; cursor: pointer;">Salvar Cadastro</button>
+                                    </div>
+                                </form>
+                            </div>
+                        `;
                         container.innerHTML = formHtml;
                         lucide.createIcons();
                         const form = container.querySelector('form');
@@ -875,6 +834,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.querySelectorAll('input[name="reg-role"]').forEach(radio => {
                         radio.addEventListener('change', (e) => {
                             renderForm(e.target.value);
+                            // Refresh selection visuals
+                            document.querySelectorAll('.role-box').forEach(box => {
+                                box.style.borderColor = '#e2e8f0';
+                                box.style.boxShadow = 'none';
+                                box.querySelector('i').style.color = '#64748b';
+                                box.querySelector('span').style.color = '#64748b';
+                            });
+                            const selectedBox = e.target.parentElement.querySelector('.role-box');
+                            selectedBox.style.borderColor = '#2563eb';
+                            selectedBox.style.boxShadow = '0 4px 15px rgba(37, 99, 235, 0.1)';
+                            selectedBox.querySelector('i').style.color = '#2563eb';
+                            selectedBox.querySelector('span').style.color = '#1e293b';
                         });
                     });
                 }, 0);
@@ -895,7 +866,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const labelMap = { student: 'Aluno', teacher: 'Professor', admin: 'Adm', secretary: 'Secretaria' };
 
                 html = `
-                    <div class="view-header"><h2>Gestão de Usuários</h2></div>
+                        < div class="view-header" > <h2>Gestão de Usuários</h2></div >
                     <div class="tabs-container" style="display:flex; gap:10px; margin-bottom:20px;">
                         <button class="tab-btn ${activeUserTab === 'student' ? 'active' : ''}" data-type="student">Alunos</button>
                         <button class="tab-btn ${activeUserTab === 'teacher' ? 'active' : ''}" data-type="teacher">Professores</button>
@@ -972,8 +943,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         b.onclick = async () => {
                             const utype = b.dataset.type;
                             const uid = b.dataset.id;
-                            console.log(`Deleting user: ${utype} with id ${uid}`);
-                            if (!confirm(`Tem certeza que deseja excluir este ${labelMap[utype]}?`)) return;
+                            console.log(`Deleting user: ${ utype } with id ${ uid } `);
+                            if (!confirm(`Tem certeza que deseja excluir este ${ labelMap[utype] }?`)) return;
                             const ukey = getStoreKey(utype);
                             await dbDeleteItem(ukey, uid);
                             await renderView('users', { type: utype });
@@ -990,12 +961,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     allSt = allSt.filter(s => s.fullName.toLowerCase().trim() === currentUser.name.toLowerCase().trim());
                 }
                 html = `
-                    <div class="view-header"><h2>Alunos</h2></div>
-                    <div class="turmas-container">
-                        ${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(g => {
-                    const inG = allSt.filter(s => s.grade == g);
-                    if (inG.length === 0) return '';
-                    return `
+                        < div class="view-header" > <h2>Alunos</h2></div >
+                            <div class="turmas-container">
+                                ${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(g => {
+                                    const inG = allSt.filter(s => s.grade == g);
+                                    if (inG.length === 0) return '';
+                                    return `
                                 <div class="turma-section" style="background: white; padding: 20px; border-radius: 15px; margin-bottom: 20px; box-shadow: var(--shadow);">
                                     <h3 style="margin-bottom: 15px; color: var(--primary); border-bottom: 2px solid var(--border); padding-bottom: 10px;">Turma ${g}</h3>
                                     <table class="data-table">
@@ -1009,16 +980,16 @@ document.addEventListener('DOMContentLoaded', () => {
                                         </thead>
                                         <tbody>
                                             ${inG.map(s => {
-                        const nameCap = (s.fullName || 'Sem Nome').split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
-                        const planLabel = s.plan === 'integral' ? 'Integral' : s.plan === 'half' ? 'Meia' : 'Bolsa';
-                        const status = s.paymentStatus || (['integral', 'scholarship'].includes(s.plan) ? 'Pago' : 'Pendente');
-                        return `
+                                        const nameCap = (s.fullName || 'Sem Nome').split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+                                        const planLabel = s.plan === 'integral' ? 'Integral' : s.plan === 'half' ? 'Meia' : 'Bolsa';
+                                        const status = s.paymentStatus || (['integral', 'scholarship'].includes(s.plan) ? 'Pago' : 'Pendente');
+                                        return `
                                                 <tr>
                                                     <td><strong>${nameCap}</strong></td>
                                                     <td><span class="badge ${s.plan === 'integral' ? 'plan-integral' : s.plan === 'half' ? 'plan-half' : 'plan-scholarship'}">${planLabel}</span></td>
                                                     <td>
                                                         ${currentUser.role !== 'student' ?
-                                `<div style="display: flex; gap: 5px;">
+                                                `<div style="display: flex; gap: 5px;">
                                                                 <button onclick="updatePaymentStatus('${s.id}', 'Pago')" class="btn-icon ${status === 'Pago' ? 'green' : ''}" title="Confirmar Pagamento" style="border: 1px solid ${status === 'Pago' ? '#22c55e' : '#cbd5e1'}; background: ${status === 'Pago' ? 'rgba(34, 197, 94, 0.1)' : 'transparent'}">
                                                                     <i data-lucide="check-circle" style="width: 14px; height: 14px; color: ${status === 'Pago' ? '#22c55e' : '#64748b'};"></i>
                                                                 </button>
@@ -1027,8 +998,8 @@ document.addEventListener('DOMContentLoaded', () => {
                                                                 </button>
                                                                 <span style="font-size: 0.75rem; font-weight: 600; color: ${status === 'Pago' ? '#16a34a' : '#dc2626'}; margin-left: 5px; align-self: center;">${status}</span>
                                                             </div>` :
-                                `<span class="badge ${status === 'Pago' ? 'active' : 'plan-half'}" style="background: ${status === 'Pago' ? '#22c55e' : '#ef4444'}; color: white;">${status}</span>`
-                            }
+                                                `<span class="badge ${status === 'Pago' ? 'active' : 'plan-half'}" style="background: ${status === 'Pago' ? '#22c55e' : '#ef4444'}; color: white;">${status}</span>`
+                                            }
                                                     </td>
                                                     <td style="text-align: right;">
                                                         <button class="btn-icon" style="color: var(--primary); background: rgba(37, 99, 235, 0.1);" title="${currentUser.role === 'student' ? 'Ver Meu Boletim' : 'Lançar Notas'}" onclick="renderGradeEditor('${s.id}')">
@@ -1046,17 +1017,17 @@ document.addEventListener('DOMContentLoaded', () => {
                                                         </button>` : ''}
                                                     </td>
                                                 </tr>`;
-                    }).join('')}
+                                    }).join('')}
                                         </tbody>
                                     </table>
                                 </div>`;
-                }).join('')}
-                    </div>`;
+                                }).join('')}
+                            </div>`;
                 setTimeout(() => {
                     document.querySelectorAll('.delete-st-class').forEach(b => {
                         b.onclick = async () => {
                             const uid = b.dataset.id;
-                            console.log(`Deleting student from class view: id ${uid}`);
+                            console.log(`Deleting student from class view: id ${ uid } `);
                             if (!confirm('Tem certeza que deseja excluir permanentemente este aluno?')) return;
                             await dbDeleteItem('sebitam-students', uid);
                             await renderView('classes');
@@ -1067,12 +1038,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 break;
             case 'modules':
                 html = `
-                    <div class="view-header">
+                        < div class="view-header" >
                         <h2>Módulos do Curso</h2>
                         <p>Acesse o material didático em PDF para cada disciplina.</p>
-                    </div>
-                    <div class="modules-grid-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
-                        ${Object.entries(subjectMap).map(([id, data]) => `
+                    </div >
+                        <div class="modules-grid-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                            ${Object.entries(subjectMap).map(([id, data]) => `
                             <div class="module-card" style="background: white; padding: 25px; border-radius: 20px; box-shadow: var(--shadow); border: 1px solid var(--border); transition: var(--transition);">
                                 <div class="module-header" style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 15px;">
                                     <div class="module-icon" style="width: 45px; height: 45px; border-radius: 12px; background: rgba(37, 99, 235, 0.1); color: var(--primary); display: flex; align-items: center; justify-content: center;">
@@ -1093,24 +1064,24 @@ document.addEventListener('DOMContentLoaded', () => {
                                 </a>
                             </div>
                         `).join('')}
-                    </div>
-                `;
+                        </div>
+                    `;
                 break;
             case 'gallery':
                 html = `
-                    <div class="view-header">
+                        < div class="view-header" >
                         <h2>Fotos & Vídeos</h2>
                         <p>Acesse nossa galeria oficial de registros institucionais.</p>
-                    </div>
-                    <div class="welcome-card" style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 20px;">
-                        <i data-lucide="image" style="width: 64px; height: 64px; opacity: 0.8;"></i>
-                        <h3>Nossa Galeria no Drive</h3>
-                        <p>Clique no botão abaixo para visualizar todas as fotos e vídeos de nossas aulas e eventos.</p>
-                        <a href="https://drive.google.com/drive/folders/1bHiOrFojPoQOcaTerk23vi-y8jtKwTd5" target="_blank" class="btn-primary" style="width: auto; padding: 12px 30px; background: white; color: var(--primary); display: flex; align-items: center; gap: 10px;">
-                            <i data-lucide="external-link"></i> Abrir Galeria Oficial
-                        </a>
-                    </div>
-                `;
+                    </div >
+                        <div class="welcome-card" style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 20px;">
+                            <i data-lucide="image" style="width: 64px; height: 64px; opacity: 0.8;"></i>
+                            <h3>Nossa Galeria no Drive</h3>
+                            <p>Clique no botão abaixo para visualizar todas as fotos e vídeos de nossas aulas e eventos.</p>
+                            <a href="https://drive.google.com/drive/folders/1bHiOrFojPoQOcaTerk23vi-y8jtKwTd5" target="_blank" class="btn-primary" style="width: auto; padding: 12px 30px; background: white; color: var(--primary); display: flex; align-items: center; gap: 10px;">
+                                <i data-lucide="external-link"></i> Abrir Galeria Oficial
+                            </a>
+                        </div>
+                    `;
                 break;
             case 'finance':
                 const finStudents = await dbGet('sebitam-students');
@@ -1132,10 +1103,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 };
 
                 html = `
-                    <div class="view-header">
+                        < div class="view-header" >
                         <h2>Painel Financeiro</h2>
                         <p>Visão de gestão de mensalidades e planos acadêmicos.</p>
-                    </div>
+                    </div >
                     
                     <div class="stats-grid" style="margin-bottom: 30px;">
                         <div class="stat-card" style="background: white;">
@@ -1184,7 +1155,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                         </div>
                     </div>
-                `;
+                    `;
 
                 setTimeout(() => {
                     if (typeof Chart === 'undefined') {
@@ -1240,43 +1211,43 @@ document.addEventListener('DOMContentLoaded', () => {
                 break;
             case 'theology-ai':
                 html = `
-                    <div class="view-header">
-                        <div style="display: flex; align-items: center; gap: 15px;">
-                            <div class="ai-avatar-large">
-                                <img src="ai-agent.png" alt="IA">
+                        < div class="view-header" >
+                            <div style="display: flex; align-items: center; gap: 15px;">
+                                <div class="ai-avatar-large">
+                                    <img src="ai-agent.png" alt="IA">
+                                </div>
+                                <div>
+                                    <h2 style="margin:0;">Antigravity - IA Teológica</h2>
+                                    <p style="margin:0; color:var(--text-muted); font-size:0.9rem;">Especialista em Teologia e Gestão SEBITAM</p>
+                                </div>
                             </div>
-                            <div>
-                                <h2 style="margin:0;">Antigravity - IA Teológica</h2>
-                                <p style="margin:0; color:var(--text-muted); font-size:0.9rem;">Especialista em Teologia e Gestão SEBITAM</p>
-                            </div>
-                        </div>
-                    </div>
+                    </div >
 
-                    <div class="chat-container">
-                        <div class="chat-messages" id="chat-messages">
-                            <div class="message ai">
-                                <div class="msg-bubble shadow-sm">
-                                    <h4 style="margin-bottom: 8px; color: var(--primary);">Saudações Teológicas!</h4>
-                                    Sou <strong>Antigravity</strong>, sua inteligência especializada no ecossistema SEBITAM. Analiso doutrinas, organizo currículos e auxilio na exegese bíblica com precisão acadêmica. Como posso iluminar seus estudos ou facilitar a gestão institucional hoje?
+                        <div class="chat-container">
+                            <div class="chat-messages" id="chat-messages">
+                                <div class="message ai">
+                                    <div class="msg-bubble shadow-sm">
+                                        <h4 style="margin-bottom: 8px; color: var(--primary);">Saudações Teológicas!</h4>
+                                        Sou <strong>Antigravity</strong>, sua inteligência especializada no ecossistema SEBITAM. Analiso doutrinas, organizo currículos e auxilio na exegese bíblica com precisão acadêmica. Como posso iluminar seus estudos ou facilitar a gestão institucional hoje?
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="chat-input-area">
+                                <div class="chat-input-wrapper" style="border-radius: 20px; align-items: flex-end; padding: 15px 25px; gap: 20px;">
+                                    <input type="file" id="ai-file-input" style="display: none;">
+                                        <button class="chat-action-btn" id="attach-file-btn" title="Anexar Material de Estudo" style="padding-bottom: 15px;"><i data-lucide="paperclip" style="width: 24px; height: 24px;"></i></button>
+                                        <textarea id="chat-input" placeholder="Digite sua dúvida teológica ou cole um texto para análise aqui..." style="flex: 1; border: none; outline: none; font-size: 1.1rem; padding: 10px 0; min-height: 120px; max-height: 400px; resize: none; background: transparent; font-family: inherit; line-height: 1.6;"></textarea>
+                                        <button class="chat-send-btn" id="send-chat-btn" style="margin-bottom: 10px; width: 55px; height: 55px;">
+                                            <i data-lucide="send" style="width: 24px; height: 24px;"></i>
+                                        </button>
+                                </div>
+                                <div id="file-preview" style="margin-top: 15px; font-size: 0.9rem; color: var(--primary); display: none; align-items: center; gap: 8px; padding-left: 10px;">
+                                    <i data-lucide="file-text"></i> <span id="file-name"></span>
                                 </div>
                             </div>
                         </div>
-                        
-                        <div class="chat-input-area">
-                            <div class="chat-input-wrapper" style="border-radius: 20px; align-items: flex-end; padding: 15px 25px; gap: 20px;">
-                                <input type="file" id="ai-file-input" style="display: none;">
-                                <button class="chat-action-btn" id="attach-file-btn" title="Anexar Material de Estudo" style="padding-bottom: 15px;"><i data-lucide="paperclip" style="width: 24px; height: 24px;"></i></button>
-                                <textarea id="chat-input" placeholder="Digite sua dúvida teológica ou cole um texto para análise aqui..." style="flex: 1; border: none; outline: none; font-size: 1.1rem; padding: 10px 0; min-height: 120px; max-height: 400px; resize: none; background: transparent; font-family: inherit; line-height: 1.6;"></textarea>
-                                <button class="chat-send-btn" id="send-chat-btn" style="margin-bottom: 10px; width: 55px; height: 55px;">
-                                    <i data-lucide="send" style="width: 24px; height: 24px;"></i>
-                                </button>
-                            </div>
-                            <div id="file-preview" style="margin-top: 15px; font-size: 0.9rem; color: var(--primary); display: none; align-items: center; gap: 8px; padding-left: 10px;">
-                                <i data-lucide="file-text"></i> <span id="file-name"></span>
-                            </div>
-                        </div>
-                    </div>
-                `;
+                    `;
 
                 setTimeout(() => {
                     const chatMessages = document.getElementById('chat-messages');
@@ -1290,15 +1261,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     attachBtn.onclick = () => fileInput.click();
                     fileInput.onchange = () => {
                         if (fileInput.files.length > 0) {
-                            fileNameSpan.textContent = `Arquivo: ${fileInput.files[0].name}`;
+                            fileNameSpan.textContent = `Arquivo: ${ fileInput.files[0].name } `;
                             filePreview.style.display = 'flex';
                         }
                     };
 
                     const addMessage = (text, type) => {
                         const msgDiv = document.createElement('div');
-                        msgDiv.className = `message ${type}`;
-                        msgDiv.innerHTML = `<div class="msg-bubble shadow-sm">${text}</div>`;
+                        msgDiv.className = `message ${ type } `;
+                        msgDiv.innerHTML = `< div class="msg-bubble shadow-sm" > ${ text }</div > `;
                         chatMessages.appendChild(msgDiv);
                         chatMessages.scrollTop = chatMessages.scrollHeight;
                         lucide.createIcons();
@@ -1310,9 +1281,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (!text && !hasFile) return;
 
                         if (hasFile) {
-                            addMessage(`[Anexo: ${fileInput.files[0].name}]<br>${text}`, 'user');
-                            fileInput.value = '';
-                            filePreview.style.display = 'none';
+                            addMessage(`[Anexo: ${ fileInput.files[0].name }]<br>${text}`, 'user');
+                        fileInput.value = '';
+                        filePreview.style.display = 'none';
                         } else {
                             addMessage(text, 'user');
                         }
@@ -1322,157 +1293,157 @@ document.addEventListener('DOMContentLoaded', () => {
 
                         setTimeout(() => {
                             let response = "";
-                            const lowText = text.toLowerCase();
+                        const lowText = text.toLowerCase();
 
-                            // Sistema de Inteligência Baseado em Contexto
-                            const contextMap = [
-                                {
-                                    keys: ['olá', 'oi', 'bom dia', 'boa tarde', 'boa noite', 'paz'],
-                                    resp: "<strong>Paz seja convosco!</strong> Como seu assistente Antigravity, estou operando com capacidade analítica máxima. Posso realizar exegeses, orientar sua jornada acadêmica no SEBITAM ou discutir estratégias ministeriais. Por onde deseja começar?"
+                        // Sistema de Inteligência Baseado em Contexto
+                        const contextMap = [
+                        {
+                            keys: ['olá', 'oi', 'bom dia', 'boa tarde', 'boa noite', 'paz'],
+                        resp: "<strong>Paz seja convosco!</strong> Como seu assistente Antigravity, estou operando com capacidade analítica máxima. Posso realizar exegeses, orientar sua jornada acadêmica no SEBITAM ou discutir estratégias ministeriais. Por onde deseja começar?"
                                 },
-                                {
-                                    keys: ['ministério', 'pastoral', 'liderança', 'igreja', 'culto', 'missões', 'prático'],
-                                    resp: `
-                                        <div style="margin-bottom: 15px;"><strong>Eixo Prático (Ministério):</strong> Notei seu interesse na área ministerial. No SEBITAM, a teologia deve frutificar em serviço.</div>
-                                        <p>Para o desenvolvimento do seu ministério, recomendo focar em:
-                                        <ul style="padding-left: 20px; margin: 10px 0;">
-                                            <li><strong>Homilética:</strong> A arte da pregação bíblica (Módulo 3).</li>
-                                            <li><strong>Teologia Pastoral:</strong> O cuidado com as almas (Módulo 4).</li>
-                                            <li><strong>Psicologia Pastoral:</strong> Compreensão do rebanho (Módulo 5).</li>
-                                        </ul>
-                                        Deseja que eu aprofunde algum destes pilares ministeriais?</p>
-                                    `
+                        {
+                            keys: ['ministério', 'pastoral', 'liderança', 'igreja', 'culto', 'missões', 'prático'],
+                        resp: `
+                        <div style="margin-bottom: 15px;"><strong>Eixo Prático (Ministério):</strong> Notei seu interesse na área ministerial. No SEBITAM, a teologia deve frutificar em serviço.</div>
+                        <p>Para o desenvolvimento do seu ministério, recomendo focar em:
+                            <ul style="padding-left: 20px; margin: 10px 0;">
+                                <li><strong>Homilética:</strong> A arte da pregação bíblica (Módulo 3).</li>
+                                <li><strong>Teologia Pastoral:</strong> O cuidado com as almas (Módulo 4).</li>
+                                <li><strong>Psicologia Pastoral:</strong> Compreensão do rebanho (Módulo 5).</li>
+                            </ul>
+                            Deseja que eu aprofunde algum destes pilares ministeriais?</p>
+                        `
                                 },
-                                {
-                                    keys: ['acadêmico', 'gestão', 'secretaria', 'coordenação', 'matrícula', 'frequência', 'sistema'],
-                                    resp: `
-                                        <div style="margin-bottom: 10px;"><strong>Eixo Acadêmico (Gestão):</strong> Compreendo. Para otimizar a gestão institucional:</div>
-                                        <ul style="padding-left: 20px;">
-                                            <li><strong>Dados:</strong> O controle de frequência e notas é automatizado via Supabase para evitar erros manuais.</li>
-                                            <li><strong>Currículo:</strong> Seguimos uma formação média dividida em 5 módulos sequenciais.</li>
-                                            <li><strong>Relatórios:</strong> A aba 'Financeiro' oferece indicadores em tempo real para tomada de decisão.</li>
-                                        </ul>
-                                        Qual área da coordenação acadêmica você deseja gerenciar agora?
-                                    `
+                        {
+                            keys: ['acadêmico', 'gestão', 'secretaria', 'coordenação', 'matrícula', 'frequência', 'sistema'],
+                        resp: `
+                        <div style="margin-bottom: 10px;"><strong>Eixo Acadêmico (Gestão):</strong> Compreendo. Para otimizar a gestão institucional:</div>
+                        <ul style="padding-left: 20px;">
+                            <li><strong>Dados:</strong> O controle de frequência e notas é automatizado via Supabase para evitar erros manuais.</li>
+                            <li><strong>Currículo:</strong> Seguimos uma formação média dividida em 5 módulos sequenciais.</li>
+                            <li><strong>Relatórios:</strong> A aba 'Financeiro' oferece indicadores em tempo real para tomada de decisão.</li>
+                        </ul>
+                        Qual área da coordenação acadêmica você deseja gerenciar agora?
+                        `
                                 },
-                                {
-                                    keys: ['exegese', 'hermenêutica', 'grego', 'hebraico', 'interpretação', 'texto', 'bíblia', 'versículo'],
-                                    resp: "<strong>Análise Exegética:</strong> Esta é uma das minhas especialidades. Posso analisar a transição entre o contexto original e a aplicação contemporânea. Estude o <em>Módulo 2 (Contexto Histórico)</em> para dominar as ferramentas de interpretação do SEBITAM. Quer que eu comente sobre algum texto bíblico específico?"
+                        {
+                            keys: ['exegese', 'hermenêutica', 'grego', 'hebraico', 'interpretação', 'texto', 'bíblia', 'versículo'],
+                        resp: "<strong>Análise Exegética:</strong> Esta é uma das minhas especialidades. Posso analisar a transição entre o contexto original e a aplicação contemporânea. Estude o <em>Módulo 2 (Contexto Histórico)</em> para dominar as ferramentas de interpretação do SEBITAM. Quer que eu comente sobre algum texto bíblico específico?"
                                 },
-                                {
-                                    keys: ['módulo', 'disciplina', 'estudar', 'curso', 'aula', 'matéria'],
-                                    resp: "<strong>Organização Curricular:</strong> O SEBITAM organiza o conhecimento de forma progressiva. Se você está iniciando no <strong>Módulo 1 (Fundamentos)</strong>, foque em <em>Bibliologia</em>. Se está concluindo no <strong>Módulo 5</strong>, o foco é <em>Prática</em>. Posso detalhar o conteúdo de qualquer uma das nossas 20 disciplinas."
+                        {
+                            keys: ['módulo', 'disciplina', 'estudar', 'curso', 'aula', 'matéria'],
+                        resp: "<strong>Organização Curricular:</strong> O SEBITAM organiza o conhecimento de forma progressiva. Se você está iniciando no <strong>Módulo 1 (Fundamentos)</strong>, foque em <em>Bibliologia</em>. Se está concluindo no <strong>Módulo 5</strong>, o foco é <em>Prática</em>. Posso detalhar o conteúdo de qualquer uma das nossas 20 disciplinas."
                                 },
-                                {
-                                    keys: ['histórico', 'nota', 'boletim', 'certificado', 'documento', 'pdf', 'imprimir'],
-                                    resp: "Sua documentação acadêmica é gerada instantaneamente. O administrador deve acessar a aba 'Alunos' e clicar nos ícones de impressora ou documento. O PDF gerado já está configurado com carga horária oficial de 40h por matéria e pronto para emissão."
+                        {
+                            keys: ['histórico', 'nota', 'boletim', 'certificado', 'documento', 'pdf', 'imprimir'],
+                        resp: "Sua documentação acadêmica é gerada instantaneamente. O administrador deve acessar a aba 'Alunos' e clicar nos ícones de impressora ou documento. O PDF gerado já está configurado com carga horária oficial de 40h por matéria e pronto para emissão."
                                 },
-                                {
-                                    keys: ['teologia', 'doutrina', 'dogma', 'deus', 'jesus', 'espírito', 'fé', 'soteriologia', 'escatologia'],
-                                    resp: "<strong>Análise Doutrinária:</strong> Minha base de dados compreende as principais sistemáticas (Soteriologia, Eclesiologia, Escatologia). No SEBITAM, prezamos pela profundidade bíblica e fidelidade ao texto. Qual destes temas dogmáticos você está pesquisando no momento?"
+                        {
+                            keys: ['teologia', 'doutrina', 'dogma', 'deus', 'jesus', 'espírito', 'fé', 'soteriologia', 'escatologia'],
+                        resp: "<strong>Análise Doutrinária:</strong> Minha base de dados compreende as principais sistemáticas (Soteriologia, Eclesiologia, Escatologia). No SEBITAM, prezamos pela profundidade bíblica e fidelidade ao texto. Qual destes temas dogmáticos você está pesquisando no momento?"
                                 }
-                            ];
+                        ];
 
                             // Buscar correspondência
                             const match = contextMap.find(c => c.keys.some(k => lowText.includes(k)));
 
-                            if (match) {
-                                response = match.resp;
+                        if (match) {
+                            response = match.resp;
                             } else if (hasFile) {
-                                response = "<strong>Arquivo Recebido:</strong> Documento digitalizado com sucesso para análise. Estou cruzando as informações com as disciplinas do SEBITAM. Pode me fazer perguntas específicas sobre o material anexado.";
+                            response = "<strong>Arquivo Recebido:</strong> Documento digitalizado com sucesso para análise. Estou cruzando as informações com as disciplinas do SEBITAM. Pode me fazer perguntas específicas sobre o material anexado.";
                             } else {
-                                response = "Como sua IA teológica, analisei sua solicitação mas preciso de mais contexto. <br><br>Seu foco é <strong>Acadêmico</strong> (gestão), <strong>Doutrinário</strong> (ensino) ou <strong>Prático</strong> (ministério)? <br><br><em>Dica: Tente palavras como 'Gestão', 'Ministério', 'Exegese' ou 'Histórico'.</em>";
+                            response = "Como sua IA teológica, analisei sua solicitação mas preciso de mais contexto. <br><br>Seu foco é <strong>Acadêmico</strong> (gestão), <strong>Doutrinário</strong> (ensino) ou <strong>Prático</strong> (ministério)? <br><br><em>Dica: Tente palavras como 'Gestão', 'Ministério', 'Exegese' ou 'Histórico'.</em>";
                             }
-                            addMessage(response, 'ai');
+                        addMessage(response, 'ai');
                         }, 1000);
                     };
 
-                    sendBtn.onclick = handleSend;
+                        sendBtn.onclick = handleSend;
                     chatInput.onkeypress = (e) => {
                         if (e.key === 'Enter' && !e.shiftKey) {
                             e.preventDefault();
-                            handleSend();
+                        handleSend();
                         }
                     };
-                    lucide.createIcons();
+                        lucide.createIcons();
                 }, 0);
-                break;
+                        break;
         }
-        if (html) contentBody.innerHTML = html;
-        lucide.createIcons();
+                        if (html) contentBody.innerHTML = html;
+                        lucide.createIcons();
     }
 
-    async function updatePaymentStatus(studentId, status) {
+                        async function updatePaymentStatus(studentId, status) {
         try {
-            console.log(`Atualizando pagamento: ID ${studentId} para ${status}`);
-            await dbUpdateItem('sebitam-students', studentId, { paymentStatus: status });
-            console.log("Pagamento atualizado com sucesso!");
-            alert(`Status de pagamento alterado para: ${status}`);
-            await renderView('classes');
+                            console.log(`Atualizando pagamento: ID ${studentId} para ${status}`);
+                        await dbUpdateItem('sebitam-students', studentId, {paymentStatus: status });
+                        console.log("Pagamento atualizado com sucesso!");
+                        alert(`Status de pagamento alterado para: ${status}`);
+                        await renderView('classes');
         } catch (err) {
-            console.error("Erro ao atualizar pagamento:", err);
-            alert("Erro ao atualizar pagamento: " + err.message);
+                            console.error("Erro ao atualizar pagamento:", err);
+                        alert("Erro ao atualizar pagamento: " + err.message);
         }
     }
 
-    // Export functions to window for onclick handlers
-    window.renderGradeEditor = renderGradeEditor;
-    window.generateCertificate = generateCertificate;
-    window.printAcademicHistory = printAcademicHistory;
-    window.updatePaymentStatus = updatePaymentStatus;
-    window.renderEditStudent = renderEditStudent;
+                        // Export functions to window for onclick handlers
+                        window.renderGradeEditor = renderGradeEditor;
+                        window.generateCertificate = generateCertificate;
+                        window.printAcademicHistory = printAcademicHistory;
+                        window.updatePaymentStatus = updatePaymentStatus;
+                        window.renderEditStudent = renderEditStudent;
 
-    // Profile Photo Upload Logic
-    const avatarContainer = document.getElementById('profile-avatar-container');
-    const profileUpload = document.getElementById('profile-upload');
-    const userAvatarImg = document.getElementById('user-avatar-img');
+                        // Profile Photo Upload Logic
+                        const avatarContainer = document.getElementById('profile-avatar-container');
+                        const profileUpload = document.getElementById('profile-upload');
+                        const userAvatarImg = document.getElementById('user-avatar-img');
 
-    if (avatarContainer && profileUpload) {
-        avatarContainer.onclick = () => profileUpload.click();
+                        if (avatarContainer && profileUpload) {
+                            avatarContainer.onclick = () => profileUpload.click();
         profileUpload.onchange = (e) => {
             const file = e.target.files[0];
-            if (file) {
+                        if (file) {
                 const reader = new FileReader();
                 reader.onload = (event) => {
-                    userAvatarImg.src = event.target.result;
-                    // Optional: Save to localStorage for persistence across sessions
-                    localStorage.setItem('sebitam-profile-pic', event.target.result);
+                            userAvatarImg.src = event.target.result;
+                        // Optional: Save to localStorage for persistence across sessions
+                        localStorage.setItem('sebitam-profile-pic', event.target.result);
                 };
-                reader.readAsDataURL(file);
+                        reader.readAsDataURL(file);
             }
         };
 
-        // Load saved profile pic on startup
-        const savedPic = localStorage.getItem('sebitam-profile-pic');
-        if (savedPic) userAvatarImg.src = savedPic;
+                        // Load saved profile pic on startup
+                        const savedPic = localStorage.getItem('sebitam-profile-pic');
+                        if (savedPic) userAvatarImg.src = savedPic;
     }
 
-    // Super Admin Auto-Registration
-    async function checkAndRegisterSuperAdmin() {
+                        // Super Admin Auto-Registration
+                        async function checkAndRegisterSuperAdmin() {
         if (!supabase) return;
-        const superAdminEmail = 'edukadoshmda@gmail.com';
-        const superAdminName = 'Luiz Eduardo Santos da Silva';
+                        const superAdminEmail = 'edukadoshmda@gmail.com';
+                        const superAdminName = 'Luiz Eduardo Santos da Silva';
 
-        try {
+                        try {
             // Usando o nome correto da tabela em inglês
-            const { data, error } = await supabase.from('admins').select('*').eq('email', superAdminEmail);
-            if (error) throw error;
+            const {data, error} = await supabase.from('admins').select('*').eq('email', superAdminEmail);
+                        if (error) throw error;
 
-            if (data.length === 0) {
-                console.log("Registrando Super Administrador...");
-                await supabase.from('admins').insert([{
-                    name: superAdminName,
-                    email: superAdminEmail,
-                    phone: 'Gestor'
+                        if (data.length === 0) {
+                            console.log("Registrando Super Administrador...");
+                        await supabase.from('admins').insert([{
+                            name: superAdminName,
+                        email: superAdminEmail,
+                        phone: 'Gestor'
                 }]);
             }
         } catch (e) {
-            console.error("Erro no auto-registro:", e);
+                            console.error("Erro no auto-registro:", e);
         }
     }
 
     // Run check and initial view
     checkAndRegisterSuperAdmin().then(() => {
-        renderView('overview');
+                            renderView('overview');
     });
 });

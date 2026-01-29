@@ -1,9 +1,10 @@
-const fs = require('fs');
-const path = 'c:/Users/eduka/Desktop/SEBITAM LIMPO/main.js';
-const content = fs.readFileSync(path, 'utf8');
-const lines = content.split(/\r?\n/);
+$filePath = "c:\Users\eduka\Desktop\SEBITAM LIMPO\main.js"
+$content = Get-Content $filePath -Raw
+# Using regex to replace the enrollment case. This is more robust than line numbers if lines shifted.
+# We'll match from 'case ''enrollment'':' to the next 'break;'
 
-const newEnrollment = `            case 'enrollment':
+$newEnrollment = @"
+            case 'enrollment':
                 const activeType = data && data.type ? data.type : 'student';
                 html = \`
                     <div class="view-header" style="margin-bottom: 30px;">
@@ -69,8 +70,8 @@ const newEnrollment = `            case 'enrollment':
                                             <label style="font-weight: 700; color: #334155; margin-bottom: 8px; display: block; font-size: 0.9rem;">Turma (1 a 10)</label>
                                             <div class="input-field" style="position: relative;">
                                                 <i data-lucide="hash" style="position: absolute; left: 16px; top: 12px; width: 18px; color: #1e293b;"></i>
-                                                <select name="grade" style="width: 100%; padding: 12px 12px 12px 45px; border-radius: 10px; border: 1.5px solid #f1f5f9; background: white;">
-                                                    \${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => \\\`<option value="\${n}">Turma \${n}</option>\\\`).join('')}
+                                                <select name="grade" style="width: 100%; padding: 12px 12px 12px 45px; border-radius: 10px; border: 1.5 solid #f1f5f9; background: white;">
+                                                    \${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => \`<option value="\${n}">Turma \${n}</option>\`).join('')}
                                                 </select>
                                             </div>
                                         </div>
@@ -78,7 +79,7 @@ const newEnrollment = `            case 'enrollment':
                                             <label style="font-weight: 700; color: #334155; margin-bottom: 8px; display: block; font-size: 0.9rem;">Módulo (1 a 5)</label>
                                             <div class="input-field" style="position: relative;">
                                                 <i data-lucide="layers" style="position: absolute; left: 16px; top: 12px; width: 18px; color: #1e293b;"></i>
-                                                <select name="module" style="width: 100%; padding: 12px 12px 12px 45px; border-radius: 10px; border: 1.5px solid #f1f5f9; background: white;">
+                                                <select name="module" style="width: 100%; padding: 12px 12px 12px 45px; border-radius: 10px; border: 1.5 solid #f1f5f9; background: white;">
                                                     <option value="1">Módulo 1</option><option value="2">Módulo 2</option><option value="3">Módulo 3</option><option value="4">Módulo 4</option><option value="5">Módulo 5</option>
                                                 </select>
                                             </div>
@@ -138,17 +139,10 @@ const newEnrollment = `            case 'enrollment':
                         });
                     });
                 }, 0);
-                break;`;
+                break;
+"@
 
-// We need to find the start and end indices of the enrollment case.
-// case 'enrollment' is at line 717 index (lines[716])
-// break; is at line 870 index (lines[869])
-
-const finalLines = [
-    ...lines.slice(0, 716),
-    newEnrollment,
-    ...lines.slice(870)
-];
-
-fs.writeFileSync(path, finalLines.join('\n'), 'utf8');
-console.log('Successfully patched main.js');
+# Perform the replacement. We target from line 717 index to some later line.
+# Actually, I'll just use a simpler script that doesn't use here-strings for the template to avoid escaping hell.
+# I'll write the template to a separate file.
+$newEnrollment | Set-Content "c:\Users\eduka\Desktop\SEBITAM LIMPO\template.txt" -Encoding UTF8
