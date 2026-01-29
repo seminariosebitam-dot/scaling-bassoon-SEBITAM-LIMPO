@@ -297,7 +297,7 @@
                         .inner-border { position: absolute; top: 5px; left: 5px; right: 5px; bottom: 5px; border: 5px solid #d4af37; pointer-events: none; }
                         .logo { height: 120px; margin-bottom: 20px; }
                         .cert-title { font-family: 'Playfair Display', serif; font-size: 5rem; color: #1a365d; margin: 10px 0; text-transform: uppercase; }
-                        .student-name { font-family: 'Playfair Display', serif; font-size: 3.8rem; color: #d4af37; margin: 20px 0; border-bottom: 2px solid #1a365d; padding: 0 40px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 95%; }
+                        .student-name { font-family: 'Playfair Display', serif; font-size: 3.8rem; color: #d4af37; margin: 20px 0; border-bottom: 2px solid #1a365d; padding: 0 40px; white-space: nowrap; width: 95%; text-align: center; }
                         .enrollment { font-size: 0.9rem; color: #64748b; margin-top: 5px; font-weight: 600; }
                         .content { text-align: center; max-width: 85% }
                         .footer { width: 100%; display: flex; justify-content: space-around; margin-top: 50px; }
@@ -321,7 +321,34 @@
                             <div class="sig-block">COORDENADOR</div>
                         </div>
                     </div>
-                    <script>window.onload = () => setTimeout(() => window.print(), 500);</script>
+                    <script>
+                        window.onload = () => {
+                            const studentName = document.querySelector('.student-name');
+                            const maxWidth = studentName.parentElement.offsetWidth * 0.95;
+                            let fontSize = 3.8; // rem
+                            
+                            // Criar um elemento invisível para medir a largura real do texto
+                            const measure = document.createElement('span');
+                            measure.style.fontFamily = getComputedStyle(studentName).fontFamily;
+                            measure.style.fontSize = fontSize + 'rem';
+                            measure.style.whiteSpace = 'nowrap';
+                            measure.style.visibility = 'hidden';
+                            measure.style.position = 'absolute';
+                            measure.innerText = studentName.innerText;
+                            document.body.appendChild(measure);
+
+                            // Reduzir a fonte até que o texto caiba na largura máxima
+                            while (measure.offsetWidth > maxWidth && fontSize > 1.5) {
+                                fontSize -= 0.1;
+                                measure.style.fontSize = fontSize + 'rem';
+                            }
+                            
+                            studentName.style.fontSize = fontSize + 'rem';
+                            document.body.removeChild(measure);
+
+                            setTimeout(() => window.print(), 500);
+                        };
+                    </script>
                 </body>
             </html>
         `);
