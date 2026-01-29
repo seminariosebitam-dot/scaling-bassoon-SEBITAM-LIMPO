@@ -690,7 +690,7 @@
                             const type = b.dataset.type;
                             const id = b.dataset.id;
                             console.log(`Deleting staff member: ${type} with id ${id}`);
-                            const label = type === 'admin' ? 'Administrador' : type === 'teacher' ? 'Professor' : 'SecretÃ¡rio';
+                            const label = type === 'admin' ? 'Administrador' : type === 'teacher' ? 'Professor' : 'Secretário';
                             if (!confirm(`Tem certeza que deseja excluir este ${label}?`)) return;
                             const key = type === 'teacher' ? 'sebitam-teachers' : type === 'admin' ? 'sebitam-admins' : 'sebitam-secretaries';
                             await dbDeleteItem(key, id);
@@ -704,14 +704,14 @@
                 const activeType = data && data.type ? data.type : 'student';
                 html = `
                     <div class="view-header" style="margin-bottom: 30px;">
-                        <h2 style="font-size: 2.22rem; font-weight: 800; color: #1e293b;">Cadastro Institucional</h2>
+                        <h2 style="font-size: 2.22rem; font-weight: 800; color: #1e293b;">Secretária</h2>
                         <span style="background: #2563eb; color: white; padding: 5px 12px; border-radius: 4px; font-size: 0.9rem; font-weight: 500; display: inline-block; margin-top: 5px;">Selecione o perfil que deseja cadastrar no sistema.</span>
                     </div>
                     
                     <div class="registration-role-selector" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 35px;">
                         ${['student', 'teacher', 'admin', 'secretary'].map(type => {
                     const icons = { student: 'user', teacher: 'graduation-cap', admin: 'shield-check', secretary: 'briefcase' };
-                    const labels = { student: 'Aluno', teacher: 'Professor', admin: 'Administrador', secretary: 'SecretÃ¡ria' };
+                    const labels = { student: 'Aluno', teacher: 'Professor', admin: 'Administrador', secretary: 'Secretária' };
                     const isActive = activeType === type;
                     return `
                                 <label class="role-option" style="text-align: center; cursor: pointer;">
@@ -730,7 +730,7 @@
                 setTimeout(() => {
                     const renderForm = (type) => {
                         const container = document.getElementById('reg-form-container');
-                        const roleNames = { student: 'Aluno', teacher: 'Professor(a)', admin: 'Administrador(a)', secretary: 'SecretÃ¡rio(a)' };
+                        const roleNames = { student: 'Aluno', teacher: 'Professor(a)', admin: 'Administrador(a)', secretary: 'Secretário(a)' };
                         const nameLabel = `Nome Completo do(a) ${roleNames[type]}`;
 
                         let formHtml = `
