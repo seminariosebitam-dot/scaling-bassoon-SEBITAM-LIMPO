@@ -865,11 +865,24 @@ document.addEventListener('DOMContentLoaded', () => {
                                             <td><span class="badge" style="background: var(--bg-main); color: var(--text-main); border: 1px solid var(--border);">${roleInfo}</span></td>
                                             <td style="font-size: 0.85rem;">${email}</td>
                                             <td style="font-size: 0.85rem;">${phone}</td>
-                                            <td style="display: flex; gap: 10px; justify-content: flex-end;">
+                                            <td style="display: flex; gap: 6px; justify-content: flex-end; align-items: center;">
                                                 ${activeUserTab === 'student' ? `
-                                                    <button class="btn-icon edit-st" data-id="${u.id}" title="Editar Aluno">
-                                                        <i data-lucide="edit"></i>
+                                                    ${currentUser.role !== 'student' ? `
+                                                        <button class="btn-icon" style="color: var(--primary); background: rgba(37, 99, 235, 0.1);" title="Lançar Notas" onclick="renderGradeEditor(${u.id})">
+                                                            <i data-lucide="edit-3"></i>
+                                                        </button>
+                                                    ` : ''}
+                                                    <button class="btn-icon" title="Imprimir Certificado" onclick="generateCertificate(${u.id})">
+                                                        <i data-lucide="printer"></i>
                                                     </button>
+                                                    <button class="btn-icon" title="Ver Histórico Acadêmico" onclick="printAcademicHistory(${u.id})">
+                                                        <i data-lucide="file-text"></i>
+                                                    </button>
+                                                    ${currentUser.role !== 'student' ? `
+                                                        <button class="btn-icon" style="color: #64748b;" title="Editar Cadastro" onclick="renderEditStudent(${u.id})">
+                                                            <i data-lucide="settings"></i>
+                                                        </button>
+                                                    ` : ''}
                                                 ` : ''}
                                                 ${currentUser.role !== 'student' ? `
                                                     <button class="btn-icon red delete-user" data-id="${u.id}" data-type="${activeUserTab}" title="Excluir">
@@ -901,9 +914,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         };
                     });
 
-                    document.querySelectorAll('.edit-st').forEach(b => b.onclick = () => {
-                        renderEditStudent(b.dataset.id);
-                    });
+
                     lucide.createIcons();
                 }, 0);
                 break;
@@ -955,8 +966,8 @@ document.addEventListener('DOMContentLoaded', () => {
                                                     </td>
                                                     <td style="text-align: right;">
                                                         ${currentUser.role !== 'student' ? `
-                                                        <button class="btn-primary btn-small" style="width: auto; display: inline-flex; align-items: center; gap: 5px;" onclick="renderGradeEditor(${s.id})">
-                                                            <i data-lucide="edit" style="width: 14px; height: 14px;"></i> Notas
+                                                        <button class="btn-icon" style="color: var(--primary); background: rgba(37, 99, 235, 0.1);" title="Lançar Notas" onclick="renderGradeEditor(${s.id})">
+                                                            <i data-lucide="edit-3"></i>
                                                         </button>
                                                         ` : ''}
                                                         <button class="btn-icon" title="Imprimir Certificado" onclick="generateCertificate(${s.id})">
@@ -1337,6 +1348,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.generateCertificate = generateCertificate;
     window.printAcademicHistory = printAcademicHistory;
     window.updatePaymentStatus = updatePaymentStatus;
+    window.renderEditStudent = renderEditStudent;
 
     // Profile Photo Upload Logic
     const avatarContainer = document.getElementById('profile-avatar-container');
