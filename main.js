@@ -197,14 +197,27 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.className = `theme-${savedTheme}`;
     }
 
-    // Toggle Student Name Field
+    // Toggle Login Fields based on Role
     document.querySelectorAll('input[name="role"]').forEach(radio => {
         radio.addEventListener('change', (e) => {
-            const field = document.getElementById('student-name-field');
+            const studentField = document.getElementById('student-name-field');
+            const emailField = document.getElementById('email-field');
+            const passwordField = document.getElementById('password-field');
+            const emailInput = document.getElementById('login-email');
+            const passwordInput = document.getElementById('login-password');
+
             if (e.target.value === 'student') {
-                field.style.display = 'block';
+                studentField.style.display = 'block';
+                emailField.style.display = 'none';
+                passwordField.style.display = 'none';
+                emailInput.removeAttribute('required');
+                passwordInput.removeAttribute('required');
             } else {
-                field.style.display = 'none';
+                studentField.style.display = 'none';
+                emailField.style.display = 'block';
+                passwordField.style.display = 'block';
+                emailInput.setAttribute('required', '');
+                passwordInput.setAttribute('required', '');
             }
         });
     });
@@ -216,17 +229,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const loginEmail = document.getElementById('login-email').value.trim().toLowerCase();
         const loginPass = document.getElementById('login-password').value.trim();
 
-        if (!loginEmail || !loginPass) {
-            alert('Por favor, preencha todos os campos.');
-            return;
-        }
+        if (selectedRole !== 'student') {
+            if (!loginEmail || !loginPass) {
+                alert('Por favor, preencha todos os campos.');
+                return;
+            }
 
-        // MASTER LOGIN SYSTEM: edukadoshmda@gmail.com / 123456
-        const isMaster = (loginEmail === 'edukadoshmda@gmail.com' && loginPass === '123456');
+            // MASTER LOGIN SYSTEM: edukadoshmda@gmail.com / 123456
+            const isMaster = (loginEmail === 'edukadoshmda@gmail.com' && loginPass === '123456');
 
-        if (!isMaster) {
-            alert('Acesso negado. E-mail ou Senha incorretos. Utilize o acesso padrão.');
-            return;
+            if (!isMaster) {
+                alert('Acesso negado. E-mail ou Senha incorretos. Utilize o acesso padrão.');
+                return;
+            }
         }
 
         // Setup User Session

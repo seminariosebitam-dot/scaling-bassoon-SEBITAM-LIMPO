@@ -31,7 +31,6 @@
                             <img src="logo.jpg" alt="SEBITAM Logo" class="main-logo">
                         </div>
                         <p>Selecione seu perfil e acesse sua conta</p>
-                        <small style="opacity: 0.5; font-size: 0.7rem;">v.7.0-Student-Self-View-Fix</small>
                     </div>
 
                     <form id="login-form">
@@ -67,19 +66,19 @@
                         </div>
 
                         <div class="input-group">
-                            <div class="input-field">
+                            <div class="input-field" id="email-field">
                                 <i data-lucide="mail"></i>
                                 <input type="email" id="login-email" placeholder="E-mail (edukadoshmda@gmail.com)"
                                     required>
                             </div>
-                            <div class="input-field">
+                            <div class="input-field" id="password-field">
                                 <i data-lucide="lock"></i>
                                 <input type="password" id="login-password" placeholder="Senha" required>
                             </div>
                             <div class="input-field" id="student-name-field"
                                 style="display: none; border: 1px solid var(--primary);">
-                                <i data-lucide="user-check"></i>
-                                <input type="text" id="login-student-name" placeholder="Seu Nome Completo (Aluno)">
+                                <input type="text" id="login-student-name"
+                                    placeholder="Digite seu Nome Completo (Aluno)">
                             </div>
                         </div>
 
