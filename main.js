@@ -329,15 +329,15 @@
     }
 
     async function printAcademicHistory(studentId) {
-        console.log("Gerando histÃ³rico para ID:", studentId);
+        console.log("Gerando histórico para ID:", studentId);
         const students = await dbGet('sebitam-students');
         const student = students.find(item => String(item.id) === String(studentId));
         if (!student) {
-            alert('Erro: Aluno nÃ£o encontrado para o histÃ³rico (ID: ' + studentId + ')');
+            alert('Erro: Aluno não encontrado para o histórico (ID: ' + studentId + ')');
             return;
         }
         const printWindow = window.open('', '_blank');
-        if (!printWindow) return alert('Por favor, libere os pop-ups para ver o histÃ³rico.');
+        if (!printWindow) return alert('Por favor, libere os pop-ups para ver o histórico.');
         const nameCap = student.fullName.toUpperCase();
         const date = new Date().toLocaleDateString('pt-BR');
 
@@ -366,23 +366,23 @@
                 <body>
                     <div class="header">
                         <img src="logo.jpg" class="logo">
-                        <h1>HistÃ³rico AcadÃªmico Oficial</h1>
-                        <p>SeminÃ¡rio BÃ­blico TeolÃ³gico da AmazÃ´nia - SEBITAM</p>
+                        <h1>Histórico Acadêmico Oficial</h1>
+                        <p>Seminário Bíblico Teológico da Amazônia - SEBITAM</p>
                     </div>
 
                     <div class="student-info">
                         <div><strong>ALUNO(A):</strong> ${nameCap}</div>
-                        <div><strong>CURSO:</strong> MÃ‰DIO EM TEOLOGIA</div>
+                        <div><strong>CURSO:</strong> MÉDIO EM TEOLOGIA</div>
                     </div>
 
                     <table>
                         <thead>
                             <tr>
                                 <th>Disciplina</th>
-                                <th style="text-align:center; width: 35px;">MÃ³dulo</th>
+                                <th style="text-align:center; width: 35px;">Módulo</th>
                                 <th style="text-align:center; width: 60px;">Nota</th>
-                                <th style="text-align:center; width: 110px;">Carga HorÃ¡ria</th>
-                                <th style="text-align:center; width: 100px;">SituaÃ§Ã£o</th>
+                                <th style="text-align:center; width: 110px;">Carga Horária</th>
+                                <th style="text-align:center; width: 100px;">Situação</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -410,7 +410,7 @@
                     </table>
 
                     <div class="footer">
-                        <div class="signature">DIRETORIA ACADÃŠMICA</div>
+                        <div class="signature">DIRETORIA ACADÊMICA</div>
                         <div class="signature">SECRETARIA GERAL</div>
                     </div>
                     <script>window.onload = () => setTimeout(() => window.print(), 500);</script>
@@ -425,7 +425,7 @@
         const students = await dbGet('sebitam-students');
         const s = students.find(item => String(item.id) === String(studentId));
         if (!s) {
-            alert('Erro: Aluno nÃ£o encontrado (ID: ' + studentId + ')');
+            alert('Erro: Aluno não encontrado (ID: ' + studentId + ')');
             return;
         }
         const moduleNum = s.module || 1;
