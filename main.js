@@ -1333,8 +1333,7 @@
                         chatInput.value = '';
                         chatInput.style.height = 'auto';
 
-                        setTimeout(() => {
-                            let response = "";
+                        setTimeout(async () => {
                             const lowText = text.toLowerCase();
 
                             // Sistema de InteligÃªncia Baseado em Contexto
@@ -1488,20 +1487,51 @@
                                 }
                             ];
 
-                            // Buscar correspondência
+                            // --- INTEGRAÇÃO COM GEMINI API ---
+                            async function callGeminiAI(userText) {
+                                const GEMINI_API_KEY = "AIzaSyCraYyXs8Q5R78ogvWpFCHhSR64GK8J_ns";
+                                const GEMINI_MODEL = "gemini-1.5-flash";
+                                const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
+
+                                const systemPrompt = `Você é o 'Antigravity', a IA teológica oficial do SEBITAM (Seminário Bíblico Teológico da Amazônia). 
+                                Responda com base no perfil do usuário: ${currentUser.name} (${currentUser.role}). 
+                                Histórico do projeto: O SEBITAM usa Supabase, tem 5 módulos teológicos e foco ministerial. 
+                                Seja pastoral, técnico e use HTML simples (<strong>, <ul>, <p>) para formatar.`;
+
+                                try {
+                                    const response = await fetch(url, {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({
+                                            contents: [{ parts: [{ text: `${systemPrompt}\n\nPergunta: ${userText}` }] }]
+                                        })
+                                    });
+                                    const data = await response.json();
+                                    return data.candidates?.[0]?.content?.parts?.[0]?.text || "Desculpe, meu cérebro teológico está processando muita informação. Tente novamente em alguns segundos.";
+                                } catch (err) {
+                                    console.error("Erro na API Gemini:", err);
+                                    return "Sinto muito, houve uma falha na conexão com meus servidores teológicos.";
+                                }
+                            }
+
+                            // Buscar correspondência local (Filtro Rápido)
                             const match = contextMap.find(c => c.keys.some(k => lowText.includes(k)));
 
                             if (match) {
-                                response = match.resp;
-                            } else if (hasFile) {
-                                response = "<strong>Arquivo Recebido:</strong> Documento digitalizado com sucesso para análise. Estou cruzando as informações com as disciplinas do SEBITAM. Pode me fazer perguntas específicas sobre o material anexado.";
+                                addMessage(match.resp, 'ai');
                             } else {
-                                response = "Como sua IA teológica, analisei sua solicitação mas preciso de mais contexto. <br><br>Seu foco é <strong>Acadêmico</strong> (gestão), <strong>Doutrinário</strong> (ensino) ou <strong>Prático</strong> (ministério)? <br><br><em>Dica: Tente palavras como 'Gestão', 'Ministério', 'Exegese' ou 'Histórico'.</em>";
-                            }
-                            addMessage(response, 'ai');
-                        }, 1000);
-                    };
+                                // Se não houver palavra-chave, chama a IA de Verdade
+                                addMessage("<em>Antigravity está consultando os registros teológicos...</em>", 'ai-loading');
+                                const aiResponse = await callGeminiAI(text);
 
+                                // Remover mensagem de loading e adicionar resposta real
+                                const loadingMsg = document.querySelector('.message.ai-loading');
+                                if (loadingMsg) loadingMsg.remove();
+
+                                addMessage(aiResponse, 'ai');
+                            }
+                        }, 500);
+                    };
                     sendBtn.onclick = handleSend;
                     chatInput.onkeypress = (e) => {
                         if (e.key === 'Enter' && !e.shiftKey) {
