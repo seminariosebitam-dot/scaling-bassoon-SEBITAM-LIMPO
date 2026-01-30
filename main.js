@@ -218,11 +218,27 @@
             currentUser.role = 'student'; // Default role if not master
         }
 
+        // Armazenar email do usuário para uso posterior
+        currentUser.email = loginEmail;
+
         refreshUIPermissions(currentUser.role);
         loginScreen.classList.remove('active');
         dashboardScreen.classList.add('active');
         lucide.createIcons();
-        await renderView('overview');
+
+        // Verificar se é o primeiro acesso do usuário
+        const userKey = `sebitam-user-${loginEmail}`;
+        const hasCompletedRegistration = localStorage.getItem(userKey);
+
+        if (!hasCompletedRegistration) {
+            // Primeiro acesso - direcionar para cadastro
+            console.log('Primeiro acesso detectado - redirecionando para cadastro');
+            await renderView('enrollment');
+        } else {
+            // Acesso subsequente - direcionar para visão geral
+            console.log('Usuário já cadastrado - redirecionando para visão geral');
+            await renderView('overview');
+        }
     });
 
     // Logout Logic
@@ -839,7 +855,15 @@
                             val.id = Date.now();
                             const key = type === 'student' ? 'sebitam-students' : type === 'teacher' ? 'sebitam-teachers' : type === 'admin' ? 'sebitam-admins' : 'sebitam-secretaries';
                             await dbAddItem(key, val);
-                            alert('Cadastrado com sucesso!');
+
+                            // Marcar que o usuário completou o cadastro
+                            // Usar o email do formulário ou o email do login
+                            const userEmail = (val.email || currentUser.email || 'unknown').toLowerCase();
+                            const userKey = `sebitam-user-${userEmail}`;
+                            localStorage.setItem(userKey, 'registered');
+                            console.log(`Usuário registrado: ${userEmail}`);
+
+                            alert('Cadastrado com sucesso! Você será direcionado para a Visão Geral.');
                             // Atualizar estado ativo da barra lateral
                             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
                             const overviewNav = document.querySelector('.nav-item[data-view="overview"]');
