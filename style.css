@@ -961,12 +961,11 @@ body {
     .table-container {
         overflow-x: auto !important;
         max-width: 100vw !important;
-        background: var(--bg-card) !important;
-        box-shadow: var(--shadow) !important;
-        border: 1px solid var(--border) !important;
-        border-radius: 20px !important;
-        padding-bottom: 10px;
-        /* Space for scrollbar */
+        background: transparent !important;
+        /* Let table handle bg */
+        box-shadow: none !important;
+        /* Move shadow or remove to avoid cut off */
+        border: none !important;
     }
 
     .data-table {
