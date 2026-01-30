@@ -259,32 +259,7 @@
         currentData = null;
     });
 
-    // Mobile Bottom Nav Logic
-    const mobileHomeBtn = document.getElementById('mobile-home-btn');
-    const mobileBackBtn = document.getElementById('mobile-back-btn');
-    const mobileLogoutBtn = document.getElementById('mobile-logout-btn');
 
-    if (mobileHomeBtn) {
-        mobileHomeBtn.addEventListener('click', () => {
-            renderView('overview');
-        });
-    }
-
-    if (mobileBackBtn) {
-        mobileBackBtn.addEventListener('click', () => {
-            if (viewHistory.length > 0) {
-                const lastState = viewHistory.pop();
-                // Pass false to addToHistory so we don't push the current view to history when going back
-                renderView(lastState.view, lastState.data, false);
-            } else {
-                renderView('overview', null, false);
-            }
-        });
-    }
-
-    if (mobileLogoutBtn) {
-        mobileLogoutBtn.addEventListener('click', () => logoutBtn.click());
-    }
 
     // Header Back Button Logic
     const headBackBtn = document.getElementById('back-btn');
@@ -707,15 +682,7 @@
         currentView = view;
         currentData = data;
 
-        // Update Mobile Bottom Nav Active State
-        const mobileHomeBtn = document.getElementById('mobile-home-btn');
-        if (mobileHomeBtn) {
-            if (view === 'overview') {
-                mobileHomeBtn.classList.add('active');
-            } else {
-                mobileHomeBtn.classList.remove('active');
-            }
-        }
+
 
         // Header Back Button Logic
         const headBackBtn = document.getElementById('back-btn');
