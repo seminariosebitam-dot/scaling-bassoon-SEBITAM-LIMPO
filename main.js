@@ -838,7 +838,7 @@
                 const activeType = data && data.type ? data.type : 'student';
                 html = `
                     <div class="view-header" style="margin-bottom: 30px;">
-                        <h2 style="font-size: 2.22rem; font-weight: 800; color: #1e293b;">Secretária</h2>
+                        <h2 style="font-size: 2.22rem; font-weight: 800; color: #1e293b;">Cadastro Institucional</h2>
                         <span style="background: #2563eb; color: white; padding: 5px 12px; border-radius: 4px; font-size: 0.9rem; font-weight: 500; display: inline-block; margin-top: 5px;">Selecione o perfil que deseja cadastrar no sistema.</span>
                     </div>
                     
@@ -1032,7 +1032,7 @@
                                             <td><strong>${nameCap}</strong></td>
                                             <td><span class="badge" style="background: var(--bg-main); color: var(--text-main); border: 1px solid var(--border);">${roleInfo}</span></td>
                                             <td style="font-size: 0.85rem;">${email}</td>
-                                            <td style="font-size: 0.85rem;">${phone}</td>
+                                            <td style="font-size: 0.85rem; white-space: nowrap;">${phone}</td>
                                             ${activeUserTab === 'student' ? `
                                                 <td><span class="badge ${u.plan === 'integral' ? 'plan-integral' : u.plan === 'half' ? 'plan-half' : 'plan-scholarship'}">${planLabel}</span></td>
                                                 <td><span class="badge ${status === 'Pago' ? 'active' : 'plan-half'}" style="background: ${status === 'Pago' ? '#22c55e' : '#ef4444'}; color: white; padding: 2px 8px; font-size: 0.7rem;">${status}</span></td>
