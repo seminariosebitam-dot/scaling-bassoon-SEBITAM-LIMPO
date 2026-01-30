@@ -256,10 +256,46 @@
             e.preventDefault();
             navItems.forEach(n => n.classList.remove('active'));
             item.classList.add('active');
+
+            // Mobile: Close sidebar on selection
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            if (window.innerWidth <= 768) {
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+            }
+
             const view = item.getAttribute('data-view');
             await renderView(view);
         });
     });
+
+    // Mobile Menu Logic
+    const menuToggle = document.getElementById('menu-toggle');
+    const sidebarClose = document.getElementById('sidebar-close');
+    const sidebarOverlay = document.getElementById('sidebar-overlay');
+    const sidebar = document.getElementById('sidebar');
+
+    if (menuToggle) {
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.add('active');
+            sidebarOverlay.classList.add('active');
+        });
+    }
+
+    if (sidebarClose) {
+        sidebarClose.addEventListener('click', () => {
+            sidebar.classList.remove('active');
+            sidebarOverlay.classList.remove('active');
+        });
+    }
+
+    if (sidebarOverlay) {
+        sidebarOverlay.addEventListener('click', () => {
+            sidebar.classList.remove('active');
+            sidebarOverlay.classList.remove('active');
+        });
+    }
 
     function refreshUIPermissions(role) {
         console.log("Applying UI Permissions for role:", role);

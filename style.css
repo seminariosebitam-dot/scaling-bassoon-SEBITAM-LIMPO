@@ -799,6 +799,161 @@ body {
     text-align: left;
 }
 
+/* Menu Toggle (Hidden on Desktop) */
+.menu-toggle {
+    display: none;
+}
+
+/* Responsive Design (Mobile) */
+@media (max-width: 768px) {
+
+    /* BREAK THE FLEX LAYOUT */
+    .screen.active {
+        display: block !important;
+        /* Forces vertical stacking, removes flex side-by-side */
+        position: relative;
+    }
+
+    /* Mobile Layout Tweaks - STRONG OVERRIIDES */
+    .sidebar {
+        position: fixed !important;
+        left: -280px !important;
+        /* Hide off-screen */
+        top: 0;
+        bottom: 0;
+        width: 280px !important;
+        max-width: 80% !important;
+        z-index: 9999 !important;
+        /* Max Z-Index */
+        box-shadow: 5px 0 15px rgba(0, 0, 0, 0.2) !important;
+        transition: left 0.3s ease !important;
+        background-color: var(--sidebar-bg) !important;
+    }
+
+    .sidebar.active {
+        left: 0 !important;
+        /* Slide in */
+    }
+
+    .sidebar-header {
+        justify-content: space-between;
+    }
+
+    .sidebar-close-btn {
+        display: block !important;
+    }
+
+    .sidebar-overlay {
+        position: fixed !important;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.6) !important;
+        z-index: 9998 !important;
+        /* Just below sidebar */
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease;
+        backdrop-filter: blur(3px);
+    }
+
+    .sidebar-overlay.active {
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+
+    .main-content {
+        width: 100% !important;
+        margin-left: 0 !important;
+        min-width: 100vw !important;
+        /* Force full width */
+        overflow-x: hidden !important;
+    }
+
+    .top-bar {
+        padding: 0 16px !important;
+        gap: 12px;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        width: 100%;
+    }
+
+    /* Menu Toggle Button */
+    .menu-toggle {
+        display: flex !important;
+        background: transparent;
+        border: none;
+        color: var(--text-main);
+        cursor: pointer;
+        padding: 8px;
+        margin-right: -4px;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .menu-toggle i {
+        width: 28px !important;
+        height: 28px !important;
+    }
+
+    .search-area {
+        max-width: none !important;
+        flex: 1;
+    }
+
+    .search-area input {
+        width: 100% !important;
+    }
+
+    .user-info {
+        display: none !important;
+    }
+
+    .content-body {
+        padding: 16px !important;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .role-selector-simple {
+        grid-template-columns: 1fr !important;
+    }
+
+    .registration-role-selector {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .form-group.full-width {
+        grid-column: span 1 !important;
+    }
+
+    .welcome-card {
+        padding: 20px !important;
+    }
+
+    .welcome-card h1 {
+        font-size: 1.4rem !important;
+    }
+
+    /* Ensure tables don't break layout */
+    .table-container {
+        overflow-x: auto !important;
+        max-width: 100vw !important;
+    }
+
+    .data-table {
+        min-width: 600px !important;
+    }
+}
+
 .data-table th {
     padding: 16px 24px;
     background: var(--bg-main);

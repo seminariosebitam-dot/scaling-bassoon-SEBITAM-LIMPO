@@ -12,7 +12,7 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Outfit:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=mobile_v2">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -71,9 +71,14 @@
 
         <!-- Dashboard Screen -->
         <section id="dashboard-screen" class="screen">
-            <aside class="sidebar">
+            <div id="sidebar-overlay" class="sidebar-overlay"></div>
+            <aside class="sidebar" id="sidebar">
                 <div class="sidebar-header">
                     <span class="sidebar-logo-text">SEBITAM</span>
+                    <button id="sidebar-close" class="sidebar-close-btn"
+                        style="display: none; background: transparent; border: none; color: white; cursor: pointer;">
+                        <i data-lucide="x"></i>
+                    </button>
                 </div>
                 <nav class="sidebar-nav">
                     <a href="#" class="nav-item active" data-view="overview">
@@ -141,6 +146,9 @@
 
             <main class="main-content">
                 <header class="top-bar">
+                    <button id="menu-toggle" class="menu-toggle">
+                        <i data-lucide="menu"></i>
+                    </button>
                     <div class="search-area">
                         <i data-lucide="search"></i>
                         <input type="text" placeholder="Pesquisar...">
