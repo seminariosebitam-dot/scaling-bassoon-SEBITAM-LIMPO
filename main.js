@@ -286,6 +286,19 @@
         mobileLogoutBtn.addEventListener('click', () => logoutBtn.click());
     }
 
+    // Header Back Button Logic
+    const headBackBtn = document.getElementById('back-btn');
+    if (headBackBtn) {
+        headBackBtn.addEventListener('click', () => {
+            if (viewHistory.length > 0) {
+                const lastState = viewHistory.pop();
+                renderView(lastState.view, lastState.data, false);
+            } else {
+                renderView('overview', null, false);
+            }
+        });
+    }
+
     // Nav Item Clicks
     navItems.forEach(item => {
         item.addEventListener('click', async (e) => {
@@ -688,6 +701,32 @@
         }
         currentView = view;
         currentData = data;
+
+        // Update Mobile Bottom Nav Active State
+        const mobileHomeBtn = document.getElementById('mobile-home-btn');
+        if (mobileHomeBtn) {
+            if (view === 'overview') {
+                mobileHomeBtn.classList.add('active');
+            } else {
+                mobileHomeBtn.classList.remove('active');
+            }
+        }
+
+        // Header Back Button Logic
+        const headBackBtn = document.getElementById('back-btn');
+        const headMenuBtn = document.getElementById('menu-toggle');
+
+        if (headBackBtn && headMenuBtn) {
+            if (view === 'overview') {
+                headBackBtn.style.display = 'none';
+                headMenuBtn.style.display = 'flex'; // Show menu on home
+            } else {
+                headBackBtn.style.display = 'flex';
+                // Optional: Hide menu button on deep pages if desired, user asked for back icon
+                // Keeping menu accessible is usually better, but let's prioritize the back button requested.
+                // headMenuBtn.style.display = 'none'; 
+            }
+        }
 
         const contentBody = document.getElementById('dynamic-content');
         let html = '';
