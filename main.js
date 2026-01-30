@@ -1445,6 +1445,46 @@
                         </blockquote>
                         <p>O SEBITAM não é apenas um centro de ensino, mas um espaço de formação integral. Cultive sua espiritualidade enquanto aprofunda seus estudos teológicos.</p>
                         `
+                                },
+                                {
+                                    keys: ['módulo 1', 'fundamentos', 'bibliologia', 'teontologia', 'novo testamento', 'antigo testamento'],
+                                    resp: "<strong>Módulo 1 - Fundamentos:</strong> Este módulo foca nas bases bíblicas e doutrinárias iniciais. Disciplinas: Bibliologia, Teontologia, Introdução ao N.T e Introdução ao A.T. É a base de todo o curso médio."
+                                },
+                                {
+                                    keys: ['módulo 2', 'contexto histórico', 'geografia bíblica', 'hermenêutica', 'período interbíblico', 'ética cristã'],
+                                    resp: "<strong>Módulo 2 - Contexto Histórico:</strong> Explora o ambiente das Escrituras e ferramentas de interpretação. Disciplinas: Geografia Bíblica, Hermenêutica, Período Interbíblico e Ética Cristã."
+                                },
+                                {
+                                    keys: ['módulo 3', 'doutrinas específicas', 'soteriologia', 'eclesiologia', 'escatologia', 'homilética'],
+                                    resp: "<strong>Módulo 3 - Doutrinas Específicas:</strong> Aprofundamento dogmático e arte da pregação. Disciplinas: Soteriologia (Salvação), Eclesiologia (Igreja), Escatologia (Fim dos Tempos) e Homilética (Pregação)."
+                                },
+                                {
+                                    keys: ['módulo 4', 'teologia aplicada', 'teologia contemporânea', 'teologia pastoral'],
+                                    resp: "<strong>Módulo 4 - Teologia Aplicada:</strong> Foca na conexão da teologia com a realidade atual e o cuidado pastoral. Disciplinas: Teologia Contemporânea, Introdução Teológica Bíblica A.T/N.T e Teologia Pastoral."
+                                },
+                                {
+                                    keys: ['módulo 5', 'prática pastoral', 'exegese bíblica', 'psicologia pastoral'],
+                                    resp: "<strong>Módulo 5 - Prática Pastoral:</strong> Estágio final focado em exegese profunda e cuidado emocional/espiritual. Disciplinas: Exegese Bíblica e Psicologia Pastoral."
+                                },
+                                {
+                                    keys: ['critério', 'aprovação', 'mínimo', 'média', 'passar', 'frequência mínima'],
+                                    resp: "<strong>Critérios de Aprovação SEBITAM:</strong> Para ser aprovado, o aluno deve atingir: 1) Nota mínima de 7.0 em cada disciplina; 2) Frequência mínima de 75% das aulas presenciais/atividades."
+                                },
+                                {
+                                    keys: ['segurança', 'privacidade', 'nuvem', 'supabase', 'dados', 'proteção'],
+                                    resp: "<strong>Segurança de Dados:</strong> O SEBITAM utiliza tecnologia de ponta com o Supabase. Seus dados são criptografados e armazenados em nuvem com backup automático, garantindo que o histórico escolar nunca se perca."
+                                },
+                                {
+                                    keys: ['liderança', 'líder', 'gestor', 'presidência', 'coordenação'],
+                                    resp: "<strong>Liderança Ministerial:</strong> O curso médio capacita líderes para servirem nas igrejas locais com excelência administrativa e equilíbrio teológico. A diretoria supervisiona o progresso de cada vocacionado."
+                                },
+                                {
+                                    keys: ['missão', 'missiologia', 'evangelismo', 'ide', 'povos'],
+                                    resp: "<strong>Missões e Evangelismo:</strong> O 'Ide' de Jesus é o motor do SEBITAM. Nossas disciplinas visam não apenas o conhecimento, mas a expansão do Reino de Deus em toda a Amazônia e além."
+                                },
+                                {
+                                    keys: ['ética', 'comportamento', 'caráter', 'cristão no mundo'],
+                                    resp: "<strong>Ética Cristã:</strong> Estudamos como os valores do Reino de Deus se aplicam às decisões morais contemporâneas, preparando o aluno para ser sal e luz na sociedade."
                                 }
                             ];
 
