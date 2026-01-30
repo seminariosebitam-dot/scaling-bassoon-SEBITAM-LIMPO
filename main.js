@@ -1383,6 +1383,68 @@
                                 {
                                     keys: ['teologia', 'doutrina', 'dogma', 'deus', 'jesus', 'espírito', 'fé', 'soteriologia', 'escatologia'],
                                     resp: "<strong>Análise Doutrinária:</strong> Minha base de dados compreende as principais sistemáticas (Soteriologia, Eclesiologia, Escatologia). No SEBITAM, prezamos pela profundidade bíblica e fidelidade ao texto. Qual destes temas dogmáticos você está pesquisando no momento?"
+                                },
+                                {
+                                    keys: ['pagamento', 'mensalidade', 'financeiro', 'bolsa', 'valor', 'pagar', 'taxa', 'custo'],
+                                    resp: `
+                        <div style="margin-bottom: 10px;"><strong>Gestão Financeira:</strong> O SEBITAM oferece diferentes planos de pagamento:</div>
+                        <ul style="padding-left: 20px;">
+                            <li><strong>Integral:</strong> Mensalidade completa</li>
+                            <li><strong>Meia Mensalidade:</strong> 50% de desconto</li>
+                            <li><strong>Bolsa Integral:</strong> Gratuidade total para casos especiais</li>
+                        </ul>
+                        <p>Os administradores podem acompanhar o status de pagamento na aba 'Financeiro' e atualizar diretamente na lista de 'Alunos'. Para dúvidas sobre seu plano específico, consulte a secretaria.</p>
+                        `
+                                },
+                                {
+                                    keys: ['matrícula', 'inscrição', 'cadastro', 'novo aluno', 'como entrar', 'requisitos', 'documentos'],
+                                    resp: `
+                        <strong>Processo de Matrícula:</strong> Para ingressar no SEBITAM:
+                        <ol style="padding-left: 20px; margin: 10px 0;">
+                            <li>O administrador ou secretário acessa a aba <strong>'Cadastro'</strong></li>
+                            <li>Seleciona o perfil <strong>'Aluno'</strong></li>
+                            <li>Preenche: Nome completo, telefone, e-mail, módulo inicial e plano financeiro</li>
+                            <li>Após salvar, o aluno recebe uma matrícula automática (formato: SEBITAM-XXXX)</li>
+                        </ol>
+                        <p>O sistema já está integrado com Supabase para armazenamento seguro dos dados. Dúvidas sobre documentação? Consulte a secretaria acadêmica.</p>
+                        `
+                                },
+                                {
+                                    keys: ['professor', 'docente', 'ensino', 'quem ensina', 'corpo docente', 'educador'],
+                                    resp: `
+                        <strong>Corpo Docente SEBITAM:</strong> Nossos professores são especialistas em suas áreas teológicas.
+                        <p>Para visualizar a lista completa de professores, acesse a aba <strong>'Visão Geral'</strong> onde você encontrará:</p>
+                        <ul style="padding-left: 20px;">
+                            <li>Nome completo de cada professor</li>
+                            <li>Contato direto (telefone/WhatsApp)</li>
+                            <li>Área de atuação</li>
+                        </ul>
+                        <p>Administradores podem gerenciar o cadastro de professores na aba 'Cadastro', selecionando o perfil 'Professor'. Materiais didáticos estão disponíveis na aba 'Material Didático Professores'.</p>
+                        `
+                                },
+                                {
+                                    keys: ['ajuda', 'help', 'socorro', 'não entendi', 'como usar', 'tutorial', 'suporte'],
+                                    resp: `
+                        <div style="margin-bottom: 15px;"><strong>Central de Ajuda SEBITAM:</strong> Estou aqui para orientar você! Veja o que posso fazer:</div>
+                        <div style="background: #f8fafc; padding: 15px; border-radius: 10px; margin: 10px 0;">
+                            <p style="margin: 5px 0;"><strong>📚 Acadêmico:</strong> Módulos, disciplinas, histórico, certificados</p>
+                            <p style="margin: 5px 0;"><strong>👥 Gestão:</strong> Cadastro de alunos, professores, notas, frequência</p>
+                            <p style="margin: 5px 0;"><strong>💰 Financeiro:</strong> Planos, pagamentos, relatórios</p>
+                            <p style="margin: 5px 0;"><strong>⛪ Teológico:</strong> Doutrinas, exegese, ministério pastoral</p>
+                        </div>
+                        <p><em>Dica: Seja específico! Pergunte sobre 'notas', 'matrícula', 'certificado', 'módulo 3', etc.</em></p>
+                        `
+                                },
+                                {
+                                    keys: ['oração', 'orar', 'intercessão', 'espiritualidade', 'devoção', 'vida espiritual', 'comunhão'],
+                                    resp: `
+                        <strong>Vida Espiritual no SEBITAM:</strong> A formação teológica deve estar enraizada em uma vida de oração e comunhão com Deus.
+                        <p>Enquanto você estuda as doutrinas e disciplinas, lembre-se:</p>
+                        <blockquote style="border-left: 4px solid var(--primary); padding-left: 15px; margin: 15px 0; font-style: italic; color: var(--text-muted);">
+                            "Conhecimento sem devoção infla; devoção sem conhecimento desvia. Busque ambos em equilíbrio." 
+                        </blockquote>
+                        <p>O SEBITAM não é apenas um centro de ensino, mas um espaço de formação integral. Cultive sua espiritualidade enquanto aprofunda seus estudos teológicos.</p>
+                        `
                                 }
                             ];
 
