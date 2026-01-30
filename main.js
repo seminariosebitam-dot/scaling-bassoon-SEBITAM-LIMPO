@@ -352,6 +352,11 @@
         userNameEl.textContent = currentUser.name;
         userRoleEl.textContent = roleDetails[role].label;
 
+        // Update Avatar
+        if (window.updateAvatarUI) {
+            window.updateAvatarUI(currentUser);
+        }
+
         // Remove all previous role classes from body
         document.body.classList.remove('user-role-admin', 'user-role-secretary', 'user-role-teacher', 'user-role-student');
         // Add current role class
@@ -1683,12 +1688,88 @@
     window.updatePaymentStatus = updatePaymentStatus;
     window.renderEditStudent = renderEditStudent;
 
-    // Profile Icon Logic (Simplified as images are removed)
+    // Profile Icon Logic (Restored)
     const avatarContainer = document.getElementById('profile-avatar-container');
-    if (avatarContainer) {
-        avatarContainer.title = "Perfil do Usuário";
-        // No upload logic needed as requested to remove images and keep only icons
+    const profileUpload = document.getElementById('profile-upload');
+    const userAvatarIcon = document.getElementById('user-avatar-icon');
+
+    if (avatarContainer && profileUpload) {
+        avatarContainer.addEventListener('click', () => {
+            profileUpload.click();
+        });
+
+        profileUpload.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = async (event) => {
+                const base64 = event.target.result;
+
+                // Update UI immediately
+                if (userAvatarIcon) {
+                    // Create img if doesn't exist or update
+                    let img = avatarContainer.querySelector('img');
+                    if (!img) {
+                        img = document.createElement('img');
+                        img.style.width = '100%';
+                        img.style.height = '100%';
+                        img.style.objectFit = 'cover';
+                        img.style.borderRadius = '50%';
+                        avatarContainer.appendChild(img);
+                        userAvatarIcon.style.display = 'none'; // Hide icon
+                    }
+                    img.src = base64;
+                }
+
+                // Update Data
+                if (currentUser) {
+                    currentUser.photo = base64;
+
+                    // Determine collection
+                    let collection = 'sebitam-students'; // default
+                    if (currentUser.role === 'admin') collection = 'sebitam-admins';
+                    if (currentUser.role === 'teacher') collection = 'sebitam-teachers';
+                    if (currentUser.role === 'secretary') collection = 'sebitam-secretaries';
+
+                    try {
+                        await dbUpdateItem(collection, currentUser.id, { photo: base64 });
+                        // Also update local storage user key if used
+                        const userKey = `sebitam-user-${currentUser.email}`;
+                        if (localStorage.getItem(userKey)) {
+                            // Logic to update stored user if needed, usually we re-fetch on login
+                        }
+                    } catch (err) {
+                        console.error('Error saving photo:', err);
+                        alert('Erro ao salvar foto.');
+                    }
+                }
+            };
+            reader.readAsDataURL(file);
+        });
     }
+
+    // Function to show avatar if exists
+    function updateAvatarUI(user) {
+        if (!avatarContainer) return;
+        const existingImg = avatarContainer.querySelector('img');
+        if (existingImg) existingImg.remove();
+        const icon = document.getElementById('user-avatar-icon');
+
+        if (user && user.photo) {
+            const img = document.createElement('img');
+            img.src = user.photo;
+            img.style.width = '100%';
+            img.style.height = '100%';
+            img.style.objectFit = 'cover';
+            img.style.borderRadius = '50%';
+            avatarContainer.appendChild(img);
+            if (icon) icon.style.display = 'none';
+        } else {
+            if (icon) icon.style.display = 'block';
+        }
+    }
+    window.updateAvatarUI = updateAvatarUI;
 
     // Super Admin Auto-Registration
     async function checkAndRegisterSuperAdmin() {
