@@ -1142,20 +1142,25 @@
                                 `<span class="badge ${status === 'Pago' ? 'active' : 'plan-half'}" style="background: ${status === 'Pago' ? '#22c55e' : '#ef4444'}; color: white;">${status}</span>`
                             }
                                                     </td>
-                                                    <td style="text-align: right;">
-                                                         <button class="btn-icon" style="color: var(--primary); background: rgba(37, 99, 235, 0.1);" title="${currentUser.role === 'student' ? 'Ver Meu Boletim' : 'Lançar Notas'}" onclick="renderGradeEditor('${s.id}')">
-                                                            <i data-lucide="${currentUser.role === 'student' ? 'eye' : 'edit-3'}"></i>
-                                                        </button>
-                                                        <button class="btn-icon" title="Imprimir Certificado" onclick="generateCertificate('${s.id}')">
-                                                            <i data-lucide="printer"></i>
-                                                        </button>
-                                                        <button class="btn-icon" title="Ver Histórico Acadêmico" onclick="printAcademicHistory('${s.id}')">
-                                                            <i data-lucide="file-text"></i>
-                                                        </button>
-                                                        ${currentUser.role !== 'student' ? `
-                                                        <button class="btn-icon red delete-st-class" data-id="${s.id}" title="Excluir Aluno">
-                                                            <i data-lucide="trash-2"></i>
-                                                        </button>` : ''}
+                                                    <td class="actions-cell">
+                                                        <div class="actions-wrapper">
+                                                             <button class="btn-icon" style="color: var(--primary); background: rgba(37, 99, 235, 0.1);" title="${currentUser.role === 'student' ? 'Ver Meu Boletim' : 'Lançar Notas'}" onclick="renderGradeEditor('${s.id}')">
+                                                                <i data-lucide="${currentUser.role === 'student' ? 'eye' : 'edit-3'}"></i>
+                                                            </button>
+                                                            <button class="btn-icon" title="Imprimir Certificado" onclick="generateCertificate('${s.id}')">
+                                                                <i data-lucide="printer"></i>
+                                                            </button>
+                                                            <button class="btn-icon" title="Ver Histórico Acadêmico" onclick="printAcademicHistory('${s.id}')">
+                                                                <i data-lucide="file-text"></i>
+                                                            </button>
+                                                            ${currentUser.role !== 'student' ? `
+                                                            <button class="btn-icon" style="color: #64748b;" title="Editar Cadastro" onclick="renderEditStudent('${s.id}')">
+                                                                <i data-lucide="settings"></i>
+                                                            </button>
+                                                            <button class="btn-icon red delete-st-class" data-id="${s.id}" title="Excluir Aluno">
+                                                                <i data-lucide="trash-2"></i>
+                                                            </button>` : ''}
+                                                        </div>
                                                     </td>
                                                 </tr>`;
                     }).join('')}
