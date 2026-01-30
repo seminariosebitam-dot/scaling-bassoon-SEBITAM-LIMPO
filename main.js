@@ -1487,30 +1487,27 @@
                                 }
                             ];
 
-                            // --- INTEGRAÇÃO COM GEMINI API ---
+                            // --- INTEGRAÇÃO SEGURA COM SUPABASE EDGE FUNCTIONS ---
                             async function callGeminiAI(userText) {
-                                const GEMINI_API_KEY = "AIzaSyCraYyXs8Q5R78ogvWpFCHhSR64GK8J_ns";
-                                const GEMINI_MODEL = "gemini-1.5-flash";
-                                const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
-
-                                const systemPrompt = `Você é o 'Antigravity', a IA teológica oficial do SEBITAM (Seminário Bíblico Teológico da Amazônia). 
-                                Responda com base no perfil do usuário: ${currentUser.name} (${currentUser.role}). 
-                                Histórico do projeto: O SEBITAM usa Supabase, tem 5 módulos teológicos e foco ministerial. 
-                                Seja pastoral, técnico e use HTML simples (<strong>, <ul>, <p>) para formatar.`;
+                                if (!supabase) return "Sinto muito, o sistema está em modo offline.";
 
                                 try {
-                                    const response = await fetch(url, {
-                                        method: 'POST',
-                                        headers: { 'Content-Type': 'application/json' },
-                                        body: JSON.stringify({
-                                            contents: [{ parts: [{ text: `${systemPrompt}\n\nPergunta: ${userText}` }] }]
-                                        })
+                                    // Chama a Edge Function 'gemini-chat' configurada no Supabase
+                                    const { data, error } = await supabase.functions.invoke('gemini-chat', {
+                                        body: {
+                                            question: userText,
+                                            userProfile: {
+                                                name: currentUser.name,
+                                                role: currentUser.role
+                                            }
+                                        }
                                     });
-                                    const data = await response.json();
-                                    return data.candidates?.[0]?.content?.parts?.[0]?.text || "Desculpe, meu cérebro teológico está processando muita informação. Tente novamente em alguns segundos.";
+
+                                    if (error) throw error;
+                                    return data.response || "Não recebi uma resposta válida da IA.";
                                 } catch (err) {
-                                    console.error("Erro na API Gemini:", err);
-                                    return "Sinto muito, houve uma falha na conexão com meus servidores teológicos.";
+                                    console.error("Erro ao invocar Edge Function:", err);
+                                    return "Sinto muito, houve uma falha na conexão segura com a IA. Verifique se a Edge Function foi implantada corretamente.";
                                 }
                             }
 
