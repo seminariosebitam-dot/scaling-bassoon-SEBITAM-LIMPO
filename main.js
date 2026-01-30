@@ -735,9 +735,9 @@
                         </div>
                     </div>
 
+
                     <div class="view-header" style="margin-top: 40px;">
                         <h2>Corpo Administrativo e Docente</h2>
-                        <p>Contatos rÃ¡pidos da equipe de gestÃ£o e ensino.</p>
                     </div>
 
                     <div class="staff-contacts-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 40px;">

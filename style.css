@@ -124,7 +124,7 @@ body {
 }
 
 .main-logo {
-    max-width: 180px;
+    max-width: 90px;
     height: auto;
     margin-bottom: 16px;
     border-radius: 8px;
@@ -907,7 +907,8 @@ body {
         justify-content: center;
     }
 
-    .menu-toggle i {
+    .menu-toggle i,
+    .menu-toggle svg {
         width: 28px !important;
         height: 28px !important;
     }
@@ -966,10 +967,13 @@ body {
         box-shadow: none !important;
         /* Move shadow or remove to avoid cut off */
         border: none !important;
+        width: 100% !important;
+        display: block;
     }
 
     .data-table {
         min-width: 600px !important;
+        width: 100% !important;
         background: var(--bg-card);
         /* Ensure bg follows content */
         border-radius: 20px;
