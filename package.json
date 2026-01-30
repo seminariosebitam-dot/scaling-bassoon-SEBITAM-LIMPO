@@ -1,0 +1,28 @@
+{
+  "name": "sebitam-limpo",
+  "version": "1.0.0",
+  "description": "Sistema de gestão institucional e teológica para o SEBITAM.",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "mobile:build": "node build-mobile.js",
+    "mobile:sync": "npm run mobile:build && npx cap sync"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/seminariosebitam-dot/scaling-bassoon-SEBITAM-LIMPO.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/seminariosebitam-dot/scaling-bassoon-SEBITAM-LIMPO/issues"
+  },
+  "homepage": "https://github.com/seminariosebitam-dot/scaling-bassoon-SEBITAM-LIMPO#readme",
+  "dependencies": {
+    "@capacitor/android": "^8.0.2",
+    "@capacitor/cli": "^8.0.2",
+    "@capacitor/core": "^8.0.2"
+  }
+}
