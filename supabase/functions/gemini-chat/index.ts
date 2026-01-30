@@ -6,35 +6,35 @@ const corsHeaders = {
 }
 
 serve(async (req) => {
-    // Handle CORS preflight
     if (req.method === 'OPTIONS') {
         return new Response('ok', { headers: corsHeaders })
     }
 
     try {
         const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
-        if (!GEMINI_API_KEY) {
-            throw new Error("Chave GEMINI_API_KEY não configurada nos Secrets do Supabase.");
-        }
+        if (!GEMINI_API_KEY) throw new Error("GEMINI_API_KEY not found");
 
         const { question, userProfile } = await req.json();
 
-        const GEMINI_MODEL = "gemini-1.5-flash";
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
 
-        const systemPrompt = `Você é o 'Antigravity', a IA teológica oficial do SEBITAM (Seminário Batista de Teologia do Amazonas).
-Seu objetivo é auxiliar alunos, professores e interessados com profundo conhecimento teológico e administrativo do seminário.
-Responda de forma sábia, respeitosa e biblicamente fundamentada.
+        // Prompt enriquecido com dados do sistema e instruções de personalidade
+        const systemPrompt = `Você é o 'Antigravity', a IA teológica oficial do SEBITAM.
+Sua missão é auxiliar de forma sábia, técnica e pastoral.
 
-Contexto do Usuário Atual:
-Nome: ${userProfile?.name || 'Visitante'}
-Papel: ${userProfile?.role || 'Interessado'}
+DADOS DO USUÁRIO ATUAL:
+- Nome: ${userProfile?.name || 'Visitante'}
+- Papel: ${userProfile?.role || 'Interessado'}
 
-Base de Conhecimento (Resumo):
-- SEBITAM: Seminário em Manaus/AM.
-- Missão: Formar líderes cristãos com excelência acadêmica e fervor espiritual.
-- Cursos: Teologia (Bacharel), Formação Pastoral, Liderança Cristã.
-- Contato: secretaria@sebitam.com.br
+INSTRUÇÕES DE RESPOSTA:
+1. Sempre cumprimente o usuário pelo nome (${userProfile?.name}) de forma respeitosa (ex: "Paz seja convosco, ${userProfile?.name}!").
+2. Se o papel for 'Admin', forneça informações mais detalhadas e técnicas. Se for 'Student', seja mais encorajador e focado no aprendizado.
+3. Use HTML básico (<strong>, <ul>, <li>, <p>) para formatar a resposta para o frontend.
+4. Base de Dados SEBITAM:
+   - Temos 5 Módulos Teológicos: 1 (Fundamentos), 2 (História), 3 (Doutrinas), 4 (Prática), 5 (Liderança).
+   - O SEBITAM fica em Manaus/AM.
+   - O reitor é o Pr. Luiz Eduardo.
+   - O foco é formação pastoral e liderança cristã.
 
 Pergunta do Usuário: ${question}`;
 
@@ -47,13 +47,12 @@ Pergunta do Usuário: ${question}`;
         });
 
         const data = await response.json();
-        const answer = data.candidates?.[0]?.content?.parts?.[0]?.text || "Desculpe, não consegui processar sua resposta no momento.";
+        const answer = data.candidates?.[0]?.content?.parts?.[0]?.text || "Não consegui processar sua resposta teológica agora.";
 
         return new Response(JSON.stringify({ response: answer }), {
             headers: { ...corsHeaders, "Content-Type": "application/json" },
             status: 200,
         });
-
     } catch (error) {
         return new Response(JSON.stringify({ error: error.message }), {
             headers: { ...corsHeaders, "Content-Type": "application/json" },
