@@ -985,6 +985,24 @@ body {
         padding: 0 20px !important;
         overflow: hidden;
     }
+
+    /* Mobile Table Optimization */
+    .actions-cell {
+        display: block !important;
+        width: 100% !important;
+        border-bottom: 2px solid var(--border) !important;
+        padding-top: 0 !important;
+    }
+
+    .actions-wrapper {
+        justify-content: flex-start !important;
+        padding: 10px 0;
+        gap: 12px !important;
+    }
+
+    .data-table td {
+        padding: 12px 16px !important;
+    }
 }
 
 .data-table th {
@@ -1005,6 +1023,20 @@ body {
 
 .data-table tr:last-child td {
     border-bottom: none;
+}
+
+.actions-wrapper {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+
+/* Ensure phone numbers don't wrap */
+.data-table td:nth-child(4),
+.data-table td:nth-child(5) {
+    white-space: nowrap !important;
 }
 
 .user-cell {

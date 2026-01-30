@@ -1037,28 +1037,36 @@
                                                 <td><span class="badge ${u.plan === 'integral' ? 'plan-integral' : u.plan === 'half' ? 'plan-half' : 'plan-scholarship'}">${planLabel}</span></td>
                                                 <td><span class="badge ${status === 'Pago' ? 'active' : 'plan-half'}" style="background: ${status === 'Pago' ? '#22c55e' : '#ef4444'}; color: white; padding: 2px 8px; font-size: 0.7rem;">${status}</span></td>
                                             ` : ''}
-                                            <td style="display: flex; gap: 6px; justify-content: flex-end; align-items: center;">
-                                                 ${activeUserTab === 'student' ? `
-                                                        <button class="btn-icon" style="color: var(--primary); background: rgba(37, 99, 235, 0.1);" title="${currentUser.role === 'student' ? 'Ver Meu Boletim' : 'Lançar Notas'}" onclick="renderGradeEditor('${u.id}')">
-                                                        <i data-lucide="${currentUser.role === 'student' ? 'eye' : 'edit-3'}"></i>
+                                            <td class="actions-cell">
+                                                <div class="actions-wrapper">
+                                                     ${activeUserTab === 'student' ? `
+                                                            <button class="btn-icon" style="color: var(--primary); background: rgba(37, 99, 235, 0.1);" title="${currentUser.role === 'student' ? 'Ver Meu Boletim' : 'Lançar Notas'}" onclick="renderGradeEditor('${u.id}')">
+                                                            <i data-lucide="${currentUser.role === 'student' ? 'eye' : 'edit-3'}"></i>
+                                                        </button>
+                                                    <button class="btn-icon" title="Imprimir Certificado" onclick="generateCertificate('${u.id}')">
+                                                        <i data-lucide="printer"></i>
                                                     </button>
-                                                <button class="btn-icon" title="Imprimir Certificado" onclick="generateCertificate('${u.id}')">
-                                                    <i data-lucide="printer"></i>
-                                                </button>
-                                                <button class="btn-icon" title="Ver Histórico Acadêmico" onclick="printAcademicHistory('${u.id}')">
-                                                    <i data-lucide="file-text"></i>
-                                                </button>
-                                                ${currentUser.role !== 'student' ? `
-                                                    <button class="btn-icon" style="color: #64748b;" title="Editar Cadastro" onclick="renderEditStudent('${u.id}')">
-                                                        <i data-lucide="settings"></i>
+                                                    <button class="btn-icon" title="Ver Histórico Acadêmico" onclick="printAcademicHistory('${u.id}')">
+                                                        <i data-lucide="file-text"></i>
                                                     </button>
-                                                ` : ''}
-                                                ` : ''}
-                                                ${currentUser.role !== 'student' ? `
-                                                    <button class="btn-icon red delete-user" data-id="${u.id}" data-type="${activeUserTab}" title="Excluir">
-                                                        <i data-lucide="trash-2"></i>
-                                                    </button>
-                                                ` : ''}
+                                                    ` : `
+                                                        <button class="btn-icon" style="color: var(--primary); background: rgba(37, 99, 235, 0.1);" title="Ver Detalhes">
+                                                            <i data-lucide="eye"></i>
+                                                        </button>
+                                                        <button class="btn-icon" title="Imprimir">
+                                                            <i data-lucide="printer"></i>
+                                                        </button>
+                                                    `}
+                                                    
+                                                    ${currentUser.role !== 'student' ? `
+                                                        <button class="btn-icon" style="color: #64748b;" title="Editar/Configurar" onclick="${activeUserTab === 'student' ? `renderEditStudent('${u.id}')` : `alert('Função em desenvolvimento para este perfil')`}">
+                                                            <i data-lucide="settings"></i>
+                                                        </button>
+                                                        <button class="btn-icon red delete-user" data-id="${u.id}" data-type="${activeUserTab}" title="Excluir">
+                                                            <i data-lucide="trash-2"></i>
+                                                        </button>
+                                                    ` : ''}
+                                                </div>
                                             </td>
                                         </tr>
                                     `;
