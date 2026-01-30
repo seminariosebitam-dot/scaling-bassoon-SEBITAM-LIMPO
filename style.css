@@ -1006,19 +1006,21 @@ body {
 }
 
 .data-table th {
-    padding: 16px 24px;
+    padding: 12px 12px;
     background: var(--bg-main);
-    font-size: 0.85rem;
-    font-weight: 600;
+    font-size: 0.75rem;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     color: var(--text-muted);
+    white-space: nowrap;
 }
 
 .data-table td {
-    padding: 16px 24px;
+    padding: 10px 12px;
     border-bottom: 1px solid var(--border);
-    font-size: 0.95rem;
+    font-size: 0.82rem;
+    white-space: nowrap !important;
 }
 
 .data-table tr:last-child td {
@@ -1033,10 +1035,22 @@ body {
     flex-wrap: nowrap;
 }
 
-/* Ensure phone numbers don't wrap */
-.data-table td:nth-child(4),
-.data-table td:nth-child(5) {
+/* Ensure table content doesn't wrap */
+.data-table td,
+.data-table th,
+.badge {
     white-space: nowrap !important;
+}
+
+.btn-icon {
+    width: 30px;
+    height: 30px;
+    padding: 4px;
+}
+
+.btn-icon i {
+    width: 16px;
+    height: 16px;
 }
 
 .user-cell {
