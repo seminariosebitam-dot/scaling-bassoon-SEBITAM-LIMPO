@@ -1021,7 +1021,7 @@
                                 ${usersList.map(u => {
                     const uName = u.fullName || u.name || 'Sem Nome';
                     const nameCap = uName.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
-                    const roleInfo = activeUserTab === 'student' ? `Turma ${u.grade || '-'}` : (labelMap[activeUserTab]);
+                    const roleInfo = activeUserTab === 'student' ? `Turma&nbsp;${u.grade || '-'}` : (labelMap[activeUserTab]);
                     const email = u.email || u.institutionalEmail || '-';
                     const phone = u.phone || '-';
                     const planLabel = u.plan === 'integral' ? 'Integral' : u.plan === 'half' ? 'Meia' : 'Bolsa';
