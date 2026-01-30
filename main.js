@@ -16,6 +16,10 @@
         role: 'admin',
         name: 'Administrador'
     };
+    // Navigation History
+    let viewHistory = [];
+    let currentView = 'login';
+    let currentData = null;
 
     // --- CONFIGURAÇÃO SUPABASE ---
     // URL do projeto
@@ -242,12 +246,45 @@
     });
 
     // Logout Logic
+
     logoutBtn.addEventListener('click', () => {
         dashboardScreen.classList.remove('active');
         loginScreen.classList.add('active');
         // Clear all role-specific classes from body
         document.body.classList.remove('user-role-admin', 'user-role-secretary', 'user-role-teacher', 'user-role-student');
+
+        // Reset History
+        viewHistory = [];
+        currentView = 'login';
+        currentData = null;
     });
+
+    // Mobile Bottom Nav Logic
+    const mobileHomeBtn = document.getElementById('mobile-home-btn');
+    const mobileBackBtn = document.getElementById('mobile-back-btn');
+    const mobileLogoutBtn = document.getElementById('mobile-logout-btn');
+
+    if (mobileHomeBtn) {
+        mobileHomeBtn.addEventListener('click', () => {
+            renderView('overview');
+        });
+    }
+
+    if (mobileBackBtn) {
+        mobileBackBtn.addEventListener('click', () => {
+            if (viewHistory.length > 0) {
+                const lastState = viewHistory.pop();
+                // Pass false to addToHistory so we don't push the current view to history when going back
+                renderView(lastState.view, lastState.data, false);
+            } else {
+                renderView('overview', null, false);
+            }
+        });
+    }
+
+    if (mobileLogoutBtn) {
+        mobileLogoutBtn.addEventListener('click', () => logoutBtn.click());
+    }
 
     // Nav Item Clicks
     navItems.forEach(item => {
@@ -644,7 +681,14 @@
         };
     }
 
-    async function renderView(view, data = null) {
+    async function renderView(view, data = null, addToHistory = true) {
+        // Handle History
+        if (addToHistory && currentView && currentView !== 'login' && currentView !== view) {
+            viewHistory.push({ view: currentView, data: currentData });
+        }
+        currentView = view;
+        currentData = data;
+
         const contentBody = document.getElementById('dynamic-content');
         let html = '';
         switch (view) {

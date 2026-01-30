@@ -146,9 +146,21 @@
 
             <main class="main-content">
                 <header class="top-bar">
-                    <button id="menu-toggle" class="menu-toggle">
-                        <i data-lucide="menu"></i>
-                    </button>
+                    <div class="header-left" style="display: flex; align-items: center; gap: 10px;">
+                        <button id="menu-toggle" class="menu-toggle">
+                            <i data-lucide="menu"></i>
+                        </button>
+                        <button id="back-btn" class="nav-btn-header" style="display: none;">
+                            <i data-lucide="arrow-left"></i>
+                        </button>
+                    </div>
+
+                    <div class="header-right mobile-only-header"
+                        style="position: absolute; right: 16px; top: 50%; transform: translateY(-50%); display: none;">
+                        <button id="header-logout-btn" class="nav-btn-header" style="color: #ef4444;">
+                            <i data-lucide="log-out"></i>
+                        </button>
+                    </div>
                     <div class="search-area">
                         <i data-lucide="search"></i>
                         <input type="text" placeholder="Pesquisar...">
@@ -201,6 +213,20 @@
                         </div>
                     </div>
                 </div>
+                <nav id="mobile-bottom-nav" class="mobile-bottom-nav">
+                    <button id="mobile-home-btn" class="mobile-nav-btn">
+                        <i data-lucide="home"></i>
+                        <span>Início</span>
+                    </button>
+                    <button id="mobile-back-btn" class="mobile-nav-btn">
+                        <i data-lucide="arrow-left"></i>
+                        <span>Voltar</span>
+                    </button>
+                    <button id="mobile-logout-btn" class="mobile-nav-btn">
+                        <i data-lucide="log-out"></i>
+                        <span>Sair</span>
+                    </button>
+                </nav>
             </main>
         </section>
     </div>

@@ -1776,3 +1776,61 @@ body.user-role-student .delete-staff-ov,
 body.user-role-student .delete-st-class {
     display: none !important;
 }
+
+/* Mobile Bottom Nav */
+.mobile-bottom-nav {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 70px;
+    background: var(--bg-card);
+    border-top: 1px solid var(--border);
+    justify-content: space-around;
+    align-items: center;
+    z-index: 1000;
+    padding-bottom: env(safe-area-inset-bottom);
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.mobile-bottom-nav .mobile-nav-btn {
+    background: none;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 10px;
+    cursor: pointer;
+    flex: 1;
+}
+
+.mobile-bottom-nav .mobile-nav-btn i {
+    width: 24px;
+    height: 24px;
+    transition: var(--transition);
+}
+
+.mobile-bottom-nav .mobile-nav-btn:active i {
+    transform: scale(0.9);
+}
+
+.mobile-bottom-nav .mobile-nav-btn.active,
+.mobile-bottom-nav .mobile-nav-btn:active {
+    color: var(--primary);
+}
+
+@media (max-width: 768px) {
+    .mobile-bottom-nav {
+        display: flex;
+    }
+
+    /* Adjust content padding so it's not hidden behind the bar */
+    .content-body {
+        padding-bottom: 90px;
+    }
+}
