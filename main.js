@@ -999,15 +999,11 @@
 
                 html = `
                         <div class="view-header" > <h2>Gestão de Usuários</h2></div>
-                    <div class="tabs-container" style="display:flex; flex-direction: column; gap:10px; margin-bottom:20px;">
-                        <div style="display:flex; gap:10px; width: 100%; justify-content: center;">
-                            <button class="tab-btn ${activeUserTab === 'admin' ? 'active' : ''}" data-type="admin">Administradores</button>
-                            <button class="tab-btn ${activeUserTab === 'secretary' ? 'active' : ''}" data-type="secretary">Secretaria</button>
-                        </div>
-                        <div style="display:flex; gap:10px; width: 100%; justify-content: center;">
-                            <button class="tab-btn ${activeUserTab === 'teacher' ? 'active' : ''}" data-type="teacher">Professores</button>
-                             <button class="tab-btn ${activeUserTab === 'student' ? 'active' : ''}" data-type="student">Alunos</button>
-                        </div>
+                    <div class="tabs-container" style="display:flex; flex-wrap: wrap; gap:10px; margin-bottom:20px;">
+                        <button class="tab-btn ${activeUserTab === 'admin' ? 'active' : ''}" data-type="admin">Administradores</button>
+                        <button class="tab-btn ${activeUserTab === 'secretary' ? 'active' : ''}" data-type="secretary">Secretaria</button>
+                        <button class="tab-btn ${activeUserTab === 'teacher' ? 'active' : ''}" data-type="teacher">Professores</button>
+                        <button class="tab-btn ${activeUserTab === 'student' ? 'active' : ''}" data-type="student">Alunos</button>
                     </div>
                     <div class="table-container">
                         <table class="data-table">
@@ -1017,7 +1013,6 @@
                                     <th>${activeUserTab === 'student' ? 'Turma' : 'Cargo'}</th>
                                     <th>E-mail</th>
                                     <th>Telefone</th>
-                                    ${activeUserTab === 'student' ? '<th>Plano</th><th>Financeiro</th>' : ''}
                                     <th class="text-right">Ações</th>
                                 </tr>
                             </thead>
@@ -1028,8 +1023,6 @@
                     const roleInfo = activeUserTab === 'student' ? `Turma&nbsp;${u.grade || '-'}` : (labelMap[activeUserTab]);
                     const email = u.email || u.institutionalEmail || '-';
                     const phone = u.phone || '-';
-                    const planLabel = u.plan === 'integral' ? 'Integral' : u.plan === 'half' ? 'Meia' : 'Bolsa';
-                    const status = u.paymentStatus || (['integral', 'scholarship'].includes(u.plan) ? 'Pago' : 'Pendente');
 
                     return `
                                         <tr>
@@ -1037,31 +1030,8 @@
                                             <td><span class="badge" style="background: var(--bg-main); color: var(--text-main); border: 1px solid var(--border);">${roleInfo}</span></td>
                                             <td style="font-size: 0.85rem;">${email}</td>
                                             <td style="font-size: 0.85rem; white-space: nowrap;">${phone}</td>
-                                            ${activeUserTab === 'student' ? `
-                                                <td><span class="badge ${u.plan === 'integral' ? 'plan-integral' : u.plan === 'half' ? 'plan-half' : 'plan-scholarship'}">${planLabel}</span></td>
-                                                <td><span class="badge ${status === 'Pago' ? 'active' : 'plan-half'}" style="background: ${status === 'Pago' ? '#22c55e' : '#ef4444'}; color: white; padding: 2px 8px; font-size: 0.7rem;">${status}</span></td>
-                                            ` : ''}
                                             <td class="actions-cell">
                                                 <div class="actions-wrapper">
-                                                     ${activeUserTab === 'student' ? `
-                                                            <button class="btn-icon" style="color: var(--primary); background: rgba(37, 99, 235, 0.1);" title="${currentUser.role === 'student' ? 'Ver Meu Boletim' : 'Lançar Notas'}" onclick="renderGradeEditor('${u.id}')">
-                                                            <i data-lucide="${currentUser.role === 'student' ? 'eye' : 'edit-3'}"></i>
-                                                        </button>
-                                                    <button class="btn-icon" title="Imprimir Certificado" onclick="generateCertificate('${u.id}')">
-                                                        <i data-lucide="printer"></i>
-                                                    </button>
-                                                    <button class="btn-icon" title="Ver Histórico Acadêmico" onclick="printAcademicHistory('${u.id}')">
-                                                        <i data-lucide="file-text"></i>
-                                                    </button>
-                                                    ` : `
-                                                        <button class="btn-icon" style="color: var(--primary); background: rgba(37, 99, 235, 0.1);" title="Ver Detalhes">
-                                                            <i data-lucide="eye"></i>
-                                                        </button>
-                                                        <button class="btn-icon" title="Imprimir">
-                                                            <i data-lucide="printer"></i>
-                                                        </button>
-                                                    `}
-                                                    
                                                     ${currentUser.role !== 'student' ? `
                                                         <button class="btn-icon" style="color: #64748b;" title="Editar/Configurar" onclick="${activeUserTab === 'student' ? `renderEditStudent('${u.id}')` : `alert('Função em desenvolvimento para este perfil')`}">
                                                             <i data-lucide="settings"></i>
@@ -1075,7 +1045,7 @@
                                         </tr>
                                     `;
                 }).join('')}
-                                ${usersList.length === 0 ? `<tr><td colspan="${activeUserTab === 'student' ? 7 : 5}" style="text-align:center; padding: 20px;">Nenhum registro encontrado.</td></tr>` : ''}
+                                ${usersList.length === 0 ? `<tr><td colspan="5" style="text-align:center; padding: 20px;">Nenhum registro encontrado.</td></tr>` : ''}
                             </tbody>
                         </table>
                     </div>`;
