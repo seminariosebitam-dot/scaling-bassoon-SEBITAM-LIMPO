@@ -1414,11 +1414,21 @@
                         <div style="display: flex; flex-direction: column; gap: 20px;">
                             
                             <!-- Stats Cards -->
+
+                            <!-- Stats Cards -->
+                            <div class="stat-card" style="background: white; border: 2px solid var(--primary); background: rgba(37, 99, 235, 0.05);">
+                                <div class="stat-icon" style="background: var(--primary); color: white;"><i data-lucide="wallet"></i></div>
+                                <div>
+                                    <div class="stat-value" style="font-size: 1.8rem; color: var(--primary);">R$ ${allFinanceSt.reduce((acc, s) => acc + (PRICES[s.plan] || 0), 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
+                                    <div class="stat-label">Total Geral (Todas as Turmas)</div>
+                                </div>
+                            </div>
+
                             <div class="stat-card" style="background: white;">
                                 <div class="stat-icon" style="background: rgba(34, 197, 94, 0.1); color: #16a34a;"><i data-lucide="dollar-sign"></i></div>
                                 <div>
                                     <div class="stat-value" style="font-size: 1.5rem;">R$ ${totalReceived.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
-                                    <div class="stat-label">Total Recebido (Mês)</div>
+                                    <div class="stat-label">Total Recebido (Mês Atual)</div>
                                 </div>
                             </div>
 
@@ -1426,7 +1436,7 @@
                                 <!-- Icon removed as requested -->
                                 <div>
                                     <div class="stat-value" style="font-size: 1.5rem;">R$ ${(totalExpected - totalReceived).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
-                                    <div class="stat-label">Total em Aberto</div>
+                                    <div class="stat-label">Total em Aberto (Seleção)</div>
                                 </div>
                             </div>
 
