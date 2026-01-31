@@ -1399,7 +1399,7 @@
                     : allFinanceSt.filter(s => s.grade == selectedGrade);
 
                 // Definição de valores monetários por plano
-                const PRICES = { integral: 200, half: 100, scholarship: 0 };
+                const PRICES = { integral: 70, half: 35, scholarship: 0 };
 
                 let totalExpected = 0;
                 let totalReceived = 0;
