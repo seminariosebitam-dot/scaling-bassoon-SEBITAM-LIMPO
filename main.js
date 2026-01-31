@@ -1283,6 +1283,66 @@
                 break;
             }
 
+            case 'themes':
+                html = `
+                    <div class="view-header">
+                        <h2>Personalizar Aparência</h2>
+                        <p>Escolha o tema visual do sistema que melhor lhe agrada.</p>
+                    </div>
+                    <div class="form-container" style="text-align: center; max-width: 700px; padding: 40px;">
+                        <h3 style="margin-bottom: 30px; color: var(--text-main);">Selecione um Tema</h3>
+                        <div class="theme-selector-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 20px;">
+                             <button class="theme-option-card" data-theme="professional" style="padding: 20px; border: 2px solid var(--border); border-radius: 15px; background: white; cursor: pointer; transition: 0.3s; display: flex; flex-direction: column; align-items: center;">
+                                <div style="width: 50px; height: 50px; border-radius: 50%; background: #2563eb; margin-bottom: 15px; border: 2px solid #e2e8f0;"></div>
+                                <span style="font-weight: 600; font-size: 0.9rem; color: var(--text-main);">Profissional</span>
+                            </button>
+                            <button class="theme-option-card" data-theme="man" style="padding: 20px; border: 2px solid var(--border); border-radius: 15px; background: white; cursor: pointer; transition: 0.3s; display: flex; flex-direction: column; align-items: center;">
+                                <div style="width: 50px; height: 50px; border-radius: 50%; background: #0f172a; margin-bottom: 15px; border: 2px solid #e2e8f0;"></div>
+                                <span style="font-weight: 600; font-size: 0.9rem; color: var(--text-main);">Elegante Dark</span>
+                            </button>
+                            <button class="theme-option-card" data-theme="woman" style="padding: 20px; border: 2px solid var(--border); border-radius: 15px; background: white; cursor: pointer; transition: 0.3s; display: flex; flex-direction: column; align-items: center;">
+                                <div style="width: 50px; height: 50px; border-radius: 50%; background: #be185d; margin-bottom: 15px; border: 2px solid #e2e8f0;"></div>
+                                <span style="font-weight: 600; font-size: 0.9rem; color: var(--text-main);">Sofisticado</span>
+                            </button>
+                            <button class="theme-option-card" data-theme="elegant" style="padding: 20px; border: 2px solid var(--border); border-radius: 15px; background: white; cursor: pointer; transition: 0.3s; display: flex; flex-direction: column; align-items: center;">
+                                <div style="width: 50px; height: 50px; border-radius: 50%; background: #d4af37; margin-bottom: 15px; border: 2px solid #e2e8f0;"></div>
+                                <span style="font-weight: 600; font-size: 0.9rem; color: var(--text-main);">Luxo Dourado</span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                setTimeout(() => {
+                    document.querySelectorAll('.theme-option-card').forEach(btn => {
+                        // Highlight current theme
+                        const currentTheme = localStorage.getItem('sebitam-theme') || 'professional';
+                        if (btn.dataset.theme === currentTheme) {
+                            btn.style.borderColor = 'var(--primary)';
+                            btn.style.background = 'rgba(37, 99, 235, 0.05)';
+                        }
+
+                        btn.onclick = () => {
+                            const theme = btn.dataset.theme;
+                            // Safe class removal to preserve user role and other classes
+                            document.body.classList.remove('theme-man', 'theme-woman', 'theme-professional', 'theme-elegant');
+                            document.body.classList.add(`theme-${theme}`);
+
+                            localStorage.setItem('sebitam-theme', theme);
+
+                            // Visual feedback
+                            document.querySelectorAll('.theme-option-card').forEach(b => {
+                                b.style.borderColor = 'var(--border)';
+                                b.style.background = 'white';
+                            });
+                            btn.style.borderColor = 'var(--primary)';
+                            btn.style.background = 'rgba(37, 99, 235, 0.05)';
+
+                            alert(`Tema ${btn.querySelector('span').textContent} aplicado!`);
+                        };
+                    });
+                    lucide.createIcons();
+                }, 0);
+                break;
+
             case 'institucional':
                 html = `
                     <div class="view-header">
