@@ -1275,9 +1275,13 @@
                 }
 
                 const today = new Date();
-                today.setDate(1); // Avoids month skip on 31st
-                today.setMonth(today.getMonth() + 1);
+                // Logic: Start from February. If today is Jan, show Feb. Else show current month.
+                // 0=Jan, 1=Feb. If month is 0, set to 1. Else keep as is.
+                if (today.getMonth() === 0) {
+                    today.setMonth(1);
+                }
                 const currentMonth = today.toLocaleString('pt-BR', { month: 'long' });
+                const currentMonthCapitalized = currentMonth.charAt(0).toUpperCase() + currentMonth.slice(1);
                 const currentYear = today.getFullYear();
 
                 html = `
@@ -1503,7 +1507,11 @@
 
                 const today = new Date();
                 today.setDate(1); // Set to 1st to prevent overflow
-                today.setMonth(today.getMonth() + 1);
+                // Logic: Start from February. If today is Jan, show Feb (1). Else show current month.
+                // Note: getMonth() is 0-indexed.
+                if (today.getMonth() === 0) {
+                    today.setMonth(1);
+                }
                 const displayMonth = today.toLocaleString('pt-BR', { month: 'long' });
                 const displayMonthCapitalized = displayMonth.charAt(0).toUpperCase() + displayMonth.slice(1);
 
@@ -1535,7 +1543,7 @@
                                 <div class="stat-icon" style="background: var(--primary); color: white;"><i data-lucide="wallet"></i></div>
                                 <div>
                                     <div class="stat-value" style="font-size: 1.8rem; color: var(--primary);">R$ ${allFinanceSt.reduce((acc, s) => acc + (PRICES[s.plan] || 0), 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
-                                    <div class="stat-label">Total Geral (Todas as Turmas)</div>
+                                    <div class="stat-label">Total Geral (Todas as Turmas) - ${displayMonthCapitalized}</div>
                                 </div>
                             </div>
 
