@@ -999,11 +999,15 @@
 
                 html = `
                         <div class="view-header" > <h2>Gestão de Usuários</h2></div>
-                    <div class="tabs-container" style="display:flex; gap:10px; margin-bottom:20px;">
-                        <button class="tab-btn ${activeUserTab === 'student' ? 'active' : ''}" data-type="student">Alunos</button>
-                        <button class="tab-btn ${activeUserTab === 'teacher' ? 'active' : ''}" data-type="teacher">Professores</button>
-                        <button class="tab-btn ${activeUserTab === 'admin' ? 'active' : ''}" data-type="admin">Administradores</button>
-                        <button class="tab-btn ${activeUserTab === 'secretary' ? 'active' : ''}" data-type="secretary">Secretaria</button>
+                    <div class="tabs-container" style="display:flex; flex-direction: column; gap:10px; margin-bottom:20px;">
+                        <div style="display:flex; gap:10px; width: 100%; justify-content: center;">
+                            <button class="tab-btn ${activeUserTab === 'admin' ? 'active' : ''}" data-type="admin">Administradores</button>
+                            <button class="tab-btn ${activeUserTab === 'secretary' ? 'active' : ''}" data-type="secretary">Secretaria</button>
+                        </div>
+                        <div style="display:flex; gap:10px; width: 100%; justify-content: center;">
+                            <button class="tab-btn ${activeUserTab === 'teacher' ? 'active' : ''}" data-type="teacher">Professores</button>
+                             <button class="tab-btn ${activeUserTab === 'student' ? 'active' : ''}" data-type="student">Alunos</button>
+                        </div>
                     </div>
                     <div class="table-container">
                         <table class="data-table">
