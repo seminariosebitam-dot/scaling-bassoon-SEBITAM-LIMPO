@@ -1229,8 +1229,8 @@
                     const activeLink = links[subView];
                     html += `
                         <div class="welcome-card" style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 20px; padding: 60px;">
-                            <div style="width: 80px; height: 80px; border-radius: 50%; background: rgba(37, 99, 235, 0.1); display: flex; align-items: center; justify-content: center;">
-                                <i data-lucide="${activeLink.icon}" style="width: 40px; height: 40px; color: var(--primary);"></i>
+                            <div style="width: 80px; height: 80px; border-radius: 50%; background: rgba(255, 255, 255, 0.1); display: flex; align-items: center; justify-content: center; border: 2px solid white;">
+                                <i data-lucide="${activeLink.icon}" style="width: 40px; height: 40px; color: white;"></i>
                             </div>
                             <h3>${activeLink.title}</h3>
                             <p>Clique no botão abaixo para acessar a pasta oficial no Google Drive contendo todo o material de ${activeLink.title}.</p>
