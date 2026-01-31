@@ -1259,12 +1259,17 @@
                                             <td style="text-transform: capitalize;">${currentMonth}</td>
                                             <td>${currentYear}</td>
                                             <td>
-                                                <span class="badge ${status === 'Pago' ? 'active' : 'plan-half'}" 
-                                                      style="background: ${status === 'Pago' ? '#22c55e' : '#ef4444'}; color: white; padding: 5px 12px;">
+                                                <span class="badge" style="background: ${status === 'Pago' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)'}; color: ${status === 'Pago' ? '#16a34a' : '#dc2626'}; border: 1px solid ${status === 'Pago' ? '#22c55e' : '#ef4444'}; display: inline-flex; align-items: center; gap: 5px;">
+                                                    <i data-lucide="${status === 'Pago' ? 'check-circle' : 'alert-circle'}" style="width: 12px; height: 12px;"></i>
                                                     ${status}
                                                 </span>
                                             </td>
-                                            <td><span class="badge" style="border: 1px solid #e2e8f0; color: #64748b;">${planText}</span></td>
+                                            <td>
+                                                <span class="badge" style="background: ${s.plan === 'integral' ? 'rgba(37, 99, 235, 0.1)' : 'transparent'}; border: 1px solid ${s.plan === 'integral' ? '#2563eb' : s.plan === 'scholarship' ? '#9333ea' : '#eab308'}; color: ${s.plan === 'integral' ? '#2563eb' : s.plan === 'scholarship' ? '#9333ea' : '#eab308'}; display: inline-flex; align-items: center;">
+                                                    ${s.plan === 'scholarship' ? '<i data-lucide="graduation-cap" style="width:14px; height:14px; margin-right:4px;"></i>' : ''} 
+                                                    ${planText}
+                                                </span>
+                                            </td>
                                         </tr>
                                     `;
                 }).join('')}
@@ -1552,10 +1557,16 @@
                                         ${processedPayments.map(p => `
                                             <tr>
                                                 <td><strong>${p.fullName}</strong></td>
-                                                <td><span class="badge" style="font-size: 0.7rem;">${p.plan === 'integral' ? 'Integral' : p.plan === 'half' ? 'Meia' : 'Bolsa'}</span></td>
+                                                <td>
+                                                    <span class="badge" style="background: ${p.plan === 'integral' ? 'rgba(37, 99, 235, 0.1)' : 'transparent'}; border: 1px solid ${p.plan === 'integral' ? '#2563eb' : p.plan === 'scholarship' ? '#9333ea' : '#eab308'}; color: ${p.plan === 'integral' ? '#2563eb' : p.plan === 'scholarship' ? '#9333ea' : '#eab308'}; font-size: 0.7rem; display: inline-flex; align-items: center;">
+                                                        ${p.plan === 'scholarship' ? '<i data-lucide="graduation-cap" style="width:12px; height:12px; margin-right:4px;"></i>' : ''}
+                                                        ${p.plan === 'integral' ? 'Integral' : p.plan === 'half' ? 'Meia' : 'Bolsa'}
+                                                    </span>
+                                                </td>
                                                 <td>R$ ${p.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
                                                 <td>
-                                                    <span class="badge" style="background: ${p.status === 'Pago' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)'}; color: ${p.status === 'Pago' ? '#16a34a' : '#dc2626'}; border: 1px solid ${p.status === 'Pago' ? '#22c55e' : '#ef4444'};">
+                                                    <span class="badge" style="background: ${p.status === 'Pago' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)'}; color: ${p.status === 'Pago' ? '#16a34a' : '#dc2626'}; border: 1px solid ${p.status === 'Pago' ? '#22c55e' : '#ef4444'}; display: inline-flex; align-items: center; gap: 5px;">
+                                                        <i data-lucide="${p.status === 'Pago' ? 'check-circle' : 'alert-circle'}" style="width: 12px; height: 12px;"></i>
                                                         ${p.status}
                                                     </span>
                                                 </td>
