@@ -1090,12 +1090,13 @@ body {
 }
 
 .badge {
-    padding: 4px 12px;
+    padding: 2px 6px;
     border-radius: 50px;
-    font-size: 0.8rem;
+    font-size: 0.65rem;
     font-weight: 500;
-    white-space: nowrap !important;
+    white-space: nowrap;
     display: inline-block;
+    line-height: 1;
 }
 
 .badge.grade {
