@@ -1029,10 +1029,10 @@ body {
 
 .actions-wrapper {
     display: flex;
-    gap: 8px;
-    justify-content: flex-end;
     align-items: center;
+    gap: 6px;
     flex-wrap: nowrap;
+    /* NÃO quebra linha */
 }
 
 /* Ensure table content doesn't wrap */
