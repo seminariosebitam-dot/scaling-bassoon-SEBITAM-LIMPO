@@ -1307,6 +1307,88 @@
                 `;
                 setTimeout(() => lucide.createIcons(), 0);
                 break;
+
+            case 'institucional':
+                html = `
+                    <div class="view-header">
+                        <h2>Sebitam Institucional</h2>
+                        <p>Nossa missão, visão e compromisso com o Reino.</p>
+                    </div>
+                    <div class="welcome-card" style="line-height: 1.8; text-align: left; padding: 40px; margin-bottom: 40px;">
+                        <div style="max-width: 800px; margin: 0 auto;">
+                            <h3 style="color: white; margin-bottom: 25px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 10px; font-size: 1.5rem;">Identidade e Propósito</h3>
+                            
+                            <p style="margin-bottom: 20px; font-size: 1.1rem;">
+                                O <strong>SEBITAM</strong> é um seminário bíblico teológico comprometido com o Reino de Deus. 
+                                Fundado para servir à Igreja de Jesus e além dela, seu propósito é formar líderes cristãos íntegros e relevantes.
+                            </p>
+
+                            <div style="background: rgba(0,0,0,0.2); padding: 25px; border-radius: 15px; margin-bottom: 25px; border-left: 4px solid var(--primary);">
+                                <p style="margin-bottom: 15px;"><strong>O SEBITAM existe para glorificar a Deus em tudo o que faz.</strong></p>
+                                <p>Promove o estudo sério e fiel das Escrituras Sagradas, valorizando a missão integral da Igreja no mundo.</p>
+                            </div>
+
+                            <p style="margin-bottom: 20px;">
+                                Sua missão é capacitar homens e mulheres para o serviço cristão, preparando-os para ensinar, pastorear e servir com excelência. 
+                                Buscamos o desenvolvimento espiritual, acadêmico e humano, cultivando caráter, ética e compromisso com o amor ao próximo.
+                            </p>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px;">
+                                <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 12px;">
+                                    <h4 style="color: white; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                                        <i data-lucide="target" style="width: 18px;"></i> Visão
+                                    </h4>
+                                    <p style="font-size: 0.9rem;">Ser referência em educação teológica na Amazônia, reconhecido pela fidelidade bíblica e relevância missional.</p>
+                                </div>
+                                <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 12px;">
+                                    <h4 style="color: white; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                                        <i data-lucide="heart" style="width: 18px;"></i> Valores
+                                    </h4>
+                                    <p style="font-size: 0.9rem;">Unidade, humildade, excelência no serviço, responsabilidade social e fidelidade às Escrituras.</p>
+                                </div>
+                            </div>
+
+                            <p style="margin-bottom: 20px;">
+                                Estimulamos o pensamento crítico à luz da Palavra de Deus, promovendo unidade, humildade e espírito de serviço. 
+                                Atuamos com responsabilidade social e sensibilidade cultural, formando discípulos que façam discípulos.
+                            </p>
+
+                            <p style="font-style: italic; opacity: 0.9; margin-top: 30px; text-align: center; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 20px;">
+                                "Desejamos ver a Igreja fortalecida e saudável e proclamar a esperança transformadora de Jesus ao mundo."
+                            </p>
+                        </div>
+                    </div>
+                `;
+                setTimeout(() => lucide.createIcons(), 0);
+                break;
+
+            case 'termo':
+                html = `
+                    <div class="view-header">
+                        <h2>Termo de Responsabilidade</h2>
+                        <p>Documentação oficial e compromissos acadêmicos / institucionais.</p>
+                    </div>
+                    <div class="welcome-card" style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 25px; padding: 60px;">
+                        <div style="width: 80px; height: 80px; border-radius: 50%; background: rgba(37, 99, 235, 0.1); display: flex; align-items: center; justify-content: center;">
+                            <i data-lucide="file-text" style="width: 40px; height: 40px; color: var(--primary);"></i>
+                        </div>
+                        <h3>Termo de Responsabilidade SEBITAM</h3>
+                        <p style="max-width: 500px;">Acesse o Termo de Responsabilidade oficial em formato PDF. Este documento descreve as diretrizes e compromissos entre o aluno e a instituição.</p>
+                        
+                        <div style="display: flex; gap: 15px; margin-top: 10px;">
+                            <a href="#" target="_blank" class="btn-primary" style="width: auto; padding: 15px 40px; border-radius: 12px; display: flex; align-items: center; gap: 10px; font-weight: 600;">
+                                <i data-lucide="external-link"></i> Abrir PDF (Visualizar)
+                            </a>
+                        </div>
+                        
+                        <div style="margin-top: 20px; font-size: 0.85rem; color: rgba(255,255,255,0.7);">
+                            <p>Para dúvidas sobre o termo, entre em contato com a secretaria acadêmica.</p>
+                        </div>
+                    </div>
+                `;
+                setTimeout(() => lucide.createIcons(), 0);
+                break;
+
             case 'finance':
                 const finStudents = await dbGet('sebitam-students');
                 const planCounts = {
