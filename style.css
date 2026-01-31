@@ -1019,8 +1019,8 @@ body {
 .data-table td {
     padding: 10px 12px;
     border-bottom: 1px solid var(--border);
-    font-size: 0.82rem;
-    white-space: nowrap !important;
+    font-size: 0.8rem;
+    white-space: nowrap;
 }
 
 .data-table tr:last-child td {
