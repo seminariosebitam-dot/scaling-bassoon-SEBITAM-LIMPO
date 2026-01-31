@@ -1230,8 +1230,10 @@
                     displayStudents = allFinanceSt.filter(s => s.fullName.toLowerCase().trim() === currentUser.name.toLowerCase().trim());
                 }
 
-                const currentMonth = new Date().toLocaleString('pt-BR', { month: 'long' });
-                const currentYear = new Date().getFullYear();
+                const today = new Date();
+                today.setMonth(today.getMonth() + 1);
+                const currentMonth = today.toLocaleString('pt-BR', { month: 'long' });
+                const currentYear = today.getFullYear();
 
                 html = `
                     <div class="view-header">
@@ -1454,8 +1456,10 @@
                 const numPaid = processedPayments.filter(p => p.status === 'Pago').length;
                 const numPending = processedPayments.filter(p => p.status === 'Pendente').length;
 
-                const months = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
-                const currentMonthIdx = new Date().getMonth();
+                const today = new Date();
+                today.setMonth(today.getMonth() + 1);
+                const displayMonth = today.toLocaleString('pt-BR', { month: 'long' });
+                const displayMonthCapitalized = displayMonth.charAt(0).toUpperCase() + displayMonth.slice(1);
 
                 html = `
                     <div class="view-header" style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 20px;">
@@ -1493,7 +1497,8 @@
                                 <div class="stat-icon" style="background: rgba(34, 197, 94, 0.1); color: #16a34a;"><i data-lucide="dollar-sign"></i></div>
                                 <div>
                                     <div class="stat-value" style="font-size: 1.5rem;">R$ ${totalReceived.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
-                                    <div class="stat-label">Total Recebido (Mês Atual)</div>
+                                    <div class="stat-value" style="font-size: 1.5rem;">R$ ${totalReceived.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
+                                    <div class="stat-label">Total Recebido (${displayMonthCapitalized})</div>
                                 </div>
                             </div>
 
