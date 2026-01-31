@@ -1408,22 +1408,25 @@
                     }).length
                 };
 
+                const months = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+                const currentMonthIdx = new Date().getMonth();
+
                 html = `
-                        <div class="view-header" >
+                    <div class="view-header">
                         <h2>Painel Financeiro</h2>
-                        <p>Visão de gestão de mensalidades e planos acadêmicos.</p>
+                        <p>Visão consolidada de recebíveis e monitoramento mensal.</p>
                     </div>
                     
                     <div class="stats-grid" style="margin-bottom: 30px;">
                         <div class="stat-card" style="background: white;">
                             <div class="stat-icon" style="background: rgba(34, 197, 94, 0.1); color: #16a34a;"><i data-lucide="trending-up"></i></div>
                             <div class="stat-value">${payments.paid}</div>
-                            <div class="stat-label">Pagamentos Confirmados</div>
+                            <div class="stat-label">Total Recebido (Mês Atual)</div>
                         </div>
                         <div class="stat-card" style="background: white;">
                             <div class="stat-icon" style="background: rgba(239, 68, 68, 0.1); color: #dc2626;"><i data-lucide="alert-circle"></i></div>
                             <div class="stat-value">${payments.pending}</div>
-                            <div class="stat-label">Pagamentos Pendentes</div>
+                            <div class="stat-label">Total Pendente (Mês Atual)</div>
                         </div>
                         <div class="stat-card" style="background: white;">
                             <div class="stat-icon" style="background: rgba(37, 99, 235, 0.1); color: #2563eb;"><i data-lucide="users"></i></div>
@@ -1432,36 +1435,53 @@
                         </div>
                     </div>
 
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; margin-bottom: 40px;">
-                        <!-- Gráfico de Planos -->
+                    <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 30px; margin-bottom: 40px; align-items: start;">
+                        <!-- Gráfico de Pagamentos (Único agora) -->
                         <div class="stat-card" style="display: block; height: auto; background: white; padding: 25px; border-radius: 20px; box-shadow: var(--shadow); border: 1px solid var(--border);">
                             <h3 style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px; font-weight: 700;">
-                                <i data-lucide="pie-chart" style="color: var(--primary);"></i> Distribuição por Plano
-                            </h3>
-                            <div style="height: 250px; width: 100%; position: relative;">
-                                <canvas id="plansChart"></canvas>
-                            </div>
-                            <div style="margin-top: 20px; font-size: 0.9rem; color: var(--text-muted);">
-                                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;"><span>Integral:</span> <strong>${planCounts.integral}</strong></div>
-                                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;"><span>Meia Mensalidade:</span> <strong>${planCounts.half}</strong></div>
-                                <div style="display: flex; justify-content: space-between;"><span>Bolsista:</span> <strong>${planCounts.scholarship}</strong></div>
-                            </div>
-                        </div>
-
-                        <!-- Gráfico de Pagamentos -->
-                        <div class="stat-card" style="display: block; height: auto; background: white; padding: 25px; border-radius: 20px; box-shadow: var(--shadow); border: 1px solid var(--border);">
-                            <h3 style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px; font-weight: 700;">
-                                <i data-lucide="dollar-sign" style="color: var(--primary);"></i> Status de Adimplência
+                                <i data-lucide="pie-chart" style="color: var(--primary);"></i> Status de Adimplência
                             </h3>
                             <div style="height: 250px; width: 100%; position: relative;">
                                 <canvas id="paymentsChart"></canvas>
                             </div>
-                            <div style="margin-top: 20px; font-size: 0.9rem; color: var(--text-muted); text-align: center;">
-                                <p>Detalhamento de recebíveis e pendências mensais.</p>
+                            <div style="margin-top: 20px; text-align: center; font-size: 0.9rem; color: var(--text-muted);">
+                                <p>Proporção entre mensalidades pagas e pendentes no ciclo atual.</p>
+                            </div>
+                        </div>
+
+                        <!-- Planilha de Recebimentos por Mês -->
+                        <div class="stat-card" style="display: block; height: auto; background: white; padding: 25px; border-radius: 20px; box-shadow: var(--shadow); border: 1px solid var(--border);">
+                            <h3 style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px; font-weight: 700;">
+                                <i data-lucide="table" style="color: var(--primary);"></i> Relatório Mensal de Recebimento
+                            </h3>
+                            <div class="table-container" style="max-height: 350px; overflow-y: auto;">
+                                <table class="data-table" style="font-size: 0.85rem;">
+                                    <thead>
+                                        <tr>
+                                            <th>Mês</th>
+                                            <th>Alunos</th>
+                                            <th>Pagos</th>
+                                            <th>Pendentes</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${months.map((m, idx) => {
+                    const isCurrent = idx === currentMonthIdx;
+                    return `
+                                                <tr style="${isCurrent ? 'background: rgba(37, 99, 235, 0.05); font-weight: 600;' : 'opacity: 0.6;'}">
+                                                    <td>${m} ${isCurrent ? '(Atual)' : ''}</td>
+                                                    <td>${finStudents.length}</td>
+                                                    <td style="color: #16a34a;">${isCurrent ? payments.paid : '-'}</td>
+                                                    <td style="color: #dc2626;">${isCurrent ? payments.pending : '-'}</td>
+                                                </tr>
+                                            `;
+                }).join('')}
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
-                    `;
+                `;
 
                 setTimeout(() => {
                     if (typeof Chart === 'undefined') {
@@ -1469,45 +1489,24 @@
                         return;
                     }
 
-                    const ctxPlans = document.getElementById('plansChart');
-                    if (ctxPlans) {
-                        new Chart(ctxPlans, {
-                            type: 'doughnut',
-                            data: {
-                                labels: ['Integral', 'Meia', 'Bolsista'],
-                                datasets: [{
-                                    data: [planCounts.integral, planCounts.half, planCounts.scholarship],
-                                    backgroundColor: ['#1a365d', '#3b82f6', '#94a3b8'],
-                                    borderWidth: 0
-                                }]
-                            },
-                            options: {
-                                responsive: true,
-                                maintainAspectRatio: false,
-                                plugins: {
-                                    legend: { position: 'bottom', labels: { usePointStyle: true, font: { family: 'Outfit', size: 11 } } }
-                                }
-                            }
-                        });
-                    }
-
                     const ctxPayments = document.getElementById('paymentsChart');
                     if (ctxPayments) {
                         new Chart(ctxPayments, {
-                            type: 'pie',
+                            type: 'doughnut',
                             data: {
                                 labels: ['Pago', 'Pendente'],
                                 datasets: [{
                                     data: [payments.paid, payments.pending],
                                     backgroundColor: ['#22c55e', '#ef4444'],
-                                    borderWidth: 0
+                                    borderWidth: 0,
+                                    hoverOffset: 10
                                 }]
                             },
                             options: {
                                 responsive: true,
                                 maintainAspectRatio: false,
                                 plugins: {
-                                    legend: { position: 'bottom', labels: { usePointStyle: true, font: { family: 'Outfit', size: 11 } } }
+                                    legend: { position: 'bottom', labels: { usePointStyle: true, font: { family: 'Outfit', size: 12 } } }
                                 }
                             }
                         });
