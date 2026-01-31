@@ -1249,7 +1249,7 @@
                 }, 0);
                 break;
 
-            case 'mensalidades':
+            case 'mensalidades': {
                 const allFinanceSt = await dbGet('sebitam-students');
                 let displayStudents = allFinanceSt;
                 if (currentUser.role === 'student') {
@@ -1307,6 +1307,7 @@
                 `;
                 setTimeout(() => lucide.createIcons(), 0);
                 break;
+            }
 
             case 'institucional':
                 html = `
@@ -1389,93 +1390,126 @@
                 setTimeout(() => lucide.createIcons(), 0);
                 break;
 
-            case 'finance':
-                const finStudents = await dbGet('sebitam-students');
-                const planCounts = {
-                    integral: finStudents.filter(s => s.plan === 'integral').length,
-                    half: finStudents.filter(s => s.plan === 'half').length,
-                    scholarship: finStudents.filter(s => s.plan === 'scholarship').length
-                };
+            case 'finance': {
+                const allFinanceSt = await dbGet('sebitam-students');
+                const selectedGrade = data && data.grade ? data.grade : 'all';
 
-                const payments = {
-                    paid: finStudents.filter(s => {
-                        const status = s.paymentStatus || (['integral', 'scholarship'].includes(s.plan) ? 'Pago' : 'Pendente');
-                        return status === 'Pago';
-                    }).length,
-                    pending: finStudents.filter(s => {
-                        const status = s.paymentStatus || (['integral', 'scholarship'].includes(s.plan) ? 'Pago' : 'Pendente');
-                        return status === 'Pendente';
-                    }).length
-                };
+                const finStudents = selectedGrade === 'all'
+                    ? allFinanceSt
+                    : allFinanceSt.filter(s => s.grade == selectedGrade);
+
+                // Definição de valores monetários por plano
+                const PRICES = { integral: 200, half: 100, scholarship: 0 };
+
+                let totalExpected = 0;
+                let totalReceived = 0;
+
+                const processedPayments = finStudents.map(s => {
+                    const status = s.paymentStatus || (['integral', 'scholarship'].includes(s.plan) ? 'Pago' : 'Pendente');
+                    const value = PRICES[s.plan] || 0;
+                    totalExpected += value;
+                    if (status === 'Pago') totalReceived += value;
+                    return { ...s, status, value };
+                });
+
+                const numPaid = processedPayments.filter(p => p.status === 'Pago').length;
+                const numPending = processedPayments.filter(p => p.status === 'Pendente').length;
 
                 const months = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
                 const currentMonthIdx = new Date().getMonth();
 
                 html = `
-                    <div class="view-header">
-                        <h2>Painel Financeiro</h2>
-                        <p>Visão consolidada de recebíveis e monitoramento mensal.</p>
+                    <div class="view-header" style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 20px;">
+                        <div>
+                            <h2>Painel Financeiro</h2>
+                            <p>Visão de recebíveis com valores monetários e filtros.</p>
+                        </div>
+                        <div style="background: white; padding: 10px 20px; border-radius: 12px; border: 1px solid var(--border); display: flex; align-items: center; gap: 10px;">
+                            <label style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">Filtrar por Turma:</label>
+                            <select id="finance-grade-filter" style="border: none; outline: none; background: transparent; font-weight: 700; color: var(--primary); cursor: pointer;">
+                                <option value="all" ${selectedGrade === 'all' ? 'selected' : ''}>Todas as Turmas</option>
+                                ${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(g => `<option value="${g}" ${selectedGrade == g ? 'selected' : ''}>Turma ${g}</option>`).join('')}
+                            </select>
+                        </div>
                     </div>
                     
                     <div class="stats-grid" style="margin-bottom: 30px;">
                         <div class="stat-card" style="background: white;">
-                            <div class="stat-icon" style="background: rgba(34, 197, 94, 0.1); color: #16a34a;"><i data-lucide="trending-up"></i></div>
-                            <div class="stat-value">${payments.paid}</div>
-                            <div class="stat-label">Total Recebido (Mês Atual)</div>
+                            <div class="stat-icon" style="background: rgba(34, 197, 94, 0.1); color: #16a34a;"><i data-lucide="dollar-sign"></i></div>
+                            <div>
+                                <div class="stat-value" style="font-size: 1.5rem;">R$ ${totalReceived.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
+                                <div class="stat-label">Total Recebido (Mês)</div>
+                            </div>
                         </div>
                         <div class="stat-card" style="background: white;">
-                            <div class="stat-icon" style="background: rgba(239, 68, 68, 0.1); color: #dc2626;"><i data-lucide="alert-circle"></i></div>
-                            <div class="stat-value">${payments.pending}</div>
-                            <div class="stat-label">Total Pendente (Mês Atual)</div>
+                            <div class="stat-icon" style="background: rgba(239, 68, 68, 0.1); color: #dc2626;"><i data-lucide="alert-triangle"></i></div>
+                            <div>
+                                <div class="stat-value" style="font-size: 1.5rem;">R$ ${(totalExpected - totalReceived).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
+                                <div class="stat-label">Total em Aberto</div>
+                            </div>
                         </div>
                         <div class="stat-card" style="background: white;">
-                            <div class="stat-icon" style="background: rgba(37, 99, 235, 0.1); color: #2563eb;"><i data-lucide="users"></i></div>
-                            <div class="stat-value">${finStudents.length}</div>
-                            <div class="stat-label">Total de Alunos</div>
+                            <div class="stat-icon" style="background: rgba(37, 99, 235, 0.1); color: #2563eb;"><i data-lucide="pie-chart"></i></div>
+                            <div>
+                                <div class="stat-value" style="font-size: 1.5rem;">${((totalReceived / (totalExpected || 1)) * 100).toFixed(1)}%</div>
+                                <div class="stat-label">Taxa de Adimplência</div>
+                            </div>
                         </div>
                     </div>
 
-                    <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 30px; margin-bottom: 40px; align-items: start;">
-                        <!-- Gráfico de Pagamentos (Único agora) -->
+                    <div style="display: grid; grid-template-columns: 1fr 1.8fr; gap: 30px; margin-bottom: 40px; align-items: start;">
+                        <!-- Gráfico de Status -->
                         <div class="stat-card" style="display: block; height: auto; background: white; padding: 25px; border-radius: 20px; box-shadow: var(--shadow); border: 1px solid var(--border);">
                             <h3 style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px; font-weight: 700;">
-                                <i data-lucide="pie-chart" style="color: var(--primary);"></i> Status de Adimplência
+                                <i data-lucide="pie-chart" style="color: var(--primary);"></i> Panorama de Pagamentos
                             </h3>
                             <div style="height: 250px; width: 100%; position: relative;">
                                 <canvas id="paymentsChart"></canvas>
                             </div>
-                            <div style="margin-top: 20px; text-align: center; font-size: 0.9rem; color: var(--text-muted);">
-                                <p>Proporção entre mensalidades pagas e pendentes no ciclo atual.</p>
+                            <div style="margin-top: 25px;">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.9rem;">
+                                    <span style="color: #16a34a; font-weight: 600;">Pagos (${numPaid}):</span>
+                                    <strong>R$ ${totalReceived.toLocaleString('pt-BR')}</strong>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; font-size: 0.9rem;">
+                                    <span style="color: #dc2626; font-weight: 600;">Pendentes (${numPending}):</span>
+                                    <strong>R$ ${(totalExpected - totalReceived).toLocaleString('pt-BR')}</strong>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Planilha de Recebimentos por Mês -->
+                        <!-- Planilha Detalhada -->
                         <div class="stat-card" style="display: block; height: auto; background: white; padding: 25px; border-radius: 20px; box-shadow: var(--shadow); border: 1px solid var(--border);">
-                            <h3 style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px; font-weight: 700;">
-                                <i data-lucide="table" style="color: var(--primary);"></i> Relatório Mensal de Recebimento
-                            </h3>
-                            <div class="table-container" style="max-height: 350px; overflow-y: auto;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                                <h3 style="display: flex; align-items: center; gap: 10px; font-weight: 700;">
+                                    <i data-lucide="table" style="color: var(--primary);"></i> Recebimentos por Aluno
+                                </h3>
+                                <span class="badge" style="background: var(--primary-light); color: var(--primary);">${finStudents.length} Alunos</span>
+                            </div>
+                            <div class="table-container" style="max-height: 400px; overflow-y: auto;">
                                 <table class="data-table" style="font-size: 0.85rem;">
                                     <thead>
                                         <tr>
-                                            <th>Mês</th>
-                                            <th>Alunos</th>
-                                            <th>Pagos</th>
-                                            <th>Pendentes</th>
+                                            <th>Aluno</th>
+                                            <th>Plano</th>
+                                            <th>Valor</th>
+                                            <th>Status</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        ${months.map((m, idx) => {
-                    const isCurrent = idx === currentMonthIdx;
-                    return `
-                                                <tr style="${isCurrent ? 'background: rgba(37, 99, 235, 0.05); font-weight: 600;' : 'opacity: 0.6;'}">
-                                                    <td>${m} ${isCurrent ? '(Atual)' : ''}</td>
-                                                    <td>${finStudents.length}</td>
-                                                    <td style="color: #16a34a;">${isCurrent ? payments.paid : '-'}</td>
-                                                    <td style="color: #dc2626;">${isCurrent ? payments.pending : '-'}</td>
-                                                </tr>
-                                            `;
-                }).join('')}
+                                        ${processedPayments.map(p => `
+                                            <tr>
+                                                <td><strong>${p.fullName}</strong></td>
+                                                <td><span class="badge" style="font-size: 0.7rem;">${p.plan === 'integral' ? 'Integral' : p.plan === 'half' ? 'Meia' : 'Bolsa'}</span></td>
+                                                <td>R$ ${p.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
+                                                <td>
+                                                    <span class="badge" style="background: ${p.status === 'Pago' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)'}; color: ${p.status === 'Pago' ? '#16a34a' : '#dc2626'}; border: 1px solid ${p.status === 'Pago' ? '#22c55e' : '#ef4444'};">
+                                                        ${p.status}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        `).join('')}
+                                        ${processedPayments.length === 0 ? '<tr><td colspan="4" style="text-align:center; padding: 30px;">Nenhum aluno encontrado para esta turma.</td></tr>' : ''}
                                     </tbody>
                                 </table>
                             </div>
@@ -1484,9 +1518,11 @@
                 `;
 
                 setTimeout(() => {
-                    if (typeof Chart === 'undefined') {
-                        console.error('Chart.js não carregado.');
-                        return;
+                    if (typeof Chart === 'undefined') return;
+
+                    const filter = document.getElementById('finance-grade-filter');
+                    if (filter) {
+                        filter.onchange = (e) => renderView('finance', { grade: e.target.value });
                     }
 
                     const ctxPayments = document.getElementById('paymentsChart');
@@ -1494,12 +1530,12 @@
                         new Chart(ctxPayments, {
                             type: 'doughnut',
                             data: {
-                                labels: ['Pago', 'Pendente'],
+                                labels: ['Recebido', 'Inadimplência'],
                                 datasets: [{
-                                    data: [payments.paid, payments.pending],
+                                    data: [totalReceived, totalExpected - totalReceived],
                                     backgroundColor: ['#22c55e', '#ef4444'],
                                     borderWidth: 0,
-                                    hoverOffset: 10
+                                    hoverOffset: 15
                                 }]
                             },
                             options: {
@@ -1514,6 +1550,7 @@
                     lucide.createIcons();
                 }, 100);
                 break;
+            }
             case 'theology-ai':
                 html = `
                         <div class="view-header" >
