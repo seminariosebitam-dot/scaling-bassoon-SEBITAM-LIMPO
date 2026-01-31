@@ -1433,60 +1433,68 @@
                         </div>
                     </div>
                     
-                    <div class="stats-grid" style="margin-bottom: 30px;">
-                        <div class="stat-card" style="background: white;">
-                            <div class="stat-icon" style="background: rgba(34, 197, 94, 0.1); color: #16a34a;"><i data-lucide="dollar-sign"></i></div>
-                            <div>
-                                <div class="stat-value" style="font-size: 1.5rem;">R$ ${totalReceived.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
-                                <div class="stat-label">Total Recebido (Mês)</div>
-                            </div>
-                        </div>
-                        <div class="stat-card" style="background: white;">
-                            <div class="stat-icon" style="background: rgba(239, 68, 68, 0.1); color: #dc2626;"><i data-lucide="alert-triangle"></i></div>
-                            <div>
-                                <div class="stat-value" style="font-size: 1.5rem;">R$ ${(totalExpected - totalReceived).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
-                                <div class="stat-label">Total em Aberto</div>
-                            </div>
-                        </div>
-                        <div class="stat-card" style="background: white;">
-                            <div class="stat-icon" style="background: rgba(37, 99, 235, 0.1); color: #2563eb;"><i data-lucide="pie-chart"></i></div>
-                            <div>
-                                <div class="stat-value" style="font-size: 1.5rem;">${((totalReceived / (totalExpected || 1)) * 100).toFixed(1)}%</div>
-                                <div class="stat-label">Taxa de Adimplência</div>
-                            </div>
-                        </div>
-                    </div>
 
-                    <div style="display: grid; grid-template-columns: 1fr 1.8fr; gap: 30px; margin-bottom: 40px; align-items: start;">
-                        <!-- Gráfico de Status -->
-                        <div class="stat-card" style="display: block; height: auto; background: white; padding: 25px; border-radius: 20px; box-shadow: var(--shadow); border: 1px solid var(--border);">
-                            <h3 style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px; font-weight: 700;">
-                                <i data-lucide="pie-chart" style="color: var(--primary);"></i> Panorama de Pagamentos
-                            </h3>
-                            <div style="height: 250px; width: 100%; position: relative;">
-                                <canvas id="paymentsChart"></canvas>
-                            </div>
-                            <div style="margin-top: 25px;">
-                                <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.9rem;">
-                                    <span style="color: #16a34a; font-weight: 600;">Pagos (${numPaid}):</span>
-                                    <strong>R$ ${totalReceived.toLocaleString('pt-BR')}</strong>
-                                </div>
-                                <div style="display: flex; justify-content: space-between; font-size: 0.9rem;">
-                                    <span style="color: #dc2626; font-weight: 600;">Pendentes (${numPending}):</span>
-                                    <strong>R$ ${(totalExpected - totalReceived).toLocaleString('pt-BR')}</strong>
+                    <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 30px; margin-bottom: 40px; align-items: start;">
+                        
+                        <!-- Left Column: Stats & Chart -->
+                        <div style="display: flex; flex-direction: column; gap: 20px;">
+                            
+                            <!-- Stats Cards -->
+                            <div class="stat-card" style="background: white;">
+                                <div class="stat-icon" style="background: rgba(34, 197, 94, 0.1); color: #16a34a;"><i data-lucide="dollar-sign"></i></div>
+                                <div>
+                                    <div class="stat-value" style="font-size: 1.5rem;">R$ ${totalReceived.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
+                                    <div class="stat-label">Total Recebido (Mês)</div>
                                 </div>
                             </div>
+
+                            <div class="stat-card" style="background: white;">
+                                <!-- Icon removed as requested -->
+                                <div>
+                                    <div class="stat-value" style="font-size: 1.5rem;">R$ ${(totalExpected - totalReceived).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
+                                    <div class="stat-label">Total em Aberto</div>
+                                </div>
+                            </div>
+
+                            <div class="stat-card" style="background: white;">
+                                <div class="stat-icon" style="background: rgba(37, 99, 235, 0.1); color: #2563eb;"><i data-lucide="pie-chart"></i></div>
+                                <div>
+                                    <div class="stat-value" style="font-size: 1.5rem;">${((totalReceived / (totalExpected || 1)) * 100).toFixed(1)}%</div>
+                                    <div class="stat-label">Taxa de Adimplência</div>
+                                </div>
+                            </div>
+
+                            <!-- Payment Chart -->
+                            <div class="stat-card" style="background: white; padding: 25px; border-radius: 20px; box-shadow: var(--shadow); border: 1px solid var(--border);">
+                                <h3 style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px; font-weight: 700;">
+                                    <i data-lucide="pie-chart" style="color: var(--primary); width: 18px; height: 18px;"></i> Panorama de Pagamentos
+                                </h3>
+                                <div style="height: 250px; width: 100%; position: relative;">
+                                    <canvas id="paymentsChart"></canvas>
+                                </div>
+                                <div style="margin-top: 25px;">
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.9rem;">
+                                        <span style="color: #16a34a; font-weight: 600;">Pagos (${numPaid}):</span>
+                                        <strong>R$ ${totalReceived.toLocaleString('pt-BR')}</strong>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; font-size: 0.9rem;">
+                                        <span style="color: #dc2626; font-weight: 600;">Pendentes (${numPending}):</span>
+                                        <strong>R$ ${(totalExpected - totalReceived).toLocaleString('pt-BR')}</strong>
+                                    </div>
+                                </div>
+                            </div>
+
                         </div>
 
-                        <!-- Planilha Detalhada -->
-                        <div class="stat-card" style="display: block; height: auto; background: white; padding: 25px; border-radius: 20px; box-shadow: var(--shadow); border: 1px solid var(--border);">
+                        <!-- Right Column: Spreadsheet -->
+                        <div class="stat-card" style="background: white; padding: 25px; border-radius: 20px; box-shadow: var(--shadow); border: 1px solid var(--border); height: 100%;">
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                                 <h3 style="display: flex; align-items: center; gap: 10px; font-weight: 700;">
                                     <i data-lucide="table" style="color: var(--primary);"></i> Recebimentos por Aluno
                                 </h3>
                                 <span class="badge" style="background: var(--primary-light); color: var(--primary);">${finStudents.length} Alunos</span>
                             </div>
-                            <div class="table-container" style="max-height: 400px; overflow-y: auto;">
+                            <div class="table-container" style="max-height: 800px; overflow-y: auto;">
                                 <table class="data-table" style="font-size: 0.85rem;">
                                     <thead>
                                         <tr>
