@@ -1114,8 +1114,7 @@
                                         <thead>
                                             <tr>
                                                 <th>Aluno</th>
-                                                <th>Plano</th>
-                                                <th>Financeiro</th>
+                                                ${currentUser.role !== 'student' ? '<th>Plano</th><th>Financeiro</th>' : ''}
                                                 <th class="text-right" style="text-align: right;">Ações</th>
                                             </tr>
                                         </thead>
@@ -1127,21 +1126,19 @@
                         return `
                                                 <tr>
                                                     <td><strong>${nameCap}</strong></td>
+                                                    ${currentUser.role !== 'student' ? `
                                                     <td><span class="badge ${s.plan === 'integral' ? 'plan-integral' : s.plan === 'half' ? 'plan-half' : 'plan-scholarship'}">${planLabel}</span></td>
                                                     <td>
-                                                        ${currentUser.role !== 'student' ?
-                                `<div style="display: flex; gap: 5px;">
-                                                                <button onclick="updatePaymentStatus('${s.id}', 'Pago')" class="btn-icon ${status === 'Pago' ? 'green' : ''}" title="Confirmar Pagamento" style="border: 1px solid ${status === 'Pago' ? '#22c55e' : '#cbd5e1'}; background: ${status === 'Pago' ? 'rgba(34, 197, 94, 0.1)' : 'transparent'}">
-                                                                    <i data-lucide="check-circle" style="width: 14px; height: 14px; color: ${status === 'Pago' ? '#22c55e' : '#64748b'};"></i>
-                                                                </button>
-                                                                <button onclick="updatePaymentStatus('${s.id}', 'Pendente')" class="btn-icon ${status === 'Pendente' ? 'red' : ''}" title="Marcar como Pendente" style="border: 1px solid ${status === 'Pendente' ? '#ef4444' : '#cbd5e1'}; background: ${status === 'Pendente' ? 'rgba(239, 68, 68, 0.1)' : 'transparent'}">
-                                                                    <i data-lucide="alert-circle" style="width: 14px; height: 14px; color: ${status === 'Pendente' ? '#ef4444' : '#64748b'};"></i>
-                                                                </button>
-                                                                <span style="font-size: 0.75rem; font-weight: 600; color: ${status === 'Pago' ? '#16a34a' : '#dc2626'}; margin-left: 5px; align-self: center;">${status}</span>
-                                                            </div>` :
-                                `<span class="badge ${status === 'Pago' ? 'active' : 'plan-half'}" style="background: ${status === 'Pago' ? '#22c55e' : '#ef4444'}; color: white;">${status}</span>`
-                            }
-                                                    </td>
+                                                        <div style="display: flex; gap: 5px;">
+                                                            <button onclick="updatePaymentStatus('${s.id}', 'Pago')" class="btn-icon ${status === 'Pago' ? 'green' : ''}" title="Confirmar Pagamento" style="border: 1px solid ${status === 'Pago' ? '#22c55e' : '#cbd5e1'}; background: ${status === 'Pago' ? 'rgba(34, 197, 94, 0.1)' : 'transparent'}">
+                                                                <i data-lucide="check-circle" style="width: 14px; height: 14px; color: ${status === 'Pago' ? '#22c55e' : '#64748b'};"></i>
+                                                            </button>
+                                                            <button onclick="updatePaymentStatus('${s.id}', 'Pendente')" class="btn-icon ${status === 'Pendente' ? 'red' : ''}" title="Marcar como Pendente" style="border: 1px solid ${status === 'Pendente' ? '#ef4444' : '#cbd5e1'}; background: ${status === 'Pendente' ? 'rgba(239, 68, 68, 0.1)' : 'transparent'}">
+                                                                <i data-lucide="alert-circle" style="width: 14px; height: 14px; color: ${status === 'Pendente' ? '#ef4444' : '#64748b'};"></i>
+                                                            </button>
+                                                            <span style="font-size: 0.75rem; font-weight: 600; color: ${status === 'Pago' ? '#16a34a' : '#dc2626'}; margin-left: 5px; align-self: center;">${status}</span>
+                                                        </div>
+                                                    </td>` : ''}
                                                     <td class="actions-cell">
                                                         <div class="actions-wrapper">
                                                              <button class="btn-icon" style="color: var(--primary); background: rgba(37, 99, 235, 0.1);" title="${currentUser.role === 'student' ? 'Ver Meu Boletim' : 'Lançar Notas'}" onclick="renderGradeEditor('${s.id}')">
