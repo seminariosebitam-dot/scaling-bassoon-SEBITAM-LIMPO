@@ -1035,10 +1035,21 @@
                     const email = u.email || u.institutionalEmail || '-';
                     const phone = u.phone || '-';
 
+                    let badgeStyle = 'background: var(--bg-main); color: var(--text-main); border: 1px solid var(--border);';
+                    if (activeUserTab === 'student') {
+                        if (u.plan === 'scholarship') {
+                            badgeStyle = 'background: rgba(168, 85, 247, 0.1); color: #a855f7; border: 1px solid #a855f7;';
+                        } else if (u.plan === 'half') {
+                            badgeStyle = 'background: rgba(59, 130, 246, 0.1); color: #3b82f6; border: 1px solid #3b82f6;';
+                        } else if (u.plan === 'integral') {
+                            badgeStyle = 'background: rgba(34, 197, 94, 0.1); color: #16a34a; border: 1px solid #16a34a;';
+                        }
+                    }
+
                     return `
                                         <tr>
                                             <td><strong>${nameCap}</strong></td>
-                                            <td><span class="badge" style="background: var(--bg-main); color: var(--text-main); border: 1px solid var(--border);">${roleInfo}</span></td>
+                                            <td><span class="badge" style="${badgeStyle}">${roleInfo}</span></td>
                                             <td style="font-size: 0.85rem;">${email}</td>
                                             <td style="font-size: 0.85rem; white-space: nowrap;">${phone}</td>
                                             <td class="actions-cell">
