@@ -711,7 +711,7 @@
                 const countSt = students.length;
 
                 html = `
-                    <div class="welcome-card"><h1 style="color: white !important;">Olá, ${currentUser.name}!</h1><p>Bem-vindo ao centro de comando SEBITAM. Aqui está o resumo atualizado da instituição.</p></div>
+                    <div class="welcome-card"><h1 style="color: white !important;">Olá, ${currentUser.name}!</h1></div>
                     <div class="stats-grid">
                         <div class="stat-card">
                             <div class="stat-icon"><i data-lucide="users"></i></div>
@@ -738,7 +738,6 @@
 
                     <div class="view-header" style="margin-top: 40px;">
                         <h2>Corpo Administrativo e Docente</h2>
-                        <!-- linha removida -->
                     </div>
 
                     <div class="staff-contacts-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 40px;">
