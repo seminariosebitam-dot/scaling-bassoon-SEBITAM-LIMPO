@@ -1032,7 +1032,8 @@ body {
     align-items: center;
     gap: 6px;
     flex-wrap: nowrap;
-    /* NÃO quebra linha */
+    /* evita quebra de linha */
+    /* flex-wrap padrão é nowrap, mas garantimos */
 }
 
 /* Ensure table content doesn't wrap */
