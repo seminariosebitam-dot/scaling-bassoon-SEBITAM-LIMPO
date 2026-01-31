@@ -1231,6 +1231,7 @@
                 }
 
                 const today = new Date();
+                today.setDate(1); // Avoids month skip on 31st
                 today.setMonth(today.getMonth() + 1);
                 const currentMonth = today.toLocaleString('pt-BR', { month: 'long' });
                 const currentYear = today.getFullYear();
@@ -1457,6 +1458,7 @@
                 const numPending = processedPayments.filter(p => p.status === 'Pendente').length;
 
                 const today = new Date();
+                today.setDate(1); // Set to 1st to prevent overflow
                 today.setMonth(today.getMonth() + 1);
                 const displayMonth = today.toLocaleString('pt-BR', { month: 'long' });
                 const displayMonthCapitalized = displayMonth.charAt(0).toUpperCase() + displayMonth.slice(1);
@@ -1559,9 +1561,34 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        ${processedPayments.map(p => `
+                                        ${processedPayments.map(p => {
+                    let stColor, stIcon, stBg, stLabel;
+
+                    if (p.plan === 'scholarship') {
+                        stLabel = 'Bolsa Integral';
+                        stColor = '#2563eb'; // Blue
+                        stBg = 'rgba(37, 99, 235, 0.1)';
+                        stIcon = 'graduation-cap';
+                    } else if (p.status === 'Pago') {
+                        stLabel = 'Pago';
+                        stColor = '#16a34a'; // Green
+                        stBg = 'rgba(34, 197, 94, 0.1)';
+                        stIcon = 'check-circle';
+                    } else {
+                        stLabel = 'Pendente';
+                        stColor = '#dc2626'; // Red
+                        stBg = 'rgba(239, 68, 68, 0.1)';
+                        stIcon = 'alert-circle';
+                    }
+
+                    return `
                                             <tr>
-                                                <td><strong>${p.fullName}</strong></td>
+                                                <td style="display: flex; align-items: center; gap: 8px;">
+                                                    <div style="background: ${stBg}; padding: 4px; border-radius: 50%; display: flex; text-align: center; justify-content: center;">
+                                                        <i data-lucide="${stIcon}" style="width: 14px; height: 14px; color: ${stColor};"></i>
+                                                    </div>
+                                                    <strong>${p.fullName}</strong>
+                                                </td>
                                                 <td>
                                                     <span class="badge" style="background: ${p.plan === 'integral' ? 'rgba(37, 99, 235, 0.1)' : 'transparent'}; border: 1px solid ${p.plan === 'integral' ? '#2563eb' : p.plan === 'scholarship' ? '#9333ea' : '#eab308'}; color: ${p.plan === 'integral' ? '#2563eb' : p.plan === 'scholarship' ? '#9333ea' : '#eab308'}; font-size: 0.7rem; display: inline-flex; align-items: center;">
                                                         ${p.plan === 'scholarship' ? '<i data-lucide="graduation-cap" style="width:12px; height:12px; margin-right:4px;"></i>' : ''}
@@ -1570,13 +1597,14 @@
                                                 </td>
                                                 <td>R$ ${p.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
                                                 <td>
-                                                    <span class="badge" style="background: ${p.status === 'Pago' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)'}; color: ${p.status === 'Pago' ? '#16a34a' : '#dc2626'}; border: 1px solid ${p.status === 'Pago' ? '#22c55e' : '#ef4444'}; display: inline-flex; align-items: center; gap: 5px;">
-                                                        <i data-lucide="${p.status === 'Pago' ? 'check-circle' : 'alert-circle'}" style="width: 12px; height: 12px;"></i>
-                                                        ${p.status}
+                                                    <span class="badge" style="background: ${stBg}; color: ${stColor}; border: 1px solid ${stColor}; display: inline-flex; align-items: center; gap: 5px;">
+                                                        <i data-lucide="${stIcon}" style="width: 12px; height: 12px;"></i>
+                                                        ${stLabel}
                                                     </span>
                                                 </td>
                                             </tr>
-                                        `).join('')}
+                                        `;
+                }).join('')}
                                         ${processedPayments.length === 0 ? '<tr><td colspan="4" style="text-align:center; padding: 30px;">Nenhum aluno encontrado para esta turma.</td></tr>' : ''}
                                     </tbody>
                                 </table>
