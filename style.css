@@ -1036,6 +1036,11 @@ body {
     /* flex-wrap padrão é nowrap, mas garantimos */
 }
 
+.actions-wrapper i {
+    width: 14px;
+    height: 14px;
+}
+
 /* Ensure table content doesn't wrap */
 .data-table td,
 .data-table th {
