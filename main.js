@@ -1369,15 +1369,15 @@
                         <p>Documentação oficial e compromissos acadêmicos / institucionais.</p>
                     </div>
                     <div class="welcome-card" style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 25px; padding: 60px;">
-                        <div style="width: 80px; height: 80px; border-radius: 50%; background: rgba(37, 99, 235, 0.1); display: flex; align-items: center; justify-content: center;">
-                            <i data-lucide="file-text" style="width: 40px; height: 40px; color: var(--primary);"></i>
+                        <div style="width: 80px; height: 80px; border-radius: 50%; background: rgba(255, 255, 255, 0.1); display: flex; align-items: center; justify-content: center; border: 2px solid white;">
+                            <i data-lucide="file-signature" style="width: 40px; height: 40px; color: white;"></i>
                         </div>
                         <h3>Termo de Responsabilidade SEBITAM</h3>
-                        <p style="max-width: 500px;">Acesse o Termo de Responsabilidade oficial em formato PDF. Este documento descreve as diretrizes e compromissos entre o aluno e a instituição.</p>
+                        <p style="max-width: 500px;">Acesse o Termo de Responsabilidade oficial. Este documento descreve as diretrizes e compromissos entre o aluno e a instituição.</p>
                         
                         <div style="display: flex; gap: 15px; margin-top: 10px;">
-                            <a href="#" target="_blank" class="btn-primary" style="width: auto; padding: 15px 40px; border-radius: 12px; display: flex; align-items: center; gap: 10px; font-weight: 600;">
-                                <i data-lucide="external-link"></i> Abrir PDF (Visualizar)
+                            <a href="https://drive.google.com/drive/folders/1us4CjRi8zJBbuLf9x4CjYTVUa-VT9UD3" target="_blank" class="btn-primary" style="width: auto; padding: 15px 40px; border-radius: 12px; display: flex; align-items: center; gap: 10px; font-weight: 600; background: white; color: var(--primary);">
+                                <i data-lucide="external-link"></i> Abrir Documento Oficial
                             </a>
                         </div>
                         
