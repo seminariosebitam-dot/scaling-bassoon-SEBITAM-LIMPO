@@ -1182,12 +1182,23 @@
                     lucide.createIcons();
                 }, 0);
                 break;
-            case 'modules':
+            case 'didatico':
+                const subView = data && data.tab ? data.tab : 'modules';
                 html = `
-                        <div class="view-header" >
-                        <h2>Módulos do Curso</h2>
-                        <p>Acesse o material didático em PDF para cada disciplina.</p>
+                    <div class="view-header">
+                        <h2>Didático Professores e Alunos</h2>
+                        <p>Acesse materiais, módulos e produções acadêmicas.</p>
                     </div>
+                    <div class="tabs-container" style="display:flex; gap:10px; margin-bottom:20px; flex-wrap: wrap;">
+                        <button class="tab-btn ${subView === 'modules' ? 'active' : ''}" data-tab="modules">Módulos do Curso</button>
+                        <button class="tab-btn ${subView === 'prod-teo' ? 'active' : ''}" data-tab="prod-teo">Produção Teológica (PDF)</button>
+                        <button class="tab-btn ${subView === 'trabalhos' ? 'active' : ''}" data-tab="trabalhos">Trabalhos Alunos</button>
+                        <button class="tab-btn ${subView === 'material-prof' ? 'active' : ''}" data-tab="material-prof">Material Professores</button>
+                    </div>
+                `;
+
+                if (subView === 'modules') {
+                    html += `
                         <div class="modules-grid-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
                             ${Object.entries(subjectMap).map(([id, data]) => `
                             <div class="module-card" style="background: white; padding: 25px; border-radius: 20px; box-shadow: var(--shadow); border: 1px solid var(--border); transition: var(--transition);">
@@ -1212,22 +1223,92 @@
                         `).join('')}
                         </div>
                     `;
-                break;
-            case 'gallery':
-                html = `
-                        <div class="view-header" >
-                        <h2>Fotos & Vídeos</h2>
-                        <p>Acesse nossa galeria oficial de registros institucionais.</p>
-                    </div>
-                        <div class="welcome-card" style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 20px;">
-                            <i data-lucide="image" style="width: 64px; height: 64px; opacity: 0.8;"></i>
-                            <h3>Nossa Galeria no Drive</h3>
-                            <p>Clique no botão abaixo para visualizar todas as fotos e vídeos de nossas aulas e eventos.</p>
-                            <a href="https://drive.google.com/drive/folders/1bHiOrFojPoQOcaTerk23vi-y8jtKwTd5" target="_blank" class="btn-primary" style="width: auto; padding: 12px 30px; background: white; color: var(--primary); display: flex; align-items: center; gap: 10px;">
-                                <i data-lucide="external-link"></i> Abrir Galeria Oficial
+                } else {
+                    const links = {
+                        'prod-teo': { url: 'https://drive.google.com/drive/folders/110x1MEaHbcaY7wOpIduiTobnt7Smeggj', title: 'Produção Teológica (PDF)', icon: 'book-marked' },
+                        'trabalhos': { url: 'https://drive.google.com/drive/folders/1HXSZPrzEdqbZiVtHmVcRwN3dODs1qASS', title: 'Trabalhos Alunos', icon: 'folder-kanban' },
+                        'material-prof': { url: 'https://drive.google.com/drive/folders/1xQbSx_GCR9IqF3k-d7ESNJ8S2C4UcrIF', title: 'Material Professores', icon: 'graduation-cap' }
+                    };
+                    const activeLink = links[subView];
+                    html += `
+                        <div class="welcome-card" style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 20px; padding: 60px;">
+                            <div style="width: 80px; height: 80px; border-radius: 50%; background: rgba(37, 99, 235, 0.1); display: flex; align-items: center; justify-content: center;">
+                                <i data-lucide="${activeLink.icon}" style="width: 40px; height: 40px; color: var(--primary);"></i>
+                            </div>
+                            <h3>${activeLink.title}</h3>
+                            <p>Clique no botão abaixo para acessar a pasta oficial no Google Drive contendo todo o material de ${activeLink.title}.</p>
+                            <a href="${activeLink.url}" target="_blank" class="btn-primary" style="width: auto; padding: 15px 40px; border-radius: 12px; display: flex; align-items: center; gap: 10px; font-weight: 600;">
+                                <i data-lucide="external-link"></i> Abrir no Google Drive
                             </a>
                         </div>
                     `;
+                }
+
+                setTimeout(() => {
+                    document.querySelectorAll('.tab-btn').forEach(b => {
+                        b.onclick = () => renderView('didatico', { tab: b.dataset.tab });
+                    });
+                    lucide.createIcons();
+                }, 0);
+                break;
+
+            case 'mensalidades':
+                const allFinanceSt = await dbGet('sebitam-students');
+                let displayStudents = allFinanceSt;
+                if (currentUser.role === 'student') {
+                    displayStudents = allFinanceSt.filter(s => s.fullName.toLowerCase().trim() === currentUser.name.toLowerCase().trim());
+                }
+
+                const currentMonth = new Date().toLocaleString('pt-BR', { month: 'long' });
+                const currentYear = new Date().getFullYear();
+
+                html = `
+                    <div class="view-header">
+                        <h2>Sebitam Mensalidades</h2>
+                        <p>Controle financeiro e monitoramento de mensalidades.</p>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Aluno</th>
+                                    <th>Mês</th>
+                                    <th>Ano</th>
+                                    <th>Status</th>
+                                    <th>Tipo</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${displayStudents.map(s => {
+                    const status = s.paymentStatus || (['integral', 'scholarship'].includes(s.plan) ? 'Pago' : 'Pendente');
+                    const planText = s.plan === 'integral' ? 'Integral' : s.plan === 'half' ? 'Meia' : 'Bolsa';
+                    return `
+                                        <tr>
+                                            <td><strong>${s.fullName}</strong></td>
+                                            <td style="text-transform: capitalize;">${currentMonth}</td>
+                                            <td>${currentYear}</td>
+                                            <td>
+                                                <span class="badge ${status === 'Pago' ? 'active' : 'plan-half'}" 
+                                                      style="background: ${status === 'Pago' ? '#22c55e' : '#ef4444'}; color: white; padding: 5px 12px;">
+                                                    ${status}
+                                                </span>
+                                            </td>
+                                            <td><span class="badge" style="border: 1px solid #e2e8f0; color: #64748b;">${planText}</span></td>
+                                        </tr>
+                                    `;
+                }).join('')}
+                                ${displayStudents.length === 0 ? '<tr><td colspan="5" style="text-align:center; padding: 30px;">Nenhum registro financeiro encontrado.</td></tr>' : ''}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div style="margin-top: 20px; padding: 20px; background: rgba(37, 99, 235, 0.05); border-radius: 12px; border: 1px solid var(--border);">
+                        <p style="font-size: 0.9rem; color: var(--text-muted); display: flex; align-items: center; gap: 8px;">
+                            <i data-lucide="info" style="width: 16px;"></i>
+                            Nota: Esta tabela reflete o status de pagamento confirmado na aba de gerenciamento de alunos.
+                        </p>
+                    </div>
+                `;
+                setTimeout(() => lucide.createIcons(), 0);
                 break;
             case 'finance':
                 const finStudents = await dbGet('sebitam-students');
