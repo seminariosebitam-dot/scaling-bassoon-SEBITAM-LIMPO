@@ -633,9 +633,9 @@
                             <div class="input-field">
                                 <i data-lucide="credit-card"></i>
                                 <select name="plan" style="padding-left: 48px;">
-                                    <option value="integral" ${s.plan === 'integral' ? 'selected' : ''}>Integral</option>
-                                    <option value="half" ${s.plan === 'half' ? 'selected' : ''}>Meia Mensalidade</option>
-                                    <option value="scholarship" ${s.plan === 'scholarship' ? 'selected' : ''}>Bolsa Estudo</option>
+                                    <option value="integral" ${s.plan === 'integral' ? 'selected' : ''}>Integral (R$ 70,00)</option>
+                                    <option value="half" ${s.plan === 'half' ? 'selected' : ''}>Parcial (R$ 35,00)</option>
+                                    <option value="scholarship" ${s.plan === 'scholarship' ? 'selected' : ''}>Bolsista</option>
                                 </select>
                             </div>
                         </div>
@@ -914,6 +914,17 @@
                                                 </select>
                                             </div>
                                         </div>
+                                        <div class="form-group">
+                                            <label style="font-weight: 700; color: #334155; margin-bottom: 8px; display: block; font-size: 0.9rem;">Plano Financeiro</label>
+                                            <div class="input-field" style="position: relative;">
+                                                <i data-lucide="credit-card" style="position: absolute; left: 16px; top: 12px; width: 18px; color: #1e293b;"></i>
+                                                <select name="plan" style="width: 100%; padding: 12px 12px 12px 45px; border-radius: 10px; border: 1.5px solid #f1f5f9; background: white;">
+                                                    <option value="integral">Integral (R$ 70,00)</option>
+                                                    <option value="half">Parcial (R$ 35,00)</option>
+                                                    <option value="scholarship">Bolsista</option>
+                                                </select>
+                                            </div>
+                                        </div>
                             `;
                         } else {
                             const extraIcon = type === 'teacher' ? 'graduation-cap' : (type === 'admin' ? 'shield-check' : 'briefcase');
@@ -1095,22 +1106,55 @@
                                         <tbody>
                                             ${inG.map(s => {
                         const nameCap = (s.fullName || 'Sem Nome').split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
-                        const planLabel = s.plan === 'integral' ? 'Integral' : s.plan === 'half' ? 'Meia' : 'Bolsa';
+                        const planLabel = s.plan === 'integral' ? 'Integral' : s.plan === 'half' ? 'Parcial' : 'Bolsista';
                         const status = s.paymentStatus || (['integral', 'scholarship'].includes(s.plan) ? 'Pago' : 'Pendente');
+
+                        let stColor, stIcon, stBg, stLabel;
+                        if (s.plan === 'scholarship') {
+                            stLabel = 'Bolsista';
+                            stColor = '#a855f7'; // Purple
+                            stBg = 'rgba(168, 85, 247, 0.1)';
+                            stIcon = 'graduation-cap';
+                        } else if (status === 'Pago') {
+                            stLabel = 'Pago';
+                            if (s.plan === 'half') {
+                                stColor = '#3b82f6'; // Blue
+                                stBg = 'rgba(59, 130, 246, 0.1)';
+                            } else { // Integral
+                                stColor = '#16a34a'; // Green
+                                stBg = 'rgba(34, 197, 94, 0.1)';
+                            }
+                            stIcon = 'check-circle';
+                        } else {
+                            stLabel = 'Pendente';
+                            stColor = '#dc2626'; // Red
+                            stBg = 'rgba(239, 68, 68, 0.1)';
+                            stIcon = 'alert-circle';
+                        }
+
                         return `
                                                 <tr>
-                                                    <td><strong>${nameCap}</strong></td>
-                                                    ${currentUser.role !== 'student' ? `
-                                                    <td><span class="badge ${s.plan === 'integral' ? 'plan-integral' : s.plan === 'half' ? 'plan-half' : 'plan-scholarship'}">${planLabel}</span></td>
                                                     <td>
-                                                        <div style="display: flex; gap: 5px;">
-                                                            <button onclick="updatePaymentStatus('${s.id}', 'Pago')" class="btn-icon ${status === 'Pago' ? 'green' : ''}" title="Confirmar Pagamento" style="border: 1px solid ${status === 'Pago' ? '#22c55e' : '#cbd5e1'}; background: ${status === 'Pago' ? 'rgba(34, 197, 94, 0.1)' : 'transparent'}">
-                                                                <i data-lucide="check-circle" style="width: 14px; height: 14px; color: ${status === 'Pago' ? '#22c55e' : '#64748b'};"></i>
+                                                        <div style="display:flex; align-items:center; gap:8px;">
+                                                             <div style="background: ${stBg}; padding: 4px; border-radius: 50%; display: flex; text-align: center; justify-content: center;">
+                                                                <i data-lucide="${stIcon}" style="width: 14px; height: 14px; color: ${stColor};"></i>
+                                                            </div>
+                                                            <strong>${nameCap}</strong>
+                                                        </div>
+                                                    </td>
+                                                    ${currentUser.role !== 'student' ? `
+                                                    <td><span class="badge" style="background:transparent; border:1px solid #cbd5e1; color:#64748b;">${planLabel}</span></td>
+                                                    <td>
+                                                        <div style="display: flex; gap: 5px; align-items: center;">
+                                                            <button onclick="updatePaymentStatus('${s.id}', 'Pago')" class="btn-icon" title="Confirmar Pagamento" style="border: 1px solid #22c55e; background: rgba(34, 197, 94, 0.1);">
+                                                                <i data-lucide="check-circle" style="width: 14px; height: 14px; color: #22c55e;"></i>
                                                             </button>
-                                                            <button onclick="updatePaymentStatus('${s.id}', 'Pendente')" class="btn-icon ${status === 'Pendente' ? 'red' : ''}" title="Marcar como Pendente" style="border: 1px solid ${status === 'Pendente' ? '#ef4444' : '#cbd5e1'}; background: ${status === 'Pendente' ? 'rgba(239, 68, 68, 0.1)' : 'transparent'}">
-                                                                <i data-lucide="alert-circle" style="width: 14px; height: 14px; color: ${status === 'Pendente' ? '#ef4444' : '#64748b'};"></i>
+                                                            <button onclick="updatePaymentStatus('${s.id}', 'Pendente')" class="btn-icon" title="Marcar como Pendente" style="border: 1px solid #ef4444; background: rgba(239, 68, 68, 0.1);">
+                                                                <i data-lucide="alert-circle" style="width: 14px; height: 14px; color: #ef4444;"></i>
                                                             </button>
-                                                            <span style="font-size: 0.75rem; font-weight: 600; color: ${status === 'Pago' ? '#16a34a' : '#dc2626'}; margin-left: 5px; align-self: center;">${status}</span>
+                                                            <span class="badge" style="background: ${stBg}; color: ${stColor}; border: 1px solid ${stColor}; margin-left: 5px;">
+                                                                ${stLabel}
+                                                            </span>
                                                         </div>
                                                     </td>` : ''}
                                                     <td class="actions-cell">
@@ -1565,14 +1609,19 @@
                     let stColor, stIcon, stBg, stLabel;
 
                     if (p.plan === 'scholarship') {
-                        stLabel = 'Bolsa Integral';
-                        stColor = '#2563eb'; // Blue
-                        stBg = 'rgba(37, 99, 235, 0.1)';
+                        stLabel = 'Bolsista';
+                        stColor = '#a855f7'; // Purple
+                        stBg = 'rgba(168, 85, 247, 0.1)';
                         stIcon = 'graduation-cap';
                     } else if (p.status === 'Pago') {
                         stLabel = 'Pago';
-                        stColor = '#16a34a'; // Green
-                        stBg = 'rgba(34, 197, 94, 0.1)';
+                        if (p.plan === 'half') {
+                            stColor = '#3b82f6'; // Blue
+                            stBg = 'rgba(59, 130, 246, 0.1)';
+                        } else {
+                            stColor = '#16a34a'; // Green
+                            stBg = 'rgba(34, 197, 94, 0.1)';
+                        }
                         stIcon = 'check-circle';
                     } else {
                         stLabel = 'Pendente';
@@ -1590,9 +1639,9 @@
                                                     <strong>${p.fullName}</strong>
                                                 </td>
                                                 <td>
-                                                    <span class="badge" style="background: ${p.plan === 'integral' ? 'rgba(37, 99, 235, 0.1)' : 'transparent'}; border: 1px solid ${p.plan === 'integral' ? '#2563eb' : p.plan === 'scholarship' ? '#9333ea' : '#eab308'}; color: ${p.plan === 'integral' ? '#2563eb' : p.plan === 'scholarship' ? '#9333ea' : '#eab308'}; font-size: 0.7rem; display: inline-flex; align-items: center;">
+                                                    <span class="badge" style="background: transparent; border: 1px solid #cbd5e1; color: #64748b; font-size: 0.7rem; display: inline-flex; align-items: center;">
                                                         ${p.plan === 'scholarship' ? '<i data-lucide="graduation-cap" style="width:12px; height:12px; margin-right:4px;"></i>' : ''}
-                                                        ${p.plan === 'integral' ? 'Integral' : p.plan === 'half' ? 'Meia' : 'Bolsa'}
+                                                        ${p.plan === 'integral' ? 'Integral' : p.plan === 'half' ? 'Parcial' : 'Bolsista'}
                                                     </span>
                                                 </td>
                                                 <td>R$ ${p.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
