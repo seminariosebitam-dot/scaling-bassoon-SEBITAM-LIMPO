@@ -871,8 +871,8 @@
                 const activeType = data && data.type ? data.type : 'student';
                 html = `
                     <div class="view-header" style="margin-bottom: 30px;">
-                        <h2 style="font-size: 2.22rem; font-weight: 800; color: #1e293b;">Cadastro Institucional</h2>
-                        <span style="background: #2563eb; color: white; padding: 5px 12px; border-radius: 4px; font-size: 0.9rem; font-weight: 500; display: inline-block; margin-top: 5px;">Selecione o perfil que deseja cadastrar no sistema.</span>
+                        <h2 style="font-size: 2.22rem; font-weight: 800; color: var(--text-main);">Cadastro Institucional</h2>
+                        <span style="background: var(--primary); color: white; padding: 5px 12px; border-radius: 4px; font-size: 0.9rem; font-weight: 500; display: inline-block; margin-top: 5px;">Selecione o perfil que deseja cadastrar no sistema.</span>
                     </div>
                     
                     <div class="registration-role-selector" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 35px;">
@@ -882,10 +882,10 @@
                     const isActive = activeType === type;
                     return `
                                 <label class="role-option" style="text-align: center; cursor: pointer;">
-                                    <input type="radio" name="reg-role" value="${type}" ${isActive ? 'checked' : ''} style="margin-bottom: 12px; transform: scale(1.3); accent-color: #2563eb;">
-                                    <div class="role-box" style="padding: 25px 10px; border: 1.5px solid ${isActive ? '#2563eb' : '#e2e8f0'}; border-radius: 15px; background: white; transition: all 0.3s; box-shadow: ${isActive ? '0 4px 15px rgba(37, 99, 235, 0.1)' : 'none'};">
-                                        <i data-lucide="${icons[type]}" style="width: 24px; height: 24px; color: ${isActive ? '#2563eb' : '#64748b'}; margin-bottom: 8px;"></i>
-                                        <span style="display: block; font-weight: 600; font-size: 0.85rem; color: ${isActive ? '#1e293b' : '#64748b'};">${labels[type]}</span>
+                                    <input type="radio" name="reg-role" value="${type}" ${isActive ? 'checked' : ''} style="margin-bottom: 12px; transform: scale(1.3); accent-color: var(--primary);">
+                                    <div class="role-box" style="padding: 25px 10px; border: 1.5px solid ${isActive ? 'var(--primary)' : 'var(--border)'}; border-radius: 15px; background: white; transition: all 0.3s; box-shadow: ${isActive ? '0 4px 15px rgba(0,0,0,0.05)' : 'none'}; position: relative;">
+                                        <i data-lucide="${icons[type]}" style="width: 24px; height: 24px; color: ${isActive ? 'var(--primary)' : 'var(--text-muted)'}; margin-bottom: 8px;"></i>
+                                        <span style="display: block; font-weight: 600; font-size: 0.85rem; color: ${isActive ? 'var(--text-main)' : 'var(--text-muted)'};">${labels[type]}</span>
                                     </div>
                                 </label>
                             `;
@@ -901,28 +901,28 @@
                         const nameLabel = `Nome Completo do(a) ${roleNames[type]}`;
 
                         let formHtml = `
-                            <div class="form-container" style="max-width: 900px; padding: 45px; background: white; border-radius: 25px; box-shadow: 0 10px 40px rgba(0,0,0,0.04); border: 1px solid #f1f5f9; margin-top: 20px;">
+                            <div class="form-container" style="max-width: 900px; padding: 45px; background: white; border-radius: 25px; box-shadow: 0 10px 40px rgba(0,0,0,0.04); border: 1px solid var(--border); margin-top: 20px;">
                                 <form id="unified-reg-form">
                                     <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                                         <div class="form-group full-width" style="grid-column: 1 / -1; margin-bottom: 20px;">
-                                            <label style="font-weight: 700; color: #334155; margin-bottom: 8px; display: block; font-size: 0.9rem;">${nameLabel}</label>
+                                            <label style="font-weight: 700; color: var(--text-main); margin-bottom: 8px; display: block; font-size: 0.9rem;">${nameLabel}</label>
                                             <div class="input-field" style="position: relative;">
-                                                <i data-lucide="user" style="position: absolute; left: 16px; top: 12px; width: 18px; color: #1e293b;"></i>
-                                                <input type="text" name="${type === 'student' ? 'fullName' : 'name'}" placeholder="Nome completo" style="width: 100%; padding: 12px 12px 12px 48px; border-radius: 10px; border: 1.5px solid #f1f5f9; background: white;" required>
+                                                <i data-lucide="user" style="position: absolute; left: 16px; top: 12px; width: 18px; color: var(--text-main);"></i>
+                                                <input type="text" name="${type === 'student' ? 'fullName' : 'name'}" placeholder="Nome completo" style="width: 100%; padding: 12px 12px 12px 48px; border-radius: 10px; border: 1.5px solid var(--border); background: white;" required>
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <label style="font-weight: 700; color: #334155; margin-bottom: 8px; display: block; font-size: 0.9rem;">Telefone / WhatsApp</label>
+                                            <label style="font-weight: 700; color: var(--text-main); margin-bottom: 8px; display: block; font-size: 0.9rem;">Telefone / WhatsApp</label>
                                             <div class="input-field" style="position: relative;">
-                                                <i data-lucide="phone" style="position: absolute; left: 16px; top: 12px; width: 18px; color: #1e293b;"></i>
-                                                <input type="tel" name="phone" placeholder="(00) 00000-0000" style="width: 100%; padding: 12px 12px 12px 48px; border-radius: 10px; border: 1.5px solid #f1f5f9; background: white;" required>
+                                                <i data-lucide="phone" style="position: absolute; left: 16px; top: 12px; width: 18px; color: var(--text-main);"></i>
+                                                <input type="tel" name="phone" placeholder="(00) 00000-0000" style="width: 100%; padding: 12px 12px 12px 48px; border-radius: 10px; border: 1.5px solid var(--border); background: white;" required>
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <label style="font-weight: 700; color: #334155; margin-bottom: 8px; display: block; font-size: 0.9rem;">E-mail</label>
+                                            <label style="font-weight: 700; color: var(--text-main); margin-bottom: 8px; display: block; font-size: 0.9rem;">E-mail</label>
                                             <div class="input-field" style="position: relative;">
-                                                <i data-lucide="mail" style="position: absolute; left: 16px; top: 12px; width: 18px; color: #1e293b;"></i>
-                                                <input type="email" name="email" placeholder="email@exemplo.com" style="width: 100%; padding: 12px 12px 12px 48px; border-radius: 10px; border: 1.5px solid #f1f5f9; background: white;" required>
+                                                <i data-lucide="mail" style="position: absolute; left: 16px; top: 12px; width: 18px; color: var(--text-main);"></i>
+                                                <input type="email" name="email" placeholder="email@exemplo.com" style="width: 100%; padding: 12px 12px 12px 48px; border-radius: 10px; border: 1.5px solid var(--border); background: white;" required>
                                             </div>
                                         </div>
                         `;
@@ -930,28 +930,28 @@
                         if (type === 'student') {
                             formHtml += `
                                         <div class="form-group">
-                                            <label style="font-weight: 700; color: #334155; margin-bottom: 8px; display: block; font-size: 0.9rem;">Turma (1 a 10)</label>
+                                            <label style="font-weight: 700; color: var(--text-main); margin-bottom: 8px; display: block; font-size: 0.9rem;">Turma (1 a 10)</label>
                                             <div class="input-field" style="position: relative;">
-                                                <i data-lucide="hash" style="position: absolute; left: 16px; top: 12px; width: 18px; color: #1e293b;"></i>
-                                                <select name="grade" style="width: 100%; padding: 12px 12px 12px 45px; border-radius: 10px; border: 1.5px solid #f1f5f9; background: white;">
+                                                <i data-lucide="hash" style="position: absolute; left: 16px; top: 12px; width: 18px; color: var(--text-main);"></i>
+                                                <select name="grade" style="width: 100%; padding: 12px 12px 12px 45px; border-radius: 10px; border: 1.5px solid var(--border); background: white;">
                                                     ${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => `<option value="${n}">Turma ${n}</option>`).join('')}
                                                 </select>
                                             </div>
                                         </div>
                                          <div class="form-group">
-                                            <label style="font-weight: 700; color: #334155; margin-bottom: 8px; display: block; font-size: 0.9rem;">Módulo (1 a 5)</label>
+                                            <label style="font-weight: 700; color: var(--text-main); margin-bottom: 8px; display: block; font-size: 0.9rem;">Módulo (1 a 5)</label>
                                             <div class="input-field" style="position: relative;">
-                                                <i data-lucide="layers" style="position: absolute; left: 16px; top: 12px; width: 18px; color: #1e293b;"></i>
-                                                <select name="module" style="width: 100%; padding: 12px 12px 12px 45px; border-radius: 10px; border: 1.5px solid #f1f5f9; background: white;">
+                                                <i data-lucide="layers" style="position: absolute; left: 16px; top: 12px; width: 18px; color: var(--text-main);"></i>
+                                                <select name="module" style="width: 100%; padding: 12px 12px 12px 45px; border-radius: 10px; border: 1.5px solid var(--border); background: white;">
                                                     <option value="1">Módulo 1</option><option value="2">Módulo 2</option><option value="3">Módulo 3</option><option value="4">Módulo 4</option><option value="5">Módulo 5</option>
                                                 </select>
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <label style="font-weight: 700; color: #334155; margin-bottom: 8px; display: block; font-size: 0.9rem;">Plano Financeiro</label>
+                                            <label style="font-weight: 700; color: var(--text-main); margin-bottom: 8px; display: block; font-size: 0.9rem;">Plano Financeiro</label>
                                             <div class="input-field" style="position: relative;">
-                                                <i data-lucide="credit-card" style="position: absolute; left: 16px; top: 12px; width: 18px; color: #1e293b;"></i>
-                                                <select name="plan" style="width: 100%; padding: 12px 12px 12px 45px; border-radius: 10px; border: 1.5px solid #f1f5f9; background: white;">
+                                                <i data-lucide="credit-card" style="position: absolute; left: 16px; top: 12px; width: 18px; color: var(--text-main);"></i>
+                                                <select name="plan" style="width: 100%; padding: 12px 12px 12px 45px; border-radius: 10px; border: 1.5px solid var(--border); background: white;">
                                                     <option value="integral">Integral (R$ 70,00)</option>
                                                     <option value="half">Parcial (R$ 35,00)</option>
                                                     <option value="scholarship">Bolsista</option>
@@ -963,10 +963,10 @@
                             const extraIcon = type === 'teacher' ? 'graduation-cap' : (type === 'admin' ? 'shield-check' : 'briefcase');
                             formHtml += `
                                         <div class="form-group full-width" style="grid-column: 1 / -1; margin-top: 10px;">
-                                            <label style="font-weight: 700; color: #334155; margin-bottom: 8px; display: block; font-size: 0.9rem;">Função / Cargo</label>
+                                            <label style="font-weight: 700; color: var(--text-main); margin-bottom: 8px; display: block; font-size: 0.9rem;">Função / Cargo</label>
                                             <div class="input-field" style="position: relative;">
-                                                <i data-lucide="${extraIcon}" style="position: absolute; left: 16px; top: 12px; width: 18px; color: #1e293b;"></i>
-                                                <input type="text" name="extra" placeholder="Ex: Financeiro" style="width: 100%; padding: 12px 12px 12px 48px; border-radius: 10px; border: 1.5px solid #f1f5f9; background: white;" required>
+                                                <i data-lucide="${extraIcon}" style="position: absolute; left: 16px; top: 12px; width: 18px; color: var(--text-main);"></i>
+                                                <input type="text" name="extra" placeholder="Ex: Financeiro" style="width: 100%; padding: 12px 12px 12px 48px; border-radius: 10px; border: 1.5px solid var(--border); background: white;" required>
                                             </div>
                                         </div>
                             `;
@@ -975,7 +975,7 @@
                         formHtml += `
                                     </div>
                                     <div class="form-actions" style="border:none; margin-top: 40px;">
-                                        <button type="submit" class="btn-primary" style="background: #2563eb; width: auto; padding: 15px 40px; border-radius: 10px; font-weight: 700; font-size: 1rem; color: white; border: none; cursor: pointer;">Salvar Cadastro</button>
+                                        <button type="submit" class="btn-primary" style="width: auto; padding: 15px 40px; border-radius: 10px; font-weight: 700; font-size: 1rem; color: white; border: none; cursor: pointer;">Salvar Cadastro</button>
                                     </div>
                                 </form>
                             </div>
@@ -991,37 +991,37 @@
                             const key = type === 'student' ? 'sebitam-students' : type === 'teacher' ? 'sebitam-teachers' : type === 'admin' ? 'sebitam-admins' : 'sebitam-secretaries';
                             await dbAddItem(key, val);
 
-                            // Marcar que o usuário completou o cadastro
-                            // Usar o email do formulário ou o email do login
                             const userEmail = (val.email || currentUser.email || 'unknown').toLowerCase();
                             const userKey = `sebitam-user-${userEmail}`;
                             localStorage.setItem(userKey, 'registered');
-                            console.log(`Usuário registrado: ${userEmail}`);
 
                             alert('Cadastrado com sucesso! Você será direcionado para a Visão Geral.');
-                            // Atualizar estado ativo da barra lateral
                             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
                             const overviewNav = document.querySelector('.nav-item[data-view="overview"]');
                             if (overviewNav) overviewNav.classList.add('active');
                             await renderView('overview');
                         };
                     };
+
                     renderForm(activeType);
                     document.querySelectorAll('input[name="reg-role"]').forEach(radio => {
                         radio.addEventListener('change', (e) => {
                             renderForm(e.target.value);
-                            // Refresh selection visuals
+                            // Visual transition handled by CSS variables indirectly or manual refresh
+                            const currentThemePrimary = getComputedStyle(document.body).getPropertyValue('--primary').trim();
+                            const currentThemeTextMain = getComputedStyle(document.body).getPropertyValue('--text-main').trim();
+
                             document.querySelectorAll('.role-box').forEach(box => {
-                                box.style.borderColor = '#e2e8f0';
+                                box.style.borderColor = 'var(--border)';
                                 box.style.boxShadow = 'none';
-                                box.querySelector('i').style.color = '#64748b';
-                                box.querySelector('span').style.color = '#64748b';
+                                box.querySelector('i').style.color = 'var(--text-muted)';
+                                box.querySelector('span').style.color = 'var(--text-muted)';
                             });
                             const selectedBox = e.target.parentElement.querySelector('.role-box');
-                            selectedBox.style.borderColor = '#2563eb';
-                            selectedBox.style.boxShadow = '0 4px 15px rgba(37, 99, 235, 0.1)';
-                            selectedBox.querySelector('i').style.color = '#2563eb';
-                            selectedBox.querySelector('span').style.color = '#1e293b';
+                            selectedBox.style.borderColor = 'var(--primary)';
+                            selectedBox.style.boxShadow = '0 4px 15px rgba(0,0,0,0.05)';
+                            selectedBox.querySelector('i').style.color = 'var(--primary)';
+                            selectedBox.querySelector('span').style.color = 'var(--text-main)';
                         });
                     });
                 }, 0);
@@ -1500,25 +1500,47 @@
             case 'termo':
                 html = `
                     <div class="view-header">
-                        <h2>Termo de Responsabilidade</h2>
-                        <p>Documentação oficial e compromissos acadêmicos / institucionais.</p>
+                        <h2>Normas Sebitam</h2>
+                        <p>Documentação oficial, diretrizes acadêmicas e regimento interno.</p>
                     </div>
-                    <div class="welcome-card" style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 25px; padding: 60px;">
-                        <div style="width: 80px; height: 80px; border-radius: 50%; background: rgba(255, 255, 255, 0.1); display: flex; align-items: center; justify-content: center; border: 2px solid white;">
-                            <i data-lucide="file-signature" style="width: 40px; height: 40px; color: white;"></i>
-                        </div>
-                        <h3>Termo de Responsabilidade SEBITAM</h3>
-                        <p style="max-width: 500px;">Acesse o Termo de Responsabilidade oficial. Este documento descreve as diretrizes e compromissos entre o aluno e a instituição.</p>
+                    
+                    <div class="rules-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 25px; margin-top: 20px;">
                         
-                        <div style="display: flex; gap: 15px; margin-top: 10px;">
-                            <a href="https://drive.google.com/drive/folders/1us4CjRi8zJBbuLf9x4CjYTVUa-VT9UD3" target="_blank" class="btn-primary" style="width: auto; padding: 15px 40px; border-radius: 12px; display: flex; align-items: center; gap: 10px; font-weight: 600; background: white; color: var(--primary);">
-                                <i data-lucide="external-link"></i> Abrir Documento Oficial
+                        <!-- Card 1: Termo de Responsabilidade -->
+                        <div class="rule-card" style="background: white; padding: 40px; border-radius: 25px; box-shadow: var(--shadow); border: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; text-align: center; transition: var(--transition);">
+                            <div class="rule-icon-box" style="width: 80px; height: 80px; border-radius: 20px; background: rgba(37, 99, 235, 0.1); color: var(--primary); display: flex; align-items: center; justify-content: center; margin-bottom: 25px;">
+                                <i data-lucide="file-signature" style="width: 38px; height: 38px;"></i>
+                            </div>
+                            <h3 style="font-size: 1.3rem; font-weight: 700; color: #1e293b; margin-bottom: 15px;">Normas Sebitam</h3>
+                            <p style="color: #64748b; font-size: 0.95rem; margin-bottom: 30px; line-height: 1.6;">
+                                Documento oficial que estabelece os compromissos éticos e acadêmicos entre o aluno e a instituição.
+                            </p>
+                            <a href="https://drive.google.com/drive/folders/1us4CjRi8zJBbuLf9x4CjYTVUa-VT9UD3" target="_blank" class="btn-primary" style="width: 100%; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 600; padding: 15px;">
+                                <i data-lucide="file-text"></i> Acessar PDF (Termo)
                             </a>
                         </div>
-                        
-                        <div style="margin-top: 20px; font-size: 0.85rem; color: rgba(255,255,255,0.7);">
-                            <p>Para dúvidas sobre o termo, entre em contato com a secretaria acadêmica.</p>
+
+                        <!-- Card 2: Regimento Interno -->
+                        <div class="rule-card" style="background: white; padding: 40px; border-radius: 25px; box-shadow: var(--shadow); border: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; text-align: center; transition: var(--transition);">
+                            <div class="rule-icon-box" style="width: 80px; height: 80px; border-radius: 20px; background: rgba(16, 185, 129, 0.1); color: #10b981; display: flex; align-items: center; justify-content: center; margin-bottom: 25px;">
+                                <i data-lucide="book-open-check" style="width: 38px; height: 38px;"></i>
+                            </div>
+                            <h3 style="font-size: 1.3rem; font-weight: 700; color: #1e293b; margin-bottom: 15px;">Regimento Interno</h3>
+                            <p style="color: #64748b; font-size: 0.95rem; margin-bottom: 30px; line-height: 1.6;">
+                                Conjunto de normas que regem o funcionamento acadêmico, administrativo e disciplinar do SEBITAM.
+                            </p>
+                            <a href="https://drive.google.com/drive/folders/1us4CjRi8zJBbuLf9x4CjYTVUa-VT9UD3" target="_blank" class="btn-primary" style="width: 100%; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 600; padding: 15px; background: #10b981;">
+                                <i data-lucide="scroll"></i> Acessar PDF (Regimento)
+                            </a>
                         </div>
+
+                    </div>
+
+                    <div style="margin-top: 40px; text-align: center; padding: 25px; background: rgba(30, 41, 59, 0.03); border-radius: 15px; border: 1.5px dashed #cbd5e1;">
+                        <p style="font-size: 0.9rem; color: #64748b;">
+                            <i data-lucide="info" style="width: 16px; height: 16px; vertical-align: middle; margin-right: 5px;"></i>
+                            Esses documentos são fundamentais para o bom convívio e organização da nossa comunidade acadêmica.
+                        </p>
                     </div>
                 `;
                 setTimeout(() => lucide.createIcons(), 0);
