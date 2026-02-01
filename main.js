@@ -188,18 +188,19 @@
     };
 
     // Theme Logic
-    themeButtons.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const theme = btn.getAttribute('data-theme');
-            document.body.className = `theme-${theme}`;
-            localStorage.setItem('sebitam-theme', theme);
-        });
-    });
-
-    const savedTheme = localStorage.getItem('sebitam-theme');
-    if (savedTheme) {
-        document.body.className = `theme-${savedTheme}`;
+    function applySavedTheme() {
+        const savedTheme = localStorage.getItem('sebitam-theme') || 'professional';
+        document.body.classList.remove('theme-man', 'theme-woman', 'theme-professional', 'theme-elegant');
+        document.body.classList.add(`theme-${savedTheme}`);
     }
+
+    function setLoginTheme() {
+        document.body.classList.remove('theme-man', 'theme-woman', 'theme-professional', 'theme-elegant');
+        document.body.classList.add('theme-man');
+    }
+
+    // Inicialmente, manter o tema preto para o login
+    setLoginTheme();
 
     // Login Logic
     loginForm.addEventListener('submit', async (e) => {
@@ -228,6 +229,7 @@
         refreshUIPermissions(currentUser.role);
         loginScreen.classList.remove('active');
         dashboardScreen.classList.add('active');
+        applySavedTheme();
         lucide.createIcons();
 
         // Verificar se é o primeiro acesso do usuário
@@ -247,9 +249,10 @@
 
     // Logout Logic
 
-    logoutBtn.addEventListener('click', () => {
+    const handleLogout = () => {
         dashboardScreen.classList.remove('active');
         loginScreen.classList.add('active');
+        setLoginTheme();
         // Clear all role-specific classes from body
         document.body.classList.remove('user-role-admin', 'user-role-secretary', 'user-role-teacher', 'user-role-student');
 
@@ -257,7 +260,13 @@
         viewHistory = [];
         currentView = 'login';
         currentData = null;
-    });
+    };
+
+    logoutBtn.addEventListener('click', handleLogout);
+    const headerLogoutBtn = document.getElementById('header-logout-btn');
+    if (headerLogoutBtn) {
+        headerLogoutBtn.addEventListener('click', handleLogout);
+    }
 
 
 
