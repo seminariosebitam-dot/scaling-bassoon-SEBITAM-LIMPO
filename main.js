@@ -213,18 +213,48 @@
             return;
         }
 
-        // Logic check: if master email, it's Luiz (Admin)
+        // Armazenar email do usuário
+        currentUser.email = loginEmail;
+        currentUser.name = loginName;
+
+        let userFound = false;
+
+        // 1. Verificar Super Admin
         if (loginEmail === 'edukadoshmda@gmail.com') {
-            currentUser.name = 'Luiz Eduardo';
             currentUser.role = 'admin';
+            currentUser.name = 'Luiz Eduardo';
+            userFound = true;
         } else {
-            // Check if user exists in any of the tables, or default to Student
-            currentUser.name = loginName;
-            currentUser.role = 'student'; // Default role if not master
+            // 2. Buscar em todas as tabelas do banco de dados
+            try {
+                const tables = [
+                    { key: 'sebitam-admins', role: 'admin' },
+                    { key: 'sebitam-secretaries', role: 'secretary' },
+                    { key: 'sebitam-teachers', role: 'teacher' },
+                    { key: 'sebitam-students', role: 'student' }
+                ];
+
+                for (const t of tables) {
+                    const data = await dbGet(t.key);
+                    const match = data.find(u => (u.email && u.email.toLowerCase() === loginEmail));
+                    if (match) {
+                        currentUser.role = t.role;
+                        currentUser.name = match.fullName || match.name || loginName;
+                        currentUser.id = match.id;
+                        currentUser.photo = match.photo || null;
+                        userFound = true;
+                        break;
+                    }
+                }
+            } catch (err) {
+                console.error("Erro ao verificar usuário no banco:", err);
+            }
         }
 
-        // Armazenar email do usuário para uso posterior
-        currentUser.email = loginEmail;
+        if (!userFound) {
+            // Se não encontrado em nenhuma tabela, define como estudante por padrão para novo cadastro
+            currentUser.role = 'student';
+        }
 
         refreshUIPermissions(currentUser.role);
         loginScreen.classList.remove('active');
@@ -232,18 +262,12 @@
         applySavedTheme();
         lucide.createIcons();
 
-        // Verificar se é o primeiro acesso do usuário
-        const userKey = `sebitam-user-${loginEmail}`;
-        const hasCompletedRegistration = localStorage.getItem(userKey);
-
-        if (!hasCompletedRegistration) {
-            // Primeiro acesso - direcionar para cadastro
-            console.log('Primeiro acesso detectado - redirecionando para cadastro');
-            await renderView('enrollment');
-        } else {
-            // Acesso subsequente - direcionar para visão geral
-            console.log('Usuário já cadastrado - redirecionando para visão geral');
+        if (userFound) {
+            console.log(`Usuário conhecido (${currentUser.role}) logado - Indo para Visão Geral`);
             await renderView('overview');
+        } else {
+            console.log('Novo usuário detectado - Redirecionando para Cadastro');
+            await renderView('enrollment');
         }
     });
 
