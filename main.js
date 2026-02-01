@@ -1408,6 +1408,14 @@
                                 <div style="width: 50px; height: 50px; border-radius: 50%; background: #d4af37; margin-bottom: 15px; border: 2px solid #e2e8f0;"></div>
                                 <span style="font-weight: 600; font-size: 0.9rem; color: var(--text-main);">Luxo Dourado</span>
                             </button>
+                            <button class="theme-option-card" data-theme="nature" style="padding: 20px; border: 2px solid var(--border); border-radius: 15px; background: white; cursor: pointer; transition: 0.3s; display: flex; flex-direction: column; align-items: center;">
+                                <div style="width: 50px; height: 50px; border-radius: 50%; background: #15803d; margin-bottom: 15px; border: 2px solid #e2e8f0;"></div>
+                                <span style="font-weight: 600; font-size: 0.9rem; color: var(--text-main);">Natureza</span>
+                            </button>
+                            <button class="theme-option-card" data-theme="spiritual" style="padding: 20px; border: 2px solid var(--border); border-radius: 15px; background: white; cursor: pointer; transition: 0.3s; display: flex; flex-direction: column; align-items: center;">
+                                <div style="width: 50px; height: 50px; border-radius: 50%; background: #7e22ce; margin-bottom: 15px; border: 2px solid #e2e8f0;"></div>
+                                <span style="font-weight: 600; font-size: 0.9rem; color: var(--text-main);">Espiritual</span>
+                            </button>
                         </div>
                     </div>
                 `;
@@ -1417,13 +1425,13 @@
                         const currentTheme = localStorage.getItem('sebitam-theme') || 'professional';
                         if (btn.dataset.theme === currentTheme) {
                             btn.style.borderColor = 'var(--primary)';
-                            btn.style.background = 'rgba(37, 99, 235, 0.05)';
+                            btn.style.background = 'rgba(var(--primary-rgb), 0.05)';
                         }
 
                         btn.onclick = () => {
                             const theme = btn.dataset.theme;
                             // Safe class removal to preserve user role and other classes
-                            document.body.classList.remove('theme-man', 'theme-woman', 'theme-professional', 'theme-elegant');
+                            document.body.classList.remove('theme-man', 'theme-woman', 'theme-professional', 'theme-elegant', 'theme-nature', 'theme-spiritual');
                             document.body.classList.add(`theme-${theme}`);
 
                             localStorage.setItem('sebitam-theme', theme);
@@ -1434,7 +1442,7 @@
                                 b.style.background = 'white';
                             });
                             btn.style.borderColor = 'var(--primary)';
-                            btn.style.background = 'rgba(37, 99, 235, 0.05)';
+                            btn.style.background = 'rgba(var(--primary-rgb), 0.05)';
 
                             alert(`Tema ${btn.querySelector('span').textContent} aplicado!`);
                         };

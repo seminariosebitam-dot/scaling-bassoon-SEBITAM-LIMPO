@@ -2,6 +2,7 @@
 :root {
     /* Theme: Professional (Default) */
     --primary: #2563eb;
+    --primary-rgb: 37, 99, 235;
     --primary-dark: #1d4ed8;
     --accent: #3b82f6;
     --bg-main: #f8fafc;
@@ -22,6 +23,7 @@
 /* Theme: Homem (Masculine Elegant) */
 body.theme-man {
     --primary: #0f172a;
+    --primary-rgb: 15, 23, 42;
     --primary-dark: #020617;
     --accent: #334155;
     --bg-main: #f1f5f9;
@@ -35,6 +37,7 @@ body.theme-man {
 /* Theme: Mulher (Feminine Sophisticated) */
 body.theme-woman {
     --primary: #be185d;
+    --primary-rgb: 190, 24, 93;
     --primary-dark: #9d174d;
     --accent: #f472b6;
     --bg-main: #fff1f2;
@@ -48,6 +51,7 @@ body.theme-woman {
 /* Theme: Elegant (Premium Gold/White) */
 body.theme-elegant {
     --primary: #b8860b;
+    --primary-rgb: 184, 134, 11;
     --primary-dark: #854d0e;
     --accent: #d4af37;
     --bg-main: #fdfdfd;
@@ -58,6 +62,38 @@ body.theme-elegant {
     --sidebar-bg: #ffffff;
     --sidebar-text: #422006;
     --sidebar-hover: #f1f5f9;
+}
+
+/* Theme: Natureza (White & Green) */
+body.theme-nature {
+    --primary: #15803d;
+    --primary-rgb: 21, 128, 61;
+    --primary-dark: #166534;
+    --accent: #22c55e;
+    --bg-main: #f0fdf4;
+    --bg-card: #ffffff;
+    --text-main: #14532d;
+    --text-muted: #166534;
+    --border: #dcfce7;
+    --sidebar-bg: #14532d;
+    --sidebar-text: #f0fdf4;
+    --sidebar-hover: #166534;
+}
+
+/* Theme: Espiritual (White & Purple) */
+body.theme-spiritual {
+    --primary: #7e22ce;
+    --primary-rgb: 126, 34, 206;
+    --primary-dark: #6b21a8;
+    --accent: #a855f7;
+    --bg-main: #faf5ff;
+    --bg-card: #ffffff;
+    --text-main: #3b0764;
+    --text-muted: #6b21a8;
+    --border: #f3e8ff;
+    --sidebar-bg: #3b0764;
+    --sidebar-text: #faf5ff;
+    --sidebar-hover: #581c87;
 }
 
 * {
@@ -187,7 +223,7 @@ body {
 
 .role-option-simple input:checked+span {
     border-color: var(--primary);
-    background: rgba(37, 99, 235, 0.05);
+    background: rgba(var(--primary-rgb), 0.05);
     color: var(--primary);
 }
 
@@ -210,7 +246,7 @@ body {
 
 .registration-role-selector .role-option input:checked+.role-box {
     border-color: var(--primary);
-    background: rgba(37, 99, 235, 0.05);
+    background: var(--bg-main);
     transform: translateY(-5px);
     box-shadow: var(--shadow);
 }
@@ -276,7 +312,7 @@ body {
 
 .input-field input:focus {
     border-color: var(--primary);
-    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+    box-shadow: 0 0 0 4px rgba(var(--primary-rgb), 0.1);
 }
 
 /* Buttons */
@@ -603,7 +639,7 @@ body {
     width: 48px;
     height: 48px;
     border-radius: 12px;
-    background: rgba(37, 99, 235, 0.1);
+    background: rgba(var(--primary-rgb), 0.1);
     color: var(--primary);
     display: flex;
     align-items: center;
@@ -691,7 +727,7 @@ body {
 .form-group input:focus,
 .form-group select:focus {
     border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1);
 }
 
 .radio-group {
@@ -1270,7 +1306,7 @@ body {
 .chat-input-area input:focus {
     border-color: var(--primary);
     background: white;
-    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+    box-shadow: 0 0 0 4px rgba(var(--primary-rgb), 0.1);
 }
 
 .btn-icon-only {
@@ -1352,7 +1388,7 @@ body {
     width: 44px;
     height: 44px;
     border-radius: 12px;
-    background: rgba(37, 99, 235, 0.1);
+    background: rgba(var(--primary-rgb), 0.1);
     color: var(--primary);
     display: flex;
     align-items: center;
@@ -1518,7 +1554,7 @@ body {
     width: 50px;
     height: 50px;
     border-radius: 10px;
-    background: rgba(37, 99, 235, 0.1);
+    background: rgba(var(--primary-rgb), 0.1);
     color: var(--primary);
     display: flex;
     align-items: center;
@@ -1640,7 +1676,7 @@ body {
 
 .chat-input-area input:focus {
     border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1);
 }
 
 .btn-icon-only {
@@ -1653,7 +1689,7 @@ body {
 }
 
 .ai-special {
-    background: linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(37, 99, 235, 0) 100%);
+    background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.1) 0%, rgba(var(--primary-rgb), 0) 100%);
     border-left: 3px solid var(--primary);
 }
 
