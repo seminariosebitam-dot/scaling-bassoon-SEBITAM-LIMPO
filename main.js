@@ -562,7 +562,110 @@
         printWindow.document.close();
     }
 
-    async function renderGradeEditor(studentId) {
+    async function printFinancialReport(monthIndex, year) {
+        console.log(`Gerando relatório financeiro: Mês ${monthIndex}, Ano ${year}`);
+        const students = await dbGet('sebitam-students');
+        const monthName = new Date(year, monthIndex).toLocaleString('pt-BR', { month: 'long' });
+        const monthNameCap = monthName.charAt(0).toUpperCase() + monthName.slice(1);
+
+        // Calcular totais
+        const PRICES = { integral: 70, half: 35, scholarship: 0 };
+        let totalExpected = 0;
+        let totalReceived = 0;
+
+        const reportData = students.map(s => {
+            const status = s.paymentStatus || (['integral', 'scholarship'].includes(s.plan) ? 'Pago' : 'Pendente');
+            const value = PRICES[s.plan] || 0;
+            totalExpected += value;
+            if (status === 'Pago') totalReceived += value;
+            return { ...s, status, value };
+        });
+
+        const printWindow = window.open('', '_blank');
+        if (!printWindow) return alert('Por favor, libere os pop-ups para imprimir o relatório.');
+
+        const dateStr = new Date().toLocaleDateString('pt-BR');
+
+        printWindow.document.write(`
+            <html>
+                <head>
+                    <title>Relatório Financeiro - ${monthNameCap}/${year}</title>
+                    <style>
+                        @page { size: A4; margin: 15mm; }
+                        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #1e293b; line-height: 1.4; }
+                        .header { text-align: center; border-bottom: 2px solid #1a365d; padding-bottom: 15px; margin-bottom: 20px; }
+                        .logo { height: 80px; margin-bottom: 10px; }
+                        h1 { color: #1a365d; margin: 5px 0; font-size: 24px; text-transform: uppercase; }
+                        h2 { color: #64748b; margin: 0; font-size: 16px; font-weight: normal; }
+                        .summary-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; margin-bottom: 20px; display: flex; justify-content: space-around; }
+                        .summary-item { text-align: center; }
+                        .summary-val { display: block; font-size: 18px; font-weight: bold; color: #0f172a; }
+                        .summary-label { font-size: 12px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
+                        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+                        th, td { border: 1px solid #cbd5e1; padding: 8px; text-align: left; }
+                        th { background: #1a365d; color: white; text-transform: uppercase; font-size: 11px; }
+                        tr:nth-child(even) { background-color: #f1f5f9; }
+                        .status-pago { color: #166534; font-weight: bold; }
+                        .status-pendente { color: #991b1b; font-weight: bold; }
+                        .audit-info { margin-top: 30px; font-size: 10px; color: #94a3b8; text-align: right; border-top: 1px solid #e2e8f0; padding-top: 5px; }
+                        @media print { button { display: none; } }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <img src="logo.jpg" class="logo">
+                        <h1>Relatório Financeiro Mensal</h1>
+                        <h2>Referência: ${monthNameCap} de ${year}</h2>
+                    </div>
+
+                    <div class="summary-box">
+                        <div class="summary-item">
+                            <span class="summary-val">R$ ${totalExpected.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                            <span class="summary-label">Previsão de Receita</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-val" style="color: #16a34a;">R$ ${totalReceived.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                            <span class="summary-label">Total Recebido</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-val" style="color: #dc2626;">R$ ${(totalExpected - totalReceived).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                            <span class="summary-label">Inadimplência</span>
+                        </div>
+                    </div>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Aluno</th>
+                                <th>Turma</th>
+                                <th>Plano</th>
+                                <th>Valor</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${reportData.map(s => `
+                                <tr>
+                                    <td>${s.fullName}</td>
+                                    <td>${s.grade || '-'}</td>
+                                    <td>${s.plan === 'integral' ? 'Integral' : s.plan === 'half' ? 'Meia' : 'Bolsa'}</td>
+                                    <td>R$ ${s.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
+                                    <td class="${s.status === 'Pago' ? 'status-pago' : 'status-pendente'}">${s.status.toUpperCase()}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+
+                    <div class="audit-info">
+                        Relatório gerado em ${dateStr} pelo usuário ${currentUser.name} (${currentUser.role}).<br>
+                        Sistema de Gestão SEBITAM.
+                    </div>
+                    <script>window.onload = () => setTimeout(() => window.print(), 500);</script>
+                </body>
+            </html>
+        `);
+        printWindow.document.close();
+
         console.log("Abrindo editor de notas para ID:", studentId);
         const students = await dbGet('sebitam-students');
         const s = students.find(item => String(item.id) === String(studentId));
@@ -1742,7 +1845,55 @@
                             </div>
                         </div>
                     </div>
+
+                    <div style="margin-top: 40px; background: white; padding: 25px; border-radius: 20px; box-shadow: var(--shadow); border: 1px solid var(--border);">
+                        <div class="view-header" style="margin-bottom: 20px;">
+                            <h3 style="display: flex; align-items: center; gap: 10px; font-weight: 700;">
+                                <i data-lucide="file-text" style="color: var(--primary);"></i> Relatórios Mensais
+                            </h3>
+                            <p>Gere e imprima relatórios financeiros detalhados por mês.</p>
+                        </div>
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Mês</th>
+                                        <th>Ano</th>
+                                        <th>Status do Relatório</th>
+                                        <th class="text-right">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${Array.from({ length: 12 }, (_, i) => {
+                    const date = new Date(new Date().getFullYear(), i, 1);
+                    const monthName = date.toLocaleString('pt-BR', { month: 'long' });
+                    const monthNameCap = monthName.charAt(0).toUpperCase() + monthName.slice(1);
+                    const year = date.getFullYear();
+                    const isPastOrCurrent = i <= new Date().getMonth();
+
+                    return `
+                                            <tr>
+                                                <td style="font-weight: 600;">${monthNameCap}</td>
+                                                <td>${year}</td>
+                                                <td>
+                                                    <span class="badge" style="background: ${isPastOrCurrent ? 'rgba(34, 197, 94, 0.1)' : 'rgba(241, 245, 249, 1)'}; color: ${isPastOrCurrent ? '#16a34a' : '#64748b'}; border: 1px solid ${isPastOrCurrent ? '#22c55e' : '#cbd5e1'};">
+                                                        ${isPastOrCurrent ? 'Disponível' : 'Futuro'}
+                                                    </span>
+                                                </td>
+                                                <td class="actions-cell">
+                                                    <button class="btn-icon" title="Imprimir Relatório" onclick="printFinancialReport(${i}, ${year})" style="color: var(--primary); background: rgba(37, 99, 235, 0.1);">
+                                                        <i data-lucide="printer"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        `;
+                }).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 `;
+
 
                 setTimeout(() => {
                     if (typeof Chart === 'undefined') return;
@@ -2089,6 +2240,7 @@
     window.generateCertificate = generateCertificate;
     window.printAcademicHistory = printAcademicHistory;
     window.updatePaymentStatus = updatePaymentStatus;
+    window.printFinancialReport = printFinancialReport;
     window.renderEditStudent = renderEditStudent;
 
     // Profile Icon Logic (Restored)
