@@ -665,7 +665,9 @@
             </html>
         `);
         printWindow.document.close();
+    }
 
+    async function renderGradeEditor(studentId) {
         console.log("Abrindo editor de notas para ID:", studentId);
         const students = await dbGet('sebitam-students');
         const s = students.find(item => String(item.id) === String(studentId));
