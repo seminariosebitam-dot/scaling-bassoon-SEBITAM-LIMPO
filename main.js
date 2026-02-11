@@ -29,15 +29,21 @@
     // Inicialização do Cliente Supabase
     let supabase = null;
     try {
-        if (!SUPABASE_ANON_KEY || SUPABASE_ANON_KEY === "COLE_AQUI_SUA_CHAVE_ANON_DO_SUPABASE") {
+        // Validar se a chave foi configurada (aceita tanto eyJ quanto sb_publishable)
+        const isKeyConfigured = SUPABASE_ANON_KEY &&
+            SUPABASE_ANON_KEY !== "COLE_AQUI_SUA_CHAVE_ANON_DO_SUPABASE" &&
+            (SUPABASE_ANON_KEY.startsWith('eyJ') || SUPABASE_ANON_KEY.startsWith('sb_'));
+
+        if (!isKeyConfigured) {
             console.warn("⚠️ SUPABASE NÃO CONFIGURADO! Edite supabase-config.js e cole sua chave anon.");
             console.warn("📖 Instruções: Acesse Supabase Dashboard > Settings > API > copie 'anon public'");
             console.warn("🔄 Usando modo offline (localStorage) temporariamente.");
         } else if (window.supabase && typeof window.supabase.createClient === 'function') {
             supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             console.log("✅ Supabase inicializado com sucesso!");
+            console.log("📡 Conectado ao projeto:", SUPABASE_URL.replace('https://', ''));
         } else {
-            console.warn("SDK do Supabase não encontrado. Usando modo offline (localStorage).");
+            console.warn("⚠️ SDK do Supabase não encontrado. Usando modo offline (localStorage).");
         }
     } catch (err) {
         console.error("❌ Erro crítico ao inicializar Supabase:", err);
@@ -119,66 +125,123 @@
 
     async function dbAddItem(collectionName, item) {
         const table = tableMap[collectionName] || collectionName;
+
+        // Modo offline (localStorage)
         if (!supabase) {
+            console.log(`💾 Salvando em localStorage: ${collectionName}`);
             const list = await dbGet(collectionName);
             // Ensure ID is present for localStorage fallback
             if (!item.id) item.id = Date.now();
             list.push(item);
             localStorage.setItem(collectionName, JSON.stringify(list));
-            return;
-        }
-        // For students, we let Supabase generate the ID
-        // For others, if the table has an auto-increment ID, we should remove our temporary ID
-        const itemToInsert = { ...item };
-        if (tableMap[collectionName] === 'students' || itemToInsert.id) {
-            delete itemToInsert.id;
+            console.log(`✅ Salvo no localStorage com ID: ${item.id}`);
+            return { success: true, id: item.id };
         }
 
-        const mapped = mapToSupabase(itemToInsert, collectionName);
-        const { error } = await supabase.from(table).insert([mapped]);
-        if (error) {
-            console.error("Error adding to Supabase:", error);
-            alert("Erro ao salvar no banco de dados: " + error.message);
-            throw error;
+        // Modo online (Supabase)
+        try {
+            // For students, we let Supabase generate the ID
+            // For others, if the table has an auto-increment ID, we should remove our temporary ID
+            const itemToInsert = { ...item };
+            if (tableMap[collectionName] === 'students' || itemToInsert.id) {
+                delete itemToInsert.id;
+            }
+
+            const mapped = mapToSupabase(itemToInsert, collectionName);
+            console.log(`💾 Salvando em Supabase (${table}):`, mapped);
+
+            const { data, error } = await supabase.from(table).insert([mapped]).select();
+
+            if (error) {
+                console.error(`❌ Erro ao salvar em ${table}:`, error);
+                alert(`Erro ao salvar no banco de dados: ${error.message || 'Erro desconhecido'}`);
+                throw error;
+            }
+
+            console.log(`✅ Salvo com sucesso em ${table}!`, data);
+            return { success: true, data: data };
+        } catch (e) {
+            console.error(`❌ Erro crítico ao salvar em ${table}:`, e);
+            throw e;
         }
     }
 
     async function dbUpdateItem(collectionName, id, updates) {
         const table = tableMap[collectionName] || collectionName;
+
+        // Modo offline (localStorage)
         if (!supabase) {
+            console.log(`💾 Atualizando em localStorage: ${collectionName}, ID: ${id}`);
             const list = await dbGet(collectionName);
             const idx = list.findIndex(i => String(i.id) === String(id));
             if (idx !== -1) {
                 list[idx] = { ...list[idx], ...updates };
                 localStorage.setItem(collectionName, JSON.stringify(list));
+                console.log(`✅ Atualizado no localStorage!`);
+                return { success: true };
+            } else {
+                console.warn(`⚠️ Item não encontrado no localStorage: ID ${id}`);
+                return { success: false, error: 'Item não encontrado' };
             }
-            return;
         }
-        const mapped = mapToSupabase(updates, collectionName);
-        // Supabase often expects numeric IDs for integer primary keys
-        const queryId = isNaN(id) ? id : parseInt(id);
-        const { error } = await supabase.from(table).update(mapped).eq('id', queryId);
-        if (error) {
-            console.error("Error updating in Supabase:", error);
-            throw error;
+
+        // Modo online (Supabase)
+        try {
+            const mapped = mapToSupabase(updates, collectionName);
+            // Supabase often expects numeric IDs for integer primary keys
+            const queryId = isNaN(id) ? id : parseInt(id);
+
+            console.log(`💾 Atualizando em Supabase (${table}), ID: ${queryId}:`, mapped);
+
+            const { data, error } = await supabase.from(table).update(mapped).eq('id', queryId).select();
+
+            if (error) {
+                console.error(`❌ Erro ao atualizar em ${table}:`, error);
+                alert(`Erro ao atualizar no banco de dados: ${error.message || 'Erro desconhecido'}`);
+                throw error;
+            }
+
+            console.log(`✅ Atualizado com sucesso em ${table}!`, data);
+            return { success: true, data: data };
+        } catch (e) {
+            console.error(`❌ Erro crítico ao atualizar em ${table}:`, e);
+            throw e;
         }
     }
 
     async function dbDeleteItem(collectionName, id) {
         const table = tableMap[collectionName] || collectionName;
+
+        // Modo offline (localStorage)
         if (!supabase) {
+            console.log(`🗑️ Excluindo de localStorage: ${collectionName}, ID: ${id}`);
             const list = await dbGet(collectionName);
             const filtered = list.filter(i => String(i.id) !== String(id));
             localStorage.setItem(collectionName, JSON.stringify(filtered));
-            return;
+            console.log(`✅ Excluído do localStorage!`);
+            return { success: true };
         }
-        // Use numeric ID if possible to avoid type mismatch with SERIAL columns
-        const queryId = isNaN(id) ? id : parseInt(id);
-        const { error } = await supabase.from(table).delete().eq('id', queryId);
-        if (error) {
-            console.error("Error deleting from Supabase:", error);
-            alert("Erro ao excluir do banco de dados: " + error.message);
-            throw error;
+
+        // Modo online (Supabase)
+        try {
+            // Use numeric ID if possible to avoid type mismatch with SERIAL columns
+            const queryId = isNaN(id) ? id : parseInt(id);
+
+            console.log(`🗑️ Excluindo de Supabase (${table}), ID: ${queryId}`);
+
+            const { data, error } = await supabase.from(table).delete().eq('id', queryId).select();
+
+            if (error) {
+                console.error(`❌ Erro ao excluir de ${table}:`, error);
+                alert(`Erro ao excluir do banco de dados: ${error.message || 'Erro desconhecido'}`);
+                throw error;
+            }
+
+            console.log(`✅ Excluído com sucesso de ${table}!`, data);
+            return { success: true, data: data };
+        } catch (e) {
+            console.error(`❌ Erro crítico ao excluir de ${table}:`, e);
+            throw e;
         }
     }
 
