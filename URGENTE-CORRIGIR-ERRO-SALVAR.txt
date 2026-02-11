@@ -1,0 +1,96 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║              🚨 CORREÇÃO URGENTE: ERRO AO SALVAR NO SUPABASE                ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+ERRO ATUAL:
+"Erro ao salvar no banco de dados: invalid schema-public"
+
+CAUSA:
+As políticas RLS (Row Level Security) do Supabase estão BLOQUEANDO os inserts.
+Sua chave "anon" está correta, mas faltam permissões.
+
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                         🔧 SOLUÇÃO RÁPIDA (3 MINUTOS)                        ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+PASSO 1: ACESSAR O SUPABASE SQL EDITOR
+   1. Vá para: https://supabase.com/dashboard/project/vwruogwdtbsareighmoc
+   2. No menu lateral, clique em "SQL Editor"
+   3. Clique em "+ New Query"
+
+
+PASSO 2: DESABILITAR RLS (SOLUÇÃO MAIS RÁPIDA)
+   Cole este código e clique em RUN:
+
+   ALTER TABLE students DISABLE ROW LEVEL SECURITY;
+   ALTER TABLE teachers DISABLE ROW LEVEL SECURITY;
+   ALTER TABLE admins DISABLE ROW LEVEL SECURITY;
+   ALTER TABLE secretaries DISABLE ROW LEVEL SECURITY;
+
+   ✅ Pronto! Isso deve resolver IMEDIATAMENTE.
+
+
+PASSO 3: TESTAR NO APP
+   1. Recarregue a página do app (F5)
+   2. Tente cadastrar novamente
+   3. Deve funcionar agora! ✅
+
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                    🛡️ ALTERNATIVA: CRIAR POLÍTICAS RLS                       ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+Se você quiser MANTER RLS ativo (mais seguro), use isso em vez da PASSO 2:
+
+-- Para students
+CREATE POLICY "Enable all for students" ON students
+FOR ALL USING (true) WITH CHECK (true);
+
+-- Para teachers
+CREATE POLICY "Enable all for teachers" ON teachers
+FOR ALL USING (true) WITH CHECK (true);
+
+-- Para admins
+CREATE POLICY "Enable all for admins" ON admins
+FOR ALL USING (true) WITH CHECK (true);
+
+-- Para secretaries
+CREATE POLICY "Enable all for secretaries" ON secretaries
+FOR ALL USING (true) WITH CHECK (true);
+
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                          📋 ARQUIVO SQL COMPLETO                             ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+Criei o arquivo: CORRIGIR-RLS-SUPABASE.sql
+Abra ele e copie todo o conteúdo para o SQL Editor do Supabase.
+
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                        ❓ POR QUE ISSO ACONTECEU?                            ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+- O Supabase ativa RLS por padrão para segurança
+- RLS bloqueia TODAS as operações até você criar políticas
+- Sua chave "anon" funciona, mas precisa de permissões RLS
+- Desabilitar RLS = permite tudo (OK para desenvolvimento)
+- Criar políticas = mais seguro (recomendado para produção)
+
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                           🎯 ESCOLHA SUA SOLUÇÃO                             ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+⚡ RÁPIDA (recomendada agora): DESABILITAR RLS
+   - Mais fácil, funciona imediatamente
+   - Execute: ALTER TABLE students DISABLE ROW LEVEL SECURITY;
+   - Repita para as outras 3 tabelas
+
+🛡️ SEGURA (para depois): CRIAR POLÍTICAS
+   - Mais trabalho, mas mais seguro
+   - Use o arquivo CORRIGIR-RLS-SUPABASE.sql
+
+
+FAÇA AGORA: Vá no Supabase e execute um dos scripts acima! 🚀
