@@ -22,23 +22,26 @@
     let currentData = null;
 
     // --- CONFIGURAÇÃO SUPABASE ---
-    // URL do projeto
-    const SUPABASE_URL = "https://vwruogwdtbsareighmoc.supabase.co";
-
-    // Chave Publicável (Publishable Key) - Segura para uso no frontend
-    const SUPABASE_ANON_KEY = "sb_publishable__1Y1EwVreZS7LEaExgwrew_hIDT-ECZ";
+    // Usando configuração do arquivo externo (supabase-config.js)
+    const SUPABASE_URL = window.SUPABASE_CONFIG?.url || "https://vwruogwdtbsareighmoc.supabase.co";
+    const SUPABASE_ANON_KEY = window.SUPABASE_CONFIG?.anonKey || "";
 
     // Inicialização do Cliente Supabase
     let supabase = null;
     try {
-        if (window.supabase && typeof window.supabase.createClient === 'function') {
+        if (!SUPABASE_ANON_KEY || SUPABASE_ANON_KEY === "COLE_AQUI_SUA_CHAVE_ANON_DO_SUPABASE") {
+            console.warn("⚠️ SUPABASE NÃO CONFIGURADO! Edite supabase-config.js e cole sua chave anon.");
+            console.warn("📖 Instruções: Acesse Supabase Dashboard > Settings > API > copie 'anon public'");
+            console.warn("🔄 Usando modo offline (localStorage) temporariamente.");
+        } else if (window.supabase && typeof window.supabase.createClient === 'function') {
             supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            console.log("Supabase inicializado com sucesso.");
+            console.log("✅ Supabase inicializado com sucesso!");
         } else {
             console.warn("SDK do Supabase não encontrado. Usando modo offline (localStorage).");
         }
     } catch (err) {
-        console.error("Erro crítico ao inicializar Supabase:", err);
+        console.error("❌ Erro crítico ao inicializar Supabase:", err);
+        console.warn("🔄 Usando modo offline (localStorage).");
     }
 
     // Mapping frontend collection names to Supabase table names
