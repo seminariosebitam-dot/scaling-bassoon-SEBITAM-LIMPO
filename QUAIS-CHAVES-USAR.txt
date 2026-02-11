@@ -1,0 +1,123 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                    🔑 GUIA COMPLETO: QUAIS CHAVES USAR ONDE                  ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ CHAVE 1: SUPABASE (anon/public)                                             │
+│ ✅ PODE ME ENVIAR / PODE FICAR NO CÓDIGO                                    │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+📍 ONDE PEGAR:
+   1. https://supabase.com/dashboard/project/vwruogwdtbsareighmoc
+   2. Settings ⚙️ > API
+   3. Seção: "Project API keys"
+   4. Copiar: "anon" "public"
+
+🔤 FORMATO:
+   Começa com: eyJ...
+   Exemplo: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3M...
+
+📂 ONDE USAR:
+   Arquivo: c:\Users\eduka\Desktop\SEBITAM LIMPO\supabase-config.js
+   Linha 15: anonKey: "COLE_AQUI"
+
+✅ SEGURANÇA:
+   - É SEGURA para usar no frontend
+   - PODE fazer commit no Git
+   - PODE me enviar para eu configurar
+   - Protegida por RLS (Row Level Security)
+
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ CHAVE 2: GOOGLE AI (Gemini API Key)                                         │
+│ ⚠️ NÃO ME ENVIE / NÃO PODE FICAR NO CÓDIGO                                  │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+📍 ONDE PEGAR:
+   1. https://aistudio.google.com/app/apikey
+   2. Clicar em "Create API Key"
+   3. Selecionar projeto: "Gemini Project SEBITAM"
+
+🔤 FORMATO:
+   Começa com: AIza...
+   Exemplo: AIzaSyBcSIclu1eob0b9Tmw5OQRkEdf-DZ-yL_s
+
+📂 ONDE USAR:
+   NO SUPABASE (não no código!):
+   1. https://supabase.com/dashboard/project/vwruogwdtbsareighmoc
+   2. Settings > Edge Functions > Secrets
+   3. Clicar "Add new secret"
+   4. Nome: GEMINI_API_KEY
+   5. Valor: cole a chave AIza...
+
+⚠️ SEGURANÇA:
+   - É PRIVADA - pode gerar custos
+   - NÃO pode fazer commit no Git
+   - NÃO me envie essa chave
+   - Você mesmo configura no Supabase
+
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                          📋 CHECKLIST PASSO A PASSO                          ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+PRIMEIRO - REVOGUE A CHAVE ANTIGA DO GOOGLE AI:
+□ 1. Acesse: https://aistudio.google.com/app/apikey
+□ 2. Delete a chave antiga (termina com ...DZ-yL_s)
+
+
+SEGUNDO - CRIE NOVA CHAVE DO GOOGLE AI:
+□ 1. No mesmo lugar, clique "Create API Key"
+□ 2. Copie a nova chave (AIza...)
+
+
+TERCEIRO - CONFIGURE A CHAVE DO GOOGLE AI NO SUPABASE:
+□ 1. Acesse Supabase Dashboard
+□ 2. Settings > Edge Functions > Secrets
+□ 3. Add new secret:
+      Nome: GEMINI_API_KEY
+      Valor: cola a chave AIza... (nova)
+
+
+QUARTO - PEGUE A CHAVE DO SUPABASE:
+□ 1. No Supabase Dashboard
+□ 2. Settings > API
+□ 3. Copie a chave "anon" "public" (eyJ...)
+□ 4. ME ENVIE ESSA CHAVE ou cole você mesmo
+
+
+QUINTO - EU CONFIGURO O ARQUIVO (ou você mesmo):
+□ 1. Editar: supabase-config.js
+□ 2. Linha 15: colar a chave eyJ...
+□ 3. Salvar
+
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                              🎯 RESUMO VISUAL                                ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+┌─────────────────────────┐         ┌─────────────────────────┐
+│   CHAVE DO SUPABASE     │         │  CHAVE DO GOOGLE AI     │
+│                         │         │                         │
+│   eyJ...                │         │   AIza...               │
+│   (anon/public)         │         │   (Gemini API)          │
+└─────────────────────────┘         └─────────────────────────┘
+           │                                    │
+           │ ✅ PODE ENVIAR                     │ ⚠️ NÃO ENVIAR
+           ↓                                    ↓
+  ┌──────────────────┐              ┌──────────────────────┐
+  │ supabase-config.js│              │ Supabase Secrets     │
+  │ (no código)       │              │ (variável ambiente)  │
+  └──────────────────┘              └──────────────────────┘
+
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                         💬 O QUE FAZER AGORA?                                ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+1️⃣ Revogue a chave antiga do Google AI (que você me enviou)
+2️⃣ Crie uma nova e adicione NO SUPABASE SECRETS (não me envie)
+3️⃣ Pegue a chave do Supabase (eyJ...) e ME ENVIE aqui no chat
+
+Pronto! Assim que você me mandar a chave do Supabase (eyJ...),
+eu configuro o arquivo para você! 😊

@@ -10,9 +10,8 @@ const SUPABASE_CONFIG = {
     url: "https://vwruogwdtbsareighmoc.supabase.co",
 
     // Chave Anon/Public (SEGURA para frontend)
-    // SUBSTITUA pela sua chave real do Supabase Dashboard > Settings > API
-    // A chave deve começar com "eyJ..."
-    anonKey: "COLE_AQUI_SUA_CHAVE_ANON_DO_SUPABASE"
+    // Esta chave é protegida por RLS (Row Level Security) do Supabase
+    anonKey: "sb_publishable__1Y1EwVreZS7LEaExgwrew_hIDT-ECZ"
 };
 
 // Não altere abaixo desta linha
