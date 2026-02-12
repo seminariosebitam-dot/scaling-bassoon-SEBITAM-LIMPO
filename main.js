@@ -63,16 +63,17 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!item) return item;
         const mappedTable = tableMap[collectionName];
         if (mappedTable === 'estudantes') {
-            const mapped = {};
-            // Gravar nas colunas que existem na tabela Supabase (português)
+            // Schema cache do Supabase: colunas sem acento (modulo, nota, plano). "nome completo" com espaço.
             const fullName = item.fullName ?? item.full_name ?? item['nome completo'] ?? item.nome_completo;
-            const moduleVal = item.module ?? item.módulo;
+            const moduleVal = item.module ?? item.módulo ?? item.modulo;
             const gradeVal = item.grade ?? item.nota;
             const planVal = item.plan ?? item.plano;
-            if (fullName !== undefined && fullName !== null) mapped['nome completo'] = String(fullName);
-            if (moduleVal !== undefined && moduleVal !== null) mapped['módulo'] = parseInt(moduleVal) || 1;
-            if (gradeVal !== undefined && gradeVal !== null) mapped['nota'] = parseInt(gradeVal) || 1;
-            if (planVal !== undefined && planVal !== null) mapped['plano'] = String(planVal);
+            const mapped = {
+                'nome completo': fullName != null && fullName !== '' ? String(fullName) : 'Sem nome',
+                'modulo': parseInt(moduleVal, 10) || 1,
+                'nota': parseInt(gradeVal, 10) || 1,
+                'plano': planVal != null && planVal !== '' ? String(planVal) : 'integral'
+            };
             return mapped;
         }
         return item; // For others, assume direct mapping or handle as needed
