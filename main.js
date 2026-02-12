@@ -1611,41 +1611,129 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 html = `
                     <div class="view-header">
-                        <h2>Sebitam Mensalidades</h2>
-                        <p>Controle financeiro e monitoramento de mensalidades.</p>
-                    </div>
+                        <h2>${currentUser.role === 'student' ? 'Minha Situação Financeira' : 'Sebitam Mensalidades'}</h2>
+                        <p>${currentUser.role === 'student' ? 'Acompanhe sua situação financeira e histórico de pagamentos.' : 'Controle financeiro e monitoramento de mensalidades.'}</p>
+                    </div>`;
+
+                // Card individual para alunos
+                if (currentUser.role === 'student' && displayStudents.length > 0) {
+                    const me = displayStudents[0];
+                    const status = me.paymentStatus || (['integral', 'scholarship'].includes(me.plan) ? 'Pago' : 'Pendente');
+                    const planText = me.plan === 'integral' ? 'Integral' : me.plan === 'half' ? 'Parcial' : 'Bolsista';
+                    const valorMensal = me.plan === 'integral' ? 'R$ 70,00' : me.plan === 'half' ? 'R$ 35,00' : 'Isento';
+
+                    html += `
+                        <div class="welcome-card" style="margin-bottom: 30px; padding: 35px; background: linear-gradient(135deg, ${status === 'Pago' ? '#10b981' : '#ef4444'}, ${status === 'Pago' ? '#059669' : '#dc2626'}); box-shadow: var(--shadow-lg); border-radius: 20px;">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 25px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 15px; flex-wrap: wrap; gap: 10px;">
+                                <h3 style="color: white; margin: 0; font-size: 1.5rem; display: flex; align-items: center; gap: 10px;">
+                                    <i data-lucide="wallet" style="width: 28px; height: 28px;"></i>
+                                    Situação Financeira - ${currentMonthCapitalized}/${currentYear}
+                                </h3>
+                                <span class="badge" style="background: white; color: ${status === 'Pago' ? '#10b981' : '#ef4444'}; border: none; font-weight: 800; padding: 10px 20px; border-radius: 50px; font-size: 0.9rem; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
+                                    ${status === 'Pago' ? '✓ PAGO' : '⚠ PENDENTE'}
+                                </span>
+                            </div>
+                            
+                            <div class="profile-card-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 25px;">
+                                <div class="info-item">
+                                    <label style="color: rgba(255,255,255,0.8); font-size: 0.75rem; display: block; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600;">Modalidade de Plano</label>
+                                    <div style="color: white; font-weight: 700; font-size: 1.2rem; display: flex; align-items: center; gap: 8px;">
+                                        <i data-lucide="credit-card" style="width: 20px; height: 20px;"></i>
+                                        ${planText}
+                                    </div>
+                                </div>
+                                <div class="info-item">
+                                    <label style="color: rgba(255,255,255,0.8); font-size: 0.75rem; display: block; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600;">Valor Mensal</label>
+                                    <div style="color: white; font-weight: 800; font-size: 1.4rem;">
+                                        ${valorMensal}
+                                    </div>
+                                </div>
+                                <div class="info-item">
+                                    <label style="color: rgba(255,255,255,0.8); font-size: 0.75rem; display: block; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600;">Período de Referência</label>
+                                    <div style="color: white; font-weight: 700; font-size: 1.2rem; display: flex; align-items: center; gap: 8px;">
+                                        <i data-lucide="calendar" style="width: 20px; height: 20px;"></i>
+                                        ${currentMonthCapitalized} ${currentYear}
+                                    </div>
+                                </div>
+                                <div class="info-item">
+                                    <label style="color: rgba(255,255,255,0.8); font-size: 0.75rem; display: block; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600;">Status do Pagamento</label>
+                                    <div style="color: white; font-weight: 800; font-size: 1.2rem; display: flex; align-items: center; gap: 8px;">
+                                        <i data-lucide="${status === 'Pago' ? 'check-circle' : 'alert-circle'}" style="width: 20px; height: 20px;"></i>
+                                        ${status}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            ${me.plan !== 'scholarship' ? `
+                            <div style="background: rgba(255,255,255,0.15); padding: 20px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.2);">
+                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                                    <i data-lucide="info" style="width: 18px; height: 18px; color: white;"></i>
+                                    <strong style="color: white; font-size: 0.95rem;">Informações de Pagamento</strong>
+                                </div>
+                                <p style="color: rgba(255,255,255,0.95); font-size: 0.9rem; line-height: 1.6; margin: 0;">
+                                    ${status === 'Pago'
+                                ? 'Sua mensalidade está em dia! Obrigado por manter seus estudos em ordem.'
+                                : 'Entre em contato com a secretaria para regularizar sua situação financeira. Sua dedicação aos estudos é importante para nós!'}
+                                </p>
+                            </div>
+                            ` : `
+                            <div style="background: rgba(255,255,255,0.15); padding: 20px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.2);">
+                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                                    <i data-lucide="graduation-cap" style="width: 18px; height: 18px; color: white;"></i>
+                                    <strong style="color: white; font-size: 0.95rem;">Programa de Bolsa de Estudos</strong>
+                                </div>
+                                <p style="color: rgba(255,255,255,0.95); font-size: 0.9rem; line-height: 1.6; margin: 0;">
+                                    Você está contemplado(a) com uma bolsa de estudos integral. Continue dedicado(a) aos seus estudos!
+                                </p>
+                            </div>
+                            `}
+                        </div>
+                    `;
+                }
+
+                html += `
                     <div class="table-container">
                         <table class="data-table">
                             <thead>
                                 <tr>
                                     <th>Aluno</th>
+                                    ${currentUser.role !== 'student' ? '<th>Contato</th>' : ''}
                                     <th>Mês</th>
                                     <th>Ano</th>
                                     <th>Status</th>
                                     <th>Tipo</th>
+                                    ${currentUser.role !== 'student' ? '<th>Valor</th>' : ''}
                                 </tr>
                             </thead>
                             <tbody>
                                 ${displayStudents.map(s => {
                     const status = s.paymentStatus || (['integral', 'scholarship'].includes(s.plan) ? 'Pago' : 'Pendente');
-                    const planText = s.plan === 'integral' ? 'Integral' : s.plan === 'half' ? 'Meia' : 'Bolsa';
+                    const planText = s.plan === 'integral' ? 'Integral' : s.plan === 'half' ? 'Parcial' : 'Bolsista';
+                    const valorMensal = s.plan === 'integral' ? 'R$ 70,00' : s.plan === 'half' ? 'R$ 35,00' : '-';
                     return `
                                         <tr>
-                                            <td><strong>${s.fullName}</strong></td>
-                                            <td style="text-transform: capitalize;">${currentMonth}</td>
-                                            <td>${currentYear}</td>
+                                            <td><strong style="font-size: 0.95rem;">${s.fullName}</strong></td>
+                                            ${currentUser.role !== 'student' ? `
                                             <td>
-                                                <span class="badge" style="background: ${status === 'Pago' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)'}; color: ${status === 'Pago' ? '#16a34a' : '#dc2626'}; border: 1px solid ${status === 'Pago' ? '#22c55e' : '#ef4444'}; display: inline-flex; align-items: center; gap: 5px;">
+                                                <div style="display: flex; flex-direction: column; font-size: 0.8rem; color: var(--text-muted);">
+                                                    <span style="display: flex; align-items: center; gap: 4px;"><i data-lucide="phone" style="width:10px;"></i> ${s.phone || '-'}</span>
+                                                </div>
+                                            </td>` : ''}
+                                            <td style="text-transform: capitalize; font-size: 0.9rem;">${currentMonth}</td>
+                                            <td style="font-size: 0.9rem;">${currentYear}</td>
+                                            <td>
+                                                <span class="badge" style="background: ${status === 'Pago' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)'}; color: ${status === 'Pago' ? '#16a34a' : '#dc2626'}; border: 1px solid ${status === 'Pago' ? '#22c55e' : '#ef4444'}; display: inline-flex; align-items: center; gap: 5px; font-size: 0.8rem; padding: 4px 10px;">
                                                     <i data-lucide="${status === 'Pago' ? 'check-circle' : 'alert-circle'}" style="width: 12px; height: 12px;"></i>
                                                     ${status}
                                                 </span>
                                             </td>
                                             <td>
-                                                <span class="badge" style="background: ${s.plan === 'integral' ? 'rgba(37, 99, 235, 0.1)' : 'transparent'}; border: 1px solid ${s.plan === 'integral' ? '#2563eb' : s.plan === 'scholarship' ? '#9333ea' : '#eab308'}; color: ${s.plan === 'integral' ? '#2563eb' : s.plan === 'scholarship' ? '#9333ea' : '#eab308'}; display: inline-flex; align-items: center;">
+                                                <span class="badge" style="background: ${s.plan === 'integral' ? 'rgba(37, 99, 235, 0.1)' : 'transparent'}; border: 1px solid ${s.plan === 'integral' ? '#2563eb' : s.plan === 'scholarship' ? '#9333ea' : '#eab308'}; color: ${s.plan === 'integral' ? '#2563eb' : s.plan === 'scholarship' ? '#9333ea' : '#eab308'}; display: inline-flex; align-items: center; font-size: 0.8rem; padding: 4px 10px;">
                                                     ${s.plan === 'scholarship' ? '<i data-lucide="graduation-cap" style="width:14px; height:14px; margin-right:4px;"></i>' : ''} 
                                                     ${planText}
                                                 </span>
                                             </td>
+                                            ${currentUser.role !== 'student' ? `<td><strong style="color: var(--primary); font-size: 0.9rem;">${valorMensal}</strong></td>` : ''}
                                         </tr>
                                     `;
                 }).join('')}
