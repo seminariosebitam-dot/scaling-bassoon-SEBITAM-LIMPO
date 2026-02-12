@@ -682,6 +682,170 @@ document.addEventListener('DOMContentLoaded', () => {
         printWindow.document.close();
     }
 
+    // Função para visualizar o histórico escolar de forma interativa
+    async function viewAcademicHistory(studentId) {
+        console.log("Abrindo histórico escolar para ID:", studentId);
+        const students = await dbGet('sebitam-students');
+        const student = students.find(item => String(item.id) === String(studentId));
+        if (!student) {
+            alert('Erro: Aluno não encontrado (ID: ' + studentId + ')');
+            return;
+        }
+
+        const nameCap = student.fullName.toUpperCase();
+        const today = new Date().toLocaleDateString('pt-BR');
+
+        // Calcular totais
+        let totalDisciplinas = 0;
+        let totalAprovadas = 0;
+        let somaNotas = 0;
+        let countNotas = 0;
+
+        Object.entries(subjectMap).forEach(([module, data]) => {
+            data.subs.forEach(sub => {
+                totalDisciplinas++;
+                const grade = (student.subjectGrades && student.subjectGrades[sub]) || 0;
+                if (grade >= 7) totalAprovadas++;
+                if (grade > 0) {
+                    somaNotas += parseFloat(grade);
+                    countNotas++;
+                }
+            });
+        });
+
+        const mediaGeral = countNotas > 0 ? (somaNotas / countNotas).toFixed(2) : '0.00';
+        const percentualConclusao = ((totalAprovadas / totalDisciplinas) * 100).toFixed(1);
+
+        const contentBody = document.getElementById('dynamic-content');
+        contentBody.innerHTML = `
+            <div class="view-header">
+                <button class="btn-primary" id="back-to-classes" style="width: auto; margin-bottom: 20px; display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="arrow-left"></i> Voltar
+                </button>
+                <h2 style="display: flex; align-items: center; gap: 12px;">
+                    <i data-lucide="file-text" style="width: 28px; height: 28px;"></i>
+                    Histórico Escolar Completo
+                </h2>
+                <p style="color: var(--text-muted);">Visualização completa do histórico acadêmico</p>
+            </div>
+
+            <div style="background: white; padding: 30px; border-radius: 20px; box-shadow: var(--shadow); margin-bottom: 20px;">
+                <!-- Cabeçalho do Aluno -->
+                <div style="text-align: center; border-bottom: 2px solid var(--primary); padding-bottom: 20px; margin-bottom: 30px;">
+                    <img src="logo.jpg" style="height: 80px; margin-bottom: 15px;">
+                    <h3 style="color: var(--primary); margin: 10px 0; font-size: 1.5rem;">SEMINÁRIO BÍBLICO TEOL ÓGICO DA AMAZÔNIA</h3>
+                    <p style="color: var(--text-muted); margin: 5px 0;">Curso Médio em Teologia</p>
+                </div>
+
+                <!-- Informações do Aluno -->
+                <div style="background: linear-gradient(135deg, var(--primary), #1e40af); padding: 25px; border-radius: 15px; margin-bottom: 30px; color: white;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                        <div>
+                            <label style="font-size: 0.75rem; opacity: 0.8; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 5px;">Aluno</label>
+                            <div style="font-size: 1.2rem; font-weight: 700;">${nameCap}</div>
+                        </div>
+                        <div>
+                            <label style="font-size: 0.75rem; opacity: 0.8; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 5px;">Turma</label>
+                            <div style="font-size: 1.2rem; font-weight: 700;">Turma ${student.grade || '-'}</div>
+                        </div>
+                        <div>
+                            <label style="font-size: 0.75rem; opacity: 0.8; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 5px;">Módulo Atual</label>
+                            <div style="font-size: 1.2rem; font-weight: 700;">Módulo ${student.module || '-'}</div>
+                        </div>
+                        <div>
+                            <label style="font-size: 0.75rem; opacity: 0.8; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 5px;">Data de Emissão</label>
+                            <div style="font-size: 1.2rem; font-weight: 700;">${today}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Resumo Acadêmico -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 30px;">
+                    <div style="background: rgba(37, 99, 235, 0.1); padding: 20px; border-radius: 12px; text-align: center; border: 2px solid rgba(37, 99, 235, 0.3);">
+                        <div style="font-size: 2rem; font-weight: 800; color: var(--primary); margin-bottom: 5px;">${totalDisciplinas}</div>
+                        <div style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Total de Disciplinas</div>
+                    </div>
+                    <div style="background: rgba(34, 197, 94, 0.1); padding: 20px; border-radius: 12px; text-align: center; border: 2px solid rgba(34, 197, 94, 0.3);">
+                        <div style="font-size: 2rem; font-weight: 800; color: #16a34a; margin-bottom: 5px;">${totalAprovadas}</div>
+                        <div style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Disciplinas Aprovadas</div>
+                    </div>
+                    <div style="background: rgba(234, 179, 8, 0.1); padding: 20px; border-radius: 12px; text-align: center; border: 2px solid rgba(234, 179, 8, 0.3);">
+                        <div style="font-size: 2rem; font-weight: 800; color: #ca8a04; margin-bottom: 5px;">${mediaGeral}</div>
+                        <div style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Média Geral</div>
+                    </div>
+                    <div style="background: rgba(139, 92, 246, 0.1); padding: 20px; border-radius: 12px; text-align: center; border: 2px solid rgba(139, 92, 246, 0.3);">
+                        <div style="font-size: 2rem; font-weight: 800; color: #7c3aed; margin-bottom: 5px;">${percentualConclusao}%</div>
+                        <div style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Progresso do Curso</div>
+                    </div>
+                </div>
+
+                <!-- Tabela de Disciplinas -->
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Disciplina</th>
+                                <th style="text-align: center; width: 80px;">Módulo</th>
+                                <th style="text-align: center; width: 80px;">Nota</th>
+                                <th style="text-align: center; width: 100px;">Carga Horária</th>
+                                <th style="text-align: center; width: 120px;">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${Object.entries(subjectMap).map(([module, data]) => `
+                                <tr style="background: #f1f5f9;">
+                                    <td colspan="5" style="font-weight: 700; color: var(--primary); padding: 12px;">
+                                        <i data-lucide="layers" style="width: 16px; height: 16px; margin-right: 8px;"></i>
+                                        ${data.title}
+                                    </td>
+                                </tr>
+                                ${data.subs.map(sub => {
+            const grade = (student.subjectGrades && student.subjectGrades[sub]) || 0;
+            const freq = (student.subjectFreqs && student.subjectFreqs[sub]) || 0;
+            const isApproved = grade >= 7 && freq >= 75;
+            const status = grade === 0 ? 'CURSANDO' : (isApproved ? 'APROVADO' : 'REPROVADO');
+            const statusColor = grade === 0 ? '#94a3b8' : (isApproved ? '#16a34a' : '#dc2626');
+            const statusBg = grade === 0 ? 'rgba(148, 163, 184, 0.1)' : (isApproved ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)');
+
+            return `
+                                        <tr>
+                                            <td style="padding-left: 30px;">${sub}</td>
+                                            <td style="text-align: center; font-weight: 600; color: var(--text-muted);">
+                                                Módulo ${module}
+                                            </td>
+                                            <td style="text-align: center;">
+                                                <strong style="font-size: 1.1rem; color: ${isApproved ? '#16a34a' : (grade === 0 ? '#94a3b8' : '#dc2626')};">
+                                                    ${grade === 0 ? '-' : grade.toFixed(1)}
+                                                </strong>
+                                            </td>
+                                            <td style="text-align: center; color: var(--text-muted);">40h</td>
+                                            <td style="text-align: center;">
+                                                <span style="background: ${statusBg}; color: ${statusColor}; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; border: 1px solid ${statusColor};">
+                                                    ${status}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    `;
+        }).join('')}
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Ações -->
+                <div style="margin-top: 30px; display: flex; gap: 15px; justify-content: flex-end;">
+                    <button onclick="printAcademicHistory('${studentId}')" class="btn-primary" style="background: var(--secondary); display: flex; align-items: center; gap: 8px;">
+                        <i data-lucide="printer"></i>
+                        Imprimir Histórico
+                    </button>
+                </div>
+            </div>
+        `;
+
+        lucide.createIcons();
+        document.getElementById('back-to-classes').onclick = () => renderView('classes');
+    }
+
     async function printFinancialReport(monthIndex, year) {
         console.log(`Gerando relatório financeiro: Mês ${monthIndex}, Ano ${year}`);
         const students = await dbGet('sebitam-students');
@@ -1489,6 +1653,9 @@ document.addEventListener('DOMContentLoaded', () => {
                                                             <div class="actions-wrapper">
                                                                  <button class="btn-icon" style="color: var(--primary); background: rgba(37, 99, 235, 0.1);" title="${currentUser.role === 'student' ? 'Ver Meu Boletim' : 'Lançar Notas'}" onclick="renderGradeEditor('${s.id}')">
                                                                     <i data-lucide="${currentUser.role === 'student' ? 'eye' : 'edit-3'}"></i>
+                                                                </button>
+                                                                <button class="btn-icon" style="color: #7c3aed; background: rgba(139, 92, 246, 0.1);" title="Ver Histórico Escolar" onclick="viewAcademicHistory('${s.id}')">
+                                                                    <i data-lucide="file-text"></i>
                                                                 </button>
                                                                 <button class="btn-icon" title="Imprimir Certificado" onclick="generateCertificate('${s.id}')">
                                                                     <i data-lucide="printer"></i>
