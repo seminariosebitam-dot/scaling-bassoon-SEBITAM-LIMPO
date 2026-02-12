@@ -1147,6 +1147,289 @@ document.addEventListener('DOMContentLoaded', () => {
     window.renderEditStudent = renderEditStudent;
     window.updatePaymentStatus = updatePaymentStatus;
 
+    // Função para imprimir boletim completo formatado
+    async function printBoletim(studentId) {
+        console.log("Gerando boletim completo para ID:", studentId);
+        const students = await dbGet('sebitam-students');
+        const s = students.find(item => String(item.id) === String(studentId));
+        if (!s) {
+            alert('Erro: Aluno não encontrado (ID: ' + studentId + ')');
+            return;
+        }
+
+        const nameCap = s.fullName.toUpperCase();
+        const today = new Date().toLocaleDateString('pt-BR');
+
+        // Calcular média geral e frequência média
+        let totalNotas = 0;
+        let countNotas = 0;
+        let totalFreq = 0;
+        let countFreq = 0;
+
+        Object.entries(subjectMap).forEach(([mod, data]) => {
+            data.subs.forEach(sub => {
+                const grade = (s.subjectGrades && s.subjectGrades[sub]) || 0;
+                const freq = (s.subjectFreqs && s.subjectFreqs[sub]) || 0;
+                if (grade > 0) {
+                    totalNotas += parseFloat(grade);
+                    countNotas++;
+                }
+                if (freq > 0) {
+                    totalFreq += parseFloat(freq);
+                    countFreq++;
+                }
+            });
+        });
+
+        const mediaGeral = countNotas > 0 ? (totalNotas / countNotas).toFixed(2) : '0.00';
+        const mediaFreq = countFreq > 0 ? (totalFreq / countFreq).toFixed(1) : '0.0';
+
+        const printWindow = window.open('', '_blank');
+        if (!printWindow) return alert('Por favor, libere os pop-ups para visualizar o boletim.');
+
+        printWindow.document.write(`
+            <html>
+                <head>
+                    <title>Boletim Escolar - ${s.fullName}</title>
+                    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+                    <style>
+                        @page { size: A4; margin: 20mm; }
+                        body { 
+                            font-family: 'Montserrat', sans-serif; 
+                            color: #1e293b; 
+                            line-height: 1.6; 
+                            margin: 0;
+                            padding: 20px;
+                        }
+                        .header { 
+                            text-align: center; 
+                            border-bottom: 3px solid #2563eb; 
+                            padding-bottom: 20px; 
+                            margin-bottom: 30px; 
+                        }
+                        .logo { height: 80px; margin-bottom: 10px; }
+                        h1 { 
+                            color: #2563eb; 
+                            margin: 10px 0; 
+                            font-size: 24px; 
+                            font-weight: 700;
+                            text-transform: uppercase; 
+                        }
+                        h2 { 
+                            color: #64748b; 
+                            margin: 5px 0; 
+                            font-size: 14px; 
+                            font-weight: 600;
+                        }
+                        .student-info {
+                            background: linear-gradient(135deg, #2563eb, #1e40af);
+                            color: white;
+                            padding: 20px;
+                            border-radius: 10px;
+                            margin-bottom: 25px;
+                            display: grid;
+                            grid-template-columns: repeat(2, 1fr);
+                            gap: 15px;
+                        }
+                        .info-row {
+                            padding: 8px 0;
+                        }
+                        .info-label {
+                            font-size: 11px;
+                            opacity: 0.8;
+                            text-transform: uppercase;
+                            letter-spacing: 0.5px;
+                            margin-bottom: 4px;
+                        }
+                        .info-value {
+                            font-size: 16px;
+                            font-weight: 700;
+                        }
+                        .summary-box {
+                            display: grid;
+                            grid-template-columns: repeat(2, 1fr);
+                            gap: 15px;
+                            margin-bottom: 25px;
+                        }
+                        .summary-card {
+                            background: #f8fafc;
+                            border: 2px solid #e2e8f0;
+                            border-radius: 8px;
+                            padding: 15px;
+                            text-align: center;
+                        }
+                        .summary-value {
+                            font-size: 28px;
+                            font-weight: 800;
+                            color: #2563eb;
+                            margin-bottom: 5px;
+                        }
+                        .summary-label {
+                            font-size: 11px;
+                            color: #64748b;
+                            text-transform: uppercase;
+                            letter-spacing: 0.5px;
+                        }
+                        table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            margin-bottom: 20px;
+                            font-size: 13px;
+                        }
+                        th {
+                            background: #2563eb;
+                            color: white;
+                            padding: 12px 10px;
+                            text-align: left;
+                            font-weight: 600;
+                            text-transform: uppercase;
+                            font-size: 11px;
+                            letter-spacing: 0.5px;
+                        }
+                        td {
+                            padding: 10px;
+                            border-bottom: 1px solid #e2e8f0;
+                        }
+                        .module-row {
+                            background: #f1f5f9 !important;
+                            font-weight: 700;
+                            color: #2563eb;
+                            font-size: 14px;
+                        }
+                        .module-row td {
+                            padding: 12px 10px;
+                            border-bottom: 2px solid #cbd5e1;
+                        }
+                        tr:hover {
+                            background: #f8fafc;
+                        }
+                        .status-aprovado {
+                            color: #16a34a;
+                            font-weight: 700;
+                        }
+                        .status-reprovado {
+                            color: #dc2626;
+                            font-weight: 700;
+                        }
+                        .status-cursando {
+                            color: #94a3b8;
+                            font-weight: 600;
+                        }
+                        .footer {
+                            margin-top: 40px;
+                            padding-top: 20px;
+                            border-top: 2px solid #e2e8f0;
+                            display: flex;
+                            justify-content: space-between;
+                            font-size: 11px;
+                            color: #64748b;
+                        }
+                        @media print {
+                            body { padding: 0; }
+                            button { display: none; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <img src="logo.jpg" class="logo">
+                        <h1>Boletim Escolar</h1>
+                        <h2>Seminário Bíblico Teológico da Amazônia - SEBITAM</h2>
+                    </div>
+
+                    <div class="student-info">
+                        <div class="info-row">
+                            <div class="info-label">Aluno</div>
+                            <div class="info-value">${nameCap}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Turma</div>
+                            <div class="info-value">Turma ${s.grade || '-'}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Módulo Atual</div>
+                            <div class="info-value">Módulo ${s.module || '-'}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Data de Emissão</div>
+                            <div class="info-value">${today}</div>
+                        </div>
+                    </div>
+
+                    <div class="summary-box">
+                        <div class="summary-card">
+                            <div class="summary-value">${mediaGeral}</div>
+                            <div class="summary-label">Média Geral</div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="summary-value">${mediaFreq}%</div>
+                            <div class="summary-label">Frequência Média</div>
+                        </div>
+                    </div>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Disciplina</th>
+                                <th style="text-align: center; width: 100px;">Módulo</th>
+                                <th style="text-align: center; width: 80px;">Nota</th>
+                                <th style="text-align: center; width: 100px;">Frequência</th>
+                                <th style="text-align: center; width: 120px;">Carga Horária</th>
+                                <th style="text-align: center; width: 100px;">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${Object.entries(subjectMap).map(([module, data]) => {
+            return `
+                                    <tr class="module-row">
+                                        <td colspan="6">
+                                            ${data.title}
+                                        </td>
+                                    </tr>
+                                    ${data.subs.map(sub => {
+                const grade = (s.subjectGrades && s.subjectGrades[sub]) || 0;
+                const freq = (s.subjectFreqs && s.subjectFreqs[sub]) || 100;
+                const isApproved = grade >= 7 && freq >= 75;
+                const status = grade === 0 ? 'CURSANDO' : (isApproved ? 'APROVADO' : 'REPROVADO');
+                const statusClass = grade === 0 ? 'status-cursando' : (isApproved ? 'status-aprovado' : 'status-reprovado');
+
+                return `
+                                            <tr>
+                                                <td style="padding-left: 25px;">${sub}</td>
+                                                <td style="text-align: center; color: #64748b;">Módulo ${module}</td>
+                                                <td style="text-align: center; font-weight: 700; font-size: 15px;">${grade === 0 ? '-' : grade.toFixed(1)}</td>
+                                                <td style="text-align: center; font-weight: 600;">${freq}%</td>
+                                                <td style="text-align: center; font-weight: 600; color: #2563eb;">40h</td>
+                                                <td style="text-align: center;" class="${statusClass}">${status}</td>
+                                            </tr>
+                                        `;
+            }).join('')}
+                                `;
+        }).join('')}
+                        </tbody>
+                    </table>
+
+                    <div class="footer">
+                        <div>
+                            <strong>Emitido em:</strong> ${today}
+                        </div>
+                        <div>
+                            <strong>Assinatura:</strong> _______________________________
+                        </div>
+                    </div>
+
+                    <script>
+                        window.onload = () => setTimeout(() => window.print(), 500);
+                    </script>
+                </body>
+            </html>
+        `);
+        printWindow.document.close();
+    }
+
+    // Expor função no escopo global
+    window.printBoletim = printBoletim;
+
     async function printFinancialReport(monthIndex, year) {
         console.log(`Gerando relatório financeiro: Mês ${monthIndex}, Ano ${year}`);
         const students = await dbGet('sebitam-students');
@@ -1955,7 +2238,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                                                  <button class="btn-icon" style="color: var(--primary); background: rgba(37, 99, 235, 0.1);" title="${currentUser.role === 'student' ? 'Ver Meu Boletim' : 'Lançar Notas'}" onclick="renderGradeEditor('${s.id}')">
                                                                     <i data-lucide="${currentUser.role === 'student' ? 'eye' : 'edit-3'}"></i>
                                                                 </button>
-                                                                <button class="btn-icon" style="color: #7c3aed; background: rgba(139, 92, 246, 0.1);" title="Ver Histórico Escolar" onclick="viewAcademicHistory('${s.id}')">
+                                                                <button class="btn-icon" style="color: #16a34a; background: rgba(34, 197, 94, 0.1);" title="Visualizar Boletim Completo" onclick="printBoletim('${s.id}')">
                                                                     <i data-lucide="file-text"></i>
                                                                 </button>
                                                                 <button class="btn-icon" title="Imprimir Certificado" onclick="generateCertificate('${s.id}')">
