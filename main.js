@@ -1,4 +1,4 @@
-﻿document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', () => {
     console.log("SEBITAM v5.1 Loaded (SSH Enabled)");
     // DOM Elements
     const loginForm = document.getElementById('login-form');
@@ -39,7 +39,9 @@
             console.warn("📖 Instruções: Acesse Supabase Dashboard > Settings > API > copie 'anon public'");
             console.warn("🔄 Usando modo offline (localStorage) temporariamente.");
         } else if (window.supabase && typeof window.supabase.createClient === 'function') {
-            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+                db: { schema: 'public' }
+            });
             console.log("✅ Supabase inicializado com sucesso!");
             console.log("📡 Conectado ao projeto:", SUPABASE_URL.replace('https://', ''));
         } else {
@@ -50,20 +52,19 @@
         console.warn("🔄 Usando modo offline (localStorage).");
     }
 
-    // Mapping frontend collection names to Supabase table names
-    // Usando nomes em inglês (padrão do Supabase)
+    // Mapping frontend collection names to Supabase table names (conforme tabelas no seu projeto)
     const tableMap = {
-        'sebitam-students': 'students',
-        'sebitam-teachers': 'teachers',
-        'sebitam-admins': 'admins',
-        'sebitam-secretaries': 'secretaries'
+        'sebitam-students': 'estudantes',
+        'sebitam-teachers': 'professores',
+        'sebitam-admins': 'administradores',
+        'sebitam-secretaries': 'secretarias'
     };
 
     // Mapping frontend fields to Supabase fields (for students)
     function mapToSupabase(item, collectionName) {
         if (!item) return item;
         const mappedTable = tableMap[collectionName];
-        if (mappedTable === 'students') {
+        if (mappedTable === 'estudantes') {
             const mapped = {};
             // Accept both camelCase and snake_case from incoming object
             const fullName = item.fullName || item.full_name;
@@ -87,7 +88,7 @@
     function mapFromSupabase(item, collectionName) {
         if (!item) return item;
         const mappedTable = tableMap[collectionName];
-        if (mappedTable === 'students') {
+        if (mappedTable === 'estudantes') {
             return {
                 id: item.id,
                 fullName: item.full_name || item.fullName || 'Aluno Sem Nome',
@@ -104,13 +105,19 @@
         return item;
     }
 
+    // Detecta erro de rede (Supabase inacessível)
+    function isNetworkError(e) {
+        const msg = (e && e.message) || '';
+        return msg.includes('fetch') || msg.includes('NetworkError') || (e && e.name === 'TypeError' && msg.toLowerCase().includes('fetch'));
+    }
+
     // Database Helpers (Abstraction layer for Supabase)
     async function dbGet(collectionName) {
         const table = tableMap[collectionName] || collectionName;
         if (!supabase) return JSON.parse(localStorage.getItem(collectionName) || '[]');
         try {
             console.log(`dbGet: Buscando dados de ${table}...`);
-            const { data, error } = await supabase.from(table).select('*');
+            const { data, error } = await supabase.schema('public').from(table).select('*');
             if (error) {
                 console.error(`dbGet Erro (${table}):`, error);
                 throw error;
@@ -119,6 +126,7 @@
             return data.map(item => mapFromSupabase(item, collectionName));
         } catch (e) {
             console.error("Error fetching from Supabase fallback:", e);
+            if (isNetworkError(e)) console.warn("⚠️ Sem conexão com Supabase. Usando dados locais.");
             return JSON.parse(localStorage.getItem(collectionName) || '[]');
         }
     }
@@ -143,14 +151,14 @@
             // For students, we let Supabase generate the ID
             // For others, if the table has an auto-increment ID, we should remove our temporary ID
             const itemToInsert = { ...item };
-            if (tableMap[collectionName] === 'students' || itemToInsert.id) {
+            if (tableMap[collectionName] === 'estudantes' || itemToInsert.id) {
                 delete itemToInsert.id;
             }
 
             const mapped = mapToSupabase(itemToInsert, collectionName);
             console.log(`💾 Salvando em Supabase (${table}):`, mapped);
 
-            const { data, error } = await supabase.from(table).insert([mapped]).select();
+            const { data, error } = await supabase.schema('public').from(table).insert([mapped]).select();
 
             if (error) {
                 console.error(`❌ Erro ao salvar em ${table}:`, error);
@@ -161,6 +169,15 @@
             console.log(`✅ Salvo com sucesso em ${table}!`, data);
             return { success: true, data: data };
         } catch (e) {
+            if (isNetworkError(e)) {
+                console.warn("⚠️ Sem conexão com Supabase. Salvando localmente.");
+                const list = await dbGet(collectionName);
+                if (!item.id) item.id = Date.now();
+                list.push(item);
+                localStorage.setItem(collectionName, JSON.stringify(list));
+                alert("Sem conexão com o servidor. Dados salvos localmente e serão enviados quando a conexão voltar.");
+                return { success: true, id: item.id };
+            }
             console.error(`❌ Erro crítico ao salvar em ${table}:`, e);
             throw e;
         }
@@ -193,7 +210,7 @@
 
             console.log(`💾 Atualizando em Supabase (${table}), ID: ${queryId}:`, mapped);
 
-            const { data, error } = await supabase.from(table).update(mapped).eq('id', queryId).select();
+            const { data, error } = await supabase.schema('public').from(table).update(mapped).eq('id', queryId).select();
 
             if (error) {
                 console.error(`❌ Erro ao atualizar em ${table}:`, error);
@@ -204,6 +221,16 @@
             console.log(`✅ Atualizado com sucesso em ${table}!`, data);
             return { success: true, data: data };
         } catch (e) {
+            if (isNetworkError(e)) {
+                const list = await dbGet(collectionName);
+                const idx = list.findIndex(i => String(i.id) === String(id));
+                if (idx !== -1) {
+                    list[idx] = { ...list[idx], ...updates };
+                    localStorage.setItem(collectionName, JSON.stringify(list));
+                    alert("Sem conexão. Atualização salva localmente.");
+                    return { success: true };
+                }
+            }
             console.error(`❌ Erro crítico ao atualizar em ${table}:`, e);
             throw e;
         }
@@ -229,7 +256,7 @@
 
             console.log(`🗑️ Excluindo de Supabase (${table}), ID: ${queryId}`);
 
-            const { data, error } = await supabase.from(table).delete().eq('id', queryId).select();
+            const { data, error } = await supabase.schema('public').from(table).delete().eq('id', queryId).select();
 
             if (error) {
                 console.error(`❌ Erro ao excluir de ${table}:`, error);
@@ -240,6 +267,13 @@
             console.log(`✅ Excluído com sucesso de ${table}!`, data);
             return { success: true, data: data };
         } catch (e) {
+            if (isNetworkError(e)) {
+                const list = await dbGet(collectionName);
+                const filtered = list.filter(i => String(i.id) !== String(id));
+                localStorage.setItem(collectionName, JSON.stringify(filtered));
+                alert("Sem conexão. Exclusão aplicada localmente.");
+                return { success: true };
+            }
             console.error(`❌ Erro crítico ao excluir de ${table}:`, e);
             throw e;
         }
@@ -2402,19 +2436,20 @@
 
         try {
             // Usando o nome correto da tabela em inglês
-            const { data, error } = await supabase.from('admins').select('*').eq('email', superAdminEmail);
+            const { data, error } = await supabase.schema('public').from('administradores').select('*').eq('email', superAdminEmail);
             if (error) throw error;
 
             if (data.length === 0) {
                 console.log("Registrando Super Administrador...");
-                await supabase.from('admins').insert([{
+                await supabase.schema('public').from('administradores').insert([{
                     name: superAdminName,
                     email: superAdminEmail,
                     phone: 'Gestor'
                 }]);
             }
         } catch (e) {
-            console.error("Erro no auto-registro:", e);
+            if (isNetworkError(e)) console.warn("⚠️ Sem conexão com Supabase; auto-registro ignorado.");
+            else console.error("Erro no auto-registro:", e);
         }
     }
 
