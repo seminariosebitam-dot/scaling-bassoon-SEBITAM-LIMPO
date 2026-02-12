@@ -78,21 +78,37 @@ document.addEventListener('DOMContentLoaded', () => {
         return item; // For others, assume direct mapping or handle as needed
     }
 
+    // Para tabela estudantes: pega valor tentando várias chaves possíveis (Supabase pode retornar nomes diferentes)
+    function getEstudanteField(item, nameVariants) {
+        for (const key of nameVariants) {
+            const v = item[key];
+            if (v !== undefined && v !== null && v !== '') return v;
+        }
+        const targets = nameVariants.map(v => v.toLowerCase().replace(/\s/g, '').replace(/[óô]/g, 'o'));
+        for (const k of Object.keys(item || {})) {
+            const kNorm = k.toLowerCase().replace(/\s/g, '').replace(/\u00a0/g, '').replace(/[óô]/g, 'o');
+            if (targets.some(t => kNorm === t || kNorm.includes(t) || t.includes(kNorm))) return item[k];
+        }
+        return undefined;
+    }
+
     function mapFromSupabase(item, collectionName) {
         if (!item) return item;
         const mappedTable = tableMap[collectionName];
         if (mappedTable === 'estudantes') {
-            // Aceitar colunas em português (tabela Supabase) ou inglês
-            const fullName = item['nome completo'] ?? item.nome_completo ?? item.full_name ?? item.fullName ?? 'Aluno Sem Nome';
-            const moduleVal = item.módulo ?? item.module ?? 1;
-            const gradeVal = item.nota ?? item.grade ?? 1;
-            const planVal = item.plano ?? item.plan ?? 'integral';
+            // Coluna no Supabase: "nome completo" (com espaço) - tentar essa chave primeiro e variantes
+            const fullName = (item['nome completo'] != null && item['nome completo'] !== '')
+                ? String(item['nome completo'])
+                : (getEstudanteField(item, ['nome_completo', 'full_name', 'fullName']) ?? 'Aluno Sem Nome');
+            const moduleVal = getEstudanteField(item, ['módulo', 'modulo', 'module']) ?? 1;
+            const gradeVal = getEstudanteField(item, ['nota', 'grade']) ?? 1;
+            const planVal = getEstudanteField(item, ['plano', 'plan']) ?? 'integral';
             return {
                 id: item.id,
-                fullName: fullName,
+                fullName: String(fullName),
                 module: typeof moduleVal === 'number' ? moduleVal : (parseInt(moduleVal) || 1),
                 grade: typeof gradeVal === 'number' ? gradeVal : (parseInt(gradeVal) || 1),
-                plan: planVal,
+                plan: String(planVal),
                 email: item.email || '',
                 phone: item.phone || '',
                 subjectGrades: item.subject_grades || {},
@@ -121,6 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw error;
             }
             console.log(`dbGet: ${data.length} registros encontrados em ${table}`);
+            if (table === 'estudantes' && data.length > 0) console.log('Supabase estudantes (1ª linha, chaves):', Object.keys(data[0]), 'Exemplo:', data[0]);
             return data.map(item => mapFromSupabase(item, collectionName));
         } catch (e) {
             console.error("Error fetching from Supabase fallback:", e);
