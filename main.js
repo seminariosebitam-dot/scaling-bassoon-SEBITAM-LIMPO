@@ -63,17 +63,21 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!item) return item;
         const mappedTable = tableMap[collectionName];
         if (mappedTable === 'estudantes') {
-            // Schema cache do Supabase: colunas sem acento (modulo, nota, plano). "nome completo" com espaço.
+            // Tabela no Supabase usa colunas em inglês (full_name, module, grade, plan) - ver PERMISSOES-SCHEMA-PUBLIC.sql
             const fullName = item.fullName ?? item.full_name ?? item['nome completo'] ?? item.nome_completo;
             const moduleVal = item.module ?? item.módulo ?? item.modulo;
             const gradeVal = item.grade ?? item.nota;
             const planVal = item.plan ?? item.plano;
-            const mapped = {
-                'nome completo': fullName != null && fullName !== '' ? String(fullName) : 'Sem nome',
-                'modulo': parseInt(moduleVal, 10) || 1,
-                'nota': parseInt(gradeVal, 10) || 1,
-                'plano': planVal != null && planVal !== '' ? String(planVal) : 'integral'
-            };
+            const mapped = {};
+            if (fullName != null && fullName !== '') mapped.full_name = String(fullName);
+            if (moduleVal != null) mapped.module = parseInt(moduleVal, 10) || 1;
+            if (gradeVal != null) mapped.grade = parseInt(gradeVal, 10) || 1;
+            if (planVal != null && planVal !== '') mapped.plan = String(planVal);
+            if (item.email !== undefined) mapped.email = item.email;
+            if (item.phone !== undefined) mapped.phone = item.phone;
+            if (item.subjectGrades !== undefined) mapped.subject_grades = item.subjectGrades;
+            if (item.subjectFreqs !== undefined) mapped.subject_freqs = item.subjectFreqs;
+            if (item.paymentStatus !== undefined) mapped.payment_status = item.paymentStatus;
             return mapped;
         }
         return item; // For others, assume direct mapping or handle as needed
