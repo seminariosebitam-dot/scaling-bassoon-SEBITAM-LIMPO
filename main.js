@@ -1053,6 +1053,39 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                         </div>
                     </div>
+
+                    <div class="view-header" style="margin-top: 40px;">
+                        <h2>Alunos que já se matricularam</h2>
+                        <p>Lista da tabela de alunos do Supabase (public.estudantes). Dados em tempo real.</p>
+                    </div>
+                    <div class="table-container" style="background: white; border-radius: 20px; box-shadow: var(--shadow); border: 1px solid var(--border); overflow: hidden;">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>E-mail</th>
+                                    <th>Turma / Módulo</th>
+                                    <th>Plano</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${students.length === 0
+                                    ? '<tr><td colspan="4" style="text-align: center; padding: 24px; color: var(--text-muted);">Nenhum aluno matriculado ainda. Cadastre em Cadastro (Alunos, Profs, Adm, Sec).</td></tr>'
+                                    : students.map(s => {
+                                        const name = (s.fullName || s.full_name || '—').trim();
+                                        const mod = s.module != null ? s.module : '—';
+                                        const plan = s.plan || 'integral';
+                                        return `<tr>
+                                            <td><strong>${name}</strong></td>
+                                            <td style="font-size: 0.9rem;">${s.email || '—'}</td>
+                                            <td>${mod}</td>
+                                            <td><span class="badge" style="background: rgba(37, 99, 235, 0.1); color: var(--primary); border: 1px solid var(--primary);">${plan}</span></td>
+                                        </tr>`;
+                                    }).join('')
+                                }
+                            </tbody>
+                        </table>
+                    </div>
                 `;
                 setTimeout(() => {
                     document.querySelectorAll('.delete-staff-ov').forEach(b => {
