@@ -846,6 +846,187 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('back-to-classes').onclick = () => renderView('classes');
     }
 
+    // Função para editar/visualizar notas (Boletim)
+    async function renderGradeEditor(studentId) {
+        console.log("Abrindo editor de notas para ID:", studentId);
+        const students = await dbGet('sebitam-students');
+        const s = students.find(item => String(item.id) === String(studentId));
+        if (!s) {
+            alert('Erro: Aluno não encontrado (ID: ' + studentId + ')');
+            return;
+        }
+
+        const moduleNum = s.module || 1;
+        const subjects = subjectMap[moduleNum] ? subjectMap[moduleNum].subs : [];
+        const contentBody = document.getElementById('dynamic-content');
+
+        // Calcular média geral e situação
+        let totalNotas = 0;
+        let countNotas = 0;
+        let totalFreq = 0;
+        let countFreq = 0;
+
+        Object.entries(subjectMap).forEach(([mod, data]) => {
+            data.subs.forEach(sub => {
+                const grade = (s.subjectGrades && s.subjectGrades[sub]) || 0;
+                const freq = (s.subjectFreqs && s.subjectFreqs[sub]) || 0;
+                if (grade > 0) {
+                    totalNotas += parseFloat(grade);
+                    countNotas++;
+                }
+                if (freq > 0) {
+                    totalFreq += parseFloat(freq);
+                    countFreq++;
+                }
+            });
+        });
+
+        const mediaGeral = countNotas > 0 ? (totalNotas / countNotas).toFixed(2) : '0.00';
+        const mediaFreq = countFreq > 0 ? (totalFreq / countFreq).toFixed(1) : '0.0';
+        const situacao = parseFloat(mediaGeral) >= 7 && parseFloat(mediaFreq) >= 75 ? 'APROVADO' : 'EM ANDAMENTO';
+        const situacaoColor = situacao === 'APROVADO' ? '#16a34a' : '#eab308';
+
+        contentBody.innerHTML = `
+            <div class="view-header">
+                <button class="btn-primary" id="back-to-classes" style="width: auto; margin-bottom: 20px; display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="arrow-left"></i> Voltar
+                </button>
+                <h2>${currentUser.role === 'student' ? 'Meu Boletim' : 'Lançamento de Notas'}: ${s.fullName.toUpperCase()}</h2>
+                <p style="color: var(--text-muted);">
+                    ${currentUser.role === 'student'
+                ? 'Visualize suas notas e frequência em todas as disciplinas'
+                : 'Edite as notas e frequências do aluno'}
+                </p>
+            </div>
+
+            ${currentUser.role === 'student' ? `
+                <div style="background: linear-gradient(135deg, ${situacaoColor}, ${situacao === 'APROVADO' ? '#059669' : '#ca8a04'}); padding: 25px; border-radius: 15px; margin-bottom: 30px; color: white; box-shadow: var(--shadow-lg);">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                        <div>
+                            <label style="font-size: 0.75rem; opacity: 0.8; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 5px;">Média Geral</label>
+                            <div style="font-size: 2rem; font-weight: 800;">${mediaGeral}</div>
+                        </div>
+                        <div>
+                            <label style="font-size: 0.75rem; opacity: 0.8; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 5px;">Frequência Média</label>
+                            <div style="font-size: 2rem; font-weight: 800;">${mediaFreq}%</div>
+                        </div>
+                        <div>
+                            <label style="font-size: 0.75rem; opacity: 0.8; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 5px;">Situação</label>
+                            <div style="font-size: 1.5rem; font-weight: 800;">${situacao}</div>
+                        </div>
+                    </div>
+                </div>
+            ` : ''}
+
+            <div class="form-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Disciplina</th>
+                            <th style="width: 100px; text-align: center;">Módulo</th>
+                            <th style="width: 120px; text-align: center;">Nota (0-10)</th>
+                            <th style="width: 120px; text-align: center;">Frequência %</th>
+                            <th style="width: 100px; text-align: center;">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${Object.entries(subjectMap).map(([mNum, mData]) => `
+                            <tr style="background: #f1f5f9; font-weight: bold;">
+                                <td colspan="5" style="padding: 12px;">
+                                    <i data-lucide="layers" style="width: 16px; height: 16px; margin-right: 8px;"></i>
+                                    ${mData.title}
+                                </td>
+                            </tr>
+                            ${mData.subs.map(sub => {
+                    const grade = (s.subjectGrades && s.subjectGrades[sub]) || '';
+                    const freq = (s.subjectFreqs && s.subjectFreqs[sub]) || '100';
+                    const isApproved = parseFloat(grade) >= 7 && parseFloat(freq) >= 75;
+                    const status = grade === '' ? '-' : (isApproved ? 'Aprovado' : 'Reprovado');
+                    const statusColor = grade === '' ? '#94a3b8' : (isApproved ? '#16a34a' : '#dc2626');
+
+                    return `
+                                    <tr>
+                                        <td>${sub}</td>
+                                        <td style="font-size: 0.8rem; color: var(--text-muted); text-align: center;">Módulo ${mNum}</td>
+                                        <td style="text-align: center;">
+                                            <input 
+                                                type="number" 
+                                                class="table-input subject-grade" 
+                                                data-subject="${sub}" 
+                                                value="${grade}" 
+                                                step="0.1" 
+                                                min="0" 
+                                                max="10" 
+                                                ${currentUser.role === 'student' ? 'disabled' : ''}
+                                                style="width: 80px; text-align: center; font-weight: 600; color: ${isApproved ? '#16a34a' : (grade === '' ? '#94a3b8' : '#dc2626')};"
+                                            >
+                                        </td>
+                                        <td style="text-align: center;">
+                                            <input 
+                                                type="number" 
+                                                class="table-input subject-freq" 
+                                                data-subject="${sub}" 
+                                                value="${freq}" 
+                                                min="0" 
+                                                max="100" 
+                                                ${currentUser.role === 'student' ? 'disabled' : ''}
+                                                style="width: 80px; text-align: center; font-weight: 600;"
+                                            >
+                                        </td>
+                                        <td style="text-align: center;">
+                                            <span style="color: ${statusColor}; font-weight: 700; font-size: 0.85rem;">
+                                                ${status}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                `;
+                }).join('')}
+                        `).join('')}
+                    </tbody>
+                </table>
+                
+                <div class="form-actions" style="margin-top: 20px; display: flex; gap: 10px;">
+                    ${currentUser.role !== 'student' ? '<button id="save-grades" class="btn-primary">Salvar Boletim</button>' : ''}
+                    <button id="print-grades" class="btn-primary" style="background: var(--secondary);">
+                        <i data-lucide="printer" style="width: 16px; height: 16px; margin-right: 8px;"></i>
+                        Imprimir Histórico
+                    </button>
+                </div>
+            </div>
+        `;
+
+        lucide.createIcons();
+        document.getElementById('back-to-classes').onclick = () => renderView('classes');
+
+        const saveBtn = document.getElementById('save-grades');
+        if (saveBtn) {
+            saveBtn.onclick = async () => {
+                const grades = {};
+                const freqs = {};
+                document.querySelectorAll('.subject-grade').forEach(i => {
+                    const val = parseFloat(i.value);
+                    if (!isNaN(val) && val >= 0) {
+                        grades[i.dataset.subject] = val;
+                    }
+                });
+                document.querySelectorAll('.subject-freq').forEach(i => {
+                    const val = parseInt(i.value);
+                    if (!isNaN(val) && val >= 0) {
+                        freqs[i.dataset.subject] = val;
+                    }
+                });
+                await dbUpdateItem('sebitam-students', studentId, {
+                    subjectGrades: grades,
+                    subjectFreqs: freqs
+                });
+                alert('Boletim salvo com sucesso!');
+                await renderView('classes');
+            };
+        }
+
+        document.getElementById('print-grades').onclick = () => printAcademicHistory(studentId);
+    }
+
     async function printFinancialReport(monthIndex, year) {
         console.log(`Gerando relatório financeiro: Mês ${monthIndex}, Ano ${year}`);
         const students = await dbGet('sebitam-students');
