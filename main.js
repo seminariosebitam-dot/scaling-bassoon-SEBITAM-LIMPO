@@ -39,9 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.warn("📖 Instruções: Acesse Supabase Dashboard > Settings > API > copie 'anon public'");
             console.warn("🔄 Usando modo offline (localStorage) temporariamente.");
         } else if (window.supabase && typeof window.supabase.createClient === 'function') {
-            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-                db: { schema: 'public' }
-            });
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             console.log("✅ Supabase inicializado com sucesso!");
             console.log("📡 Conectado ao projeto:", SUPABASE_URL.replace('https://', ''));
         } else {
@@ -117,7 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!supabase) return JSON.parse(localStorage.getItem(collectionName) || '[]');
         try {
             console.log(`dbGet: Buscando dados de ${table}...`);
-            const { data, error } = await supabase.schema('public').from(table).select('*');
+            const { data, error } = await supabase.from(table).select('*');
             if (error) {
                 console.error(`dbGet Erro (${table}):`, error);
                 throw error;
@@ -158,7 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const mapped = mapToSupabase(itemToInsert, collectionName);
             console.log(`💾 Salvando em Supabase (${table}):`, mapped);
 
-            const { data, error } = await supabase.schema('public').from(table).insert([mapped]).select();
+            const { data, error } = await supabase.from(table).insert([mapped]).select();
 
             if (error) {
                 console.error(`❌ Erro ao salvar em ${table}:`, error);
@@ -210,7 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             console.log(`💾 Atualizando em Supabase (${table}), ID: ${queryId}:`, mapped);
 
-            const { data, error } = await supabase.schema('public').from(table).update(mapped).eq('id', queryId).select();
+            const { data, error } = await supabase.from(table).update(mapped).eq('id', queryId).select();
 
             if (error) {
                 console.error(`❌ Erro ao atualizar em ${table}:`, error);
@@ -256,7 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             console.log(`🗑️ Excluindo de Supabase (${table}), ID: ${queryId}`);
 
-            const { data, error } = await supabase.schema('public').from(table).delete().eq('id', queryId).select();
+            const { data, error } = await supabase.from(table).delete().eq('id', queryId).select();
 
             if (error) {
                 console.error(`❌ Erro ao excluir de ${table}:`, error);
@@ -2433,12 +2431,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             // Usando o nome correto da tabela em inglês
-            const { data, error } = await supabase.schema('public').from('administradores').select('*').eq('email', superAdminEmail);
+            const { data, error } = await supabase.from('administradores').select('*').eq('email', superAdminEmail);
             if (error) throw error;
 
             if (data.length === 0) {
                 console.log("Registrando Super Administrador...");
-                await supabase.schema('public').from('administradores').insert([{
+                await supabase.from('administradores').insert([{
                     name: superAdminName,
                     email: superAdminEmail,
                     phone: 'Gestor'
