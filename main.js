@@ -1027,6 +1027,126 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('print-grades').onclick = () => printAcademicHistory(studentId);
     }
 
+    // Expor funções no escopo global para serem acessíveis via onclick
+    window.renderGradeEditor = renderGradeEditor;
+    window.viewAcademicHistory = viewAcademicHistory;
+    window.generateCertificate = generateCertificate;
+    window.printAcademicHistory = printAcademicHistory;
+
+    // Função para editar cadastro de aluno
+    async function renderEditStudent(studentId) {
+        console.log("Editando cadastro do aluno ID:", studentId);
+        const students = await dbGet('sebitam-students');
+        const s = students.find(item => String(item.id) === String(studentId));
+        if (!s) {
+            alert('Erro: Aluno não encontrado (ID: ' + studentId + ')');
+            return;
+        }
+
+        const contentBody = document.getElementById('dynamic-content');
+        contentBody.innerHTML = `
+            <div class="view-header">
+                <button class="btn-primary" id="back-to-classes" style="width: auto; margin-bottom: 20px; display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="arrow-left"></i> Voltar
+                </button>
+                <h2>Editar Cadastro: ${s.fullName}</h2>
+                <p style="color: var(--text-muted);">Atualize as informações cadastrais do aluno</p>
+            </div>
+
+            <div class="form-container">
+                <form id="edit-student-form">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Nome Completo</label>
+                            <div class="input-field">
+                                <i data-lucide="user"></i>
+                                <input type="text" name="fullName" value="${s.fullName}" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Módulo (1 a 5)</label>
+                            <div class="input-field">
+                                <i data-lucide="layers"></i>
+                                <select name="module" style="padding-left: 48px;">
+                                    ${[1, 2, 3, 4, 5].map(n => `<option value="${n}" ${s.module == n ? 'selected' : ''}>Módulo ${n}</option>`).join('')}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Turma (1 a 10)</label>
+                            <div class="input-field">
+                                <i data-lucide="hash"></i>
+                                <select name="grade" style="padding-left: 48px;">
+                                    ${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => `<option value="${n}" ${s.grade == n ? 'selected' : ''}>Turma ${n}</option>`).join('')}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Plano Financeiro</label>
+                            <div class="input-field">
+                                <i data-lucide="credit-card"></i>
+                                <select name="plan" style="padding-left: 48px;">
+                                    <option value="integral" ${s.plan === 'integral' ? 'selected' : ''}>Integral (R$ 70,00)</option>
+                                    <option value="half" ${s.plan === 'half' ? 'selected' : ''}>Parcial (R$ 35,00)</option>
+                                    <option value="scholarship" ${s.plan === 'scholarship' ? 'selected' : ''}>Bolsista</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>E-mail</label>
+                            <div class="input-field">
+                                <i data-lucide="mail"></i>
+                                <input type="email" name="email" value="${s.email || ''}" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Telefone / WhatsApp</label>
+                            <div class="input-field">
+                                <i data-lucide="phone"></i>
+                                <input type="tel" name="phone" value="${s.phone || ''}" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-actions" style="margin-top: 20px;">
+                        <button type="submit" class="btn-primary">Salvar Alterações</button>
+                    </div>
+                </form>
+            </div>
+        `;
+
+        lucide.createIcons();
+        document.getElementById('back-to-classes').onclick = () => renderView('classes');
+
+        document.getElementById('edit-student-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const updates = {
+                fullName: formData.get('fullName'),
+                module: parseInt(formData.get('module')),
+                grade: parseInt(formData.get('grade')),
+                plan: formData.get('plan'),
+                email: formData.get('email'),
+                phone: formData.get('phone')
+            };
+
+            await dbUpdateItem('sebitam-students', studentId, updates);
+            alert('Cadastro atualizado com sucesso!');
+            await renderView('classes');
+        };
+    }
+
+    // Função para atualizar status de pagamento
+    async function updatePaymentStatus(studentId, newStatus) {
+        console.log(`Atualizando status de pagamento: ID ${studentId} -> ${newStatus}`);
+        await dbUpdateItem('sebitam-students', studentId, { paymentStatus: newStatus });
+        alert(`Status de pagamento alterado para: ${newStatus}`);
+        await renderView('classes');
+    }
+
+    // Expor novas funções no escopo global
+    window.renderEditStudent = renderEditStudent;
+    window.updatePaymentStatus = updatePaymentStatus;
+
     async function printFinancialReport(monthIndex, year) {
         console.log(`Gerando relatório financeiro: Mês ${monthIndex}, Ano ${year}`);
         const students = await dbGet('sebitam-students');
