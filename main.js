@@ -1414,9 +1414,6 @@ document.addEventListener('DOMContentLoaded', () => {
                                                             <button class="btn-icon" title="Imprimir Certificado" onclick="generateCertificate('${s.id}')">
                                                                 <i data-lucide="printer"></i>
                                                             </button>
-                                                            <button class="btn-icon" title="Ver Histórico Acadêmico" onclick="printAcademicHistory('${s.id}')">
-                                                                <i data-lucide="file-text"></i>
-                                                            </button>
                                                             ${currentUser.role !== 'student' ? `
                                                             <button class="btn-icon" style="color: #64748b;" title="Editar Cadastro" onclick="renderEditStudent('${s.id}')">
                                                                 <i data-lucide="settings"></i>
