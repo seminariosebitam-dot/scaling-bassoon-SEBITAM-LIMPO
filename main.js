@@ -2104,7 +2104,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     allSt = allSt.filter(s => s.fullName.toLowerCase().trim() === currentUser.name.toLowerCase().trim());
                 }
                 html = `
-                        <div class="view-header" > <h2>${currentUser.role === 'student' ? 'Minha Situação Acadêmica' : 'Gestão de Alunos'}</h2></div>`;
+                        <div class="view-header" > <h2>${currentUser.role === 'student' ? 'Minha Situação Acadêmica' : 'Gestão de Alunos'}</h2></div>
+                        <div style="background: rgba(234, 179, 8, 0.1); border: 1px solid #eab308; color: #854d0e; padding: 15px 20px; border-radius: 12px; margin-bottom: 25px; display: flex; align-items: center; gap: 12px; font-weight: 700; font-size: 0.95rem; box-shadow: var(--shadow-sm);">
+                            <i data-lucide="info" style="width: 20px; height: 20px;"></i>
+                            <span>AVISO: DIA DE PAGAMENTO DA MENSALIDADE DO SEBTAM DIAS 05 A 10 DE CADA MÊS</span>
+                        </div>`;
 
                 if (currentUser.role === 'student' && allSt.length > 0) {
                     const me = allSt[0];
@@ -2364,6 +2368,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="view-header">
                         <h2>${currentUser.role === 'student' ? 'Minha Situação Financeira' : 'Sebitam Mensalidades'}</h2>
                         <p>${currentUser.role === 'student' ? 'Acompanhe sua situação financeira e histórico de pagamentos.' : 'Controle financeiro e monitoramento de mensalidades.'}</p>
+                    </div>
+                    <div style="background: rgba(234, 179, 8, 0.1); border: 1px solid #eab308; color: #854d0e; padding: 15px 20px; border-radius: 12px; margin-bottom: 25px; display: flex; align-items: center; gap: 12px; font-weight: 700; font-size: 0.95rem; box-shadow: var(--shadow-sm);">
+                        <i data-lucide="info" style="width: 20px; height: 20px;"></i>
+                        <span>AVISO: DIA DE PAGAMENTO DA MENSALIDADE DO SEBTAM DIAS 05 A 10 DE CADA MÊS</span>
                     </div>`;
 
                 // Card individual para alunos
