@@ -1884,3 +1884,45 @@ body.user-role-student .delete-staff-ov,
 body.user-role-student .delete-st-class {
     display: none !important;
 }
+
+/* Student Profile Card Styles */
+.profile-card-grid {
+    transition: all 0.3s ease;
+}
+
+.info-item {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 15px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.info-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+}
+
+.table-responsive {
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary) transparent;
+}
+
+.table-responsive::-webkit-scrollbar {
+    height: 6px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border-radius: 10px;
+}
+
+@media (max-width: 480px) {
+    .profile-card-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .view-header h2 {
+        font-size: 1.4rem !important;
+    }
+}

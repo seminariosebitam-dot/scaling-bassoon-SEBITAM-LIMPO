@@ -1356,24 +1356,77 @@ document.addEventListener('DOMContentLoaded', () => {
                     allSt = allSt.filter(s => s.fullName.toLowerCase().trim() === currentUser.name.toLowerCase().trim());
                 }
                 html = `
-                        <div class="view-header" > <h2>Alunos</h2></div>
+                        <div class="view-header" > <h2>${currentUser.role === 'student' ? 'Minha Situação Acadêmica' : 'Gestão de Alunos'}</h2></div>`;
+
+                if (currentUser.role === 'student' && allSt.length > 0) {
+                    const me = allSt[0];
+                    const status = me.paymentStatus || (['integral', 'scholarship'].includes(me.plan) ? 'Pago' : 'Pendente');
+                    html += `
+                        <div class="welcome-card" style="margin-bottom: 30px; padding: 30px; background: linear-gradient(135deg, var(--primary), #1e40af); box-shadow: var(--shadow-lg); border-radius: 20px;">
+                             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 25px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 15px; flex-wrap: wrap; gap: 10px;">
+                                 <h3 style="color: white; margin: 0; font-size: 1.4rem;">Situação Cadastral Individual</h3>
+                                 <span class="badge" style="background: ${status === 'Pago' ? '#22c55e' : '#ef4444'}; color: white; border: none; font-weight: 800; padding: 8px 16px; border-radius: 50px; font-size: 0.8rem; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">${status.toUpperCase()}</span>
+                             </div>
+                             <div class="profile-card-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 25px;">
+                                 <div class="info-item">
+                                     <label style="color: rgba(255,255,255,0.8); font-size: 0.75rem; display: block; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600;">Nome Completo</label>
+                                     <div style="color: white; font-weight: 700; font-size: 1.15rem;">${me.fullName}</div>
+                                 </div>
+                                 <div class="info-item">
+                                     <label style="color: rgba(255,255,255,0.8); font-size: 0.75rem; display: block; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600;">E-mail Institucional</label>
+                                     <div style="color: white; font-weight: 600; font-size: 1rem;">${me.email || '-'}</div>
+                                 </div>
+                                 <div class="info-item">
+                                     <label style="color: rgba(255,255,255,0.8); font-size: 0.75rem; display: block; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600;">WhatsApp / Telefone</label>
+                                     <div style="color: white; font-weight: 600; font-size: 1rem;">${me.phone || '-'}</div>
+                                 </div>
+                                 <div class="info-item">
+                                     <label style="color: rgba(255,255,255,0.8); font-size: 0.75rem; display: block; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600;">Turma Designada</label>
+                                     <div style="color: white; font-weight: 700; font-size: 1.15rem; display: flex; align-items: center; gap: 8px;">
+                                        <i data-lucide="users" style="width: 18px; height: 18px;"></i> Turma ${me.grade || '-'}
+                                     </div>
+                                 </div>
+                                 <div class="info-item">
+                                     <label style="color: rgba(255,255,255,0.8); font-size: 0.75rem; display: block; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600;">Módulo Atual</label>
+                                     <div style="color: white; font-weight: 700; font-size: 1.15rem; display: flex; align-items: center; gap: 8px;">
+                                        <i data-lucide="layers" style="width: 18px; height: 18px;"></i> Módulo ${me.module || '-'}
+                                     </div>
+                                 </div>
+                                 <div class="info-item">
+                                     <label style="color: rgba(255,255,255,0.8); font-size: 0.75rem; display: block; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600;">Modalidade de Plano</label>
+                                     <div style="color: white; font-weight: 700; text-transform: capitalize; font-size: 1.1rem; display: flex; align-items: center; gap: 8px;">
+                                        <i data-lucide="credit-card" style="width: 18px; height: 18px;"></i> ${me.plan || '-'}
+                                     </div>
+                                 </div>
+                             </div>
+                        </div>
+                    `;
+                }
+
+                html += `
                             <div class="turmas-container">
                                 ${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(g => {
                     const inG = allSt.filter(s => s.grade == g);
                     if (inG.length === 0) return '';
                     return `
-                                <div class="turma-section" style="background: white; padding: 20px; border-radius: 15px; margin-bottom: 20px; box-shadow: var(--shadow);">
-                                    <h3 style="margin-bottom: 15px; color: var(--primary); border-bottom: 2px solid var(--border); padding-bottom: 10px;">Turma ${g}</h3>
-                                    <table class="data-table">
-                                        <thead>
-                                            <tr>
-                                                <th>Aluno</th>
-                                                ${currentUser.role !== 'student' ? '<th>Plano</th><th>Financeiro</th>' : ''}
-                                                <th class="text-right" style="text-align: right;">Ações</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            ${inG.map(s => {
+                                <div class="turma-section" style="background: white; padding: 25px; border-radius: 15px; margin-bottom: 25px; box-shadow: var(--shadow); border: 1px solid var(--border);">
+                                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid var(--bg-main); padding-bottom: 12px;">
+                                        <i data-lucide="users" style="color: var(--primary); width: 20px; height: 20px;"></i>
+                                        <h3 style="margin: 0; color: var(--text-main); font-weight: 700;">Turma ${g}</h3>
+                                    </div>
+                                    <div class="table-responsive" style="overflow-x: auto;">
+                                        <table class="data-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Aluno</th>
+                                                    <th>Contato</th>
+                                                    <th>Plano</th>
+                                                    ${currentUser.role !== 'student' ? '<th>Financeiro</th>' : ''}
+                                                    <th class="text-right" style="text-align: right;">Ações</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                ${inG.map(s => {
                         const nameCap = (s.fullName || 'Sem Nome').split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
                         const planLabel = s.plan === 'integral' ? 'Integral' : s.plan === 'half' ? 'Parcial' : 'Bolsista';
                         const status = s.paymentStatus || (['integral', 'scholarship'].includes(s.plan) ? 'Pago' : 'Pendente');
@@ -1402,48 +1455,54 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
 
                         return `
-                                                <tr>
-                                                    <td>
-                                                        <div style="display:flex; align-items:center; gap:8px;">
-                                                             <div style="background: ${stBg}; padding: 4px; border-radius: 50%; display: flex; text-align: center; justify-content: center;">
-                                                                <i data-lucide="${stIcon}" style="width: 14px; height: 14px; color: ${stColor};"></i>
+                                                    <tr>
+                                                        <td>
+                                                            <div style="display:flex; align-items:center; gap:8px;">
+                                                                 <div style="background: ${stBg}; padding: 6px; border-radius: 50%; display: flex; text-align: center; justify-content: center;">
+                                                                    <i data-lucide="${stIcon}" style="width: 16px; height: 16px; color: ${stColor};"></i>
+                                                                </div>
+                                                                <strong style="font-size: 0.95rem;">${nameCap}</strong>
                                                             </div>
-                                                            <strong>${nameCap}</strong>
-                                                        </div>
-                                                    </td>
-                                                    ${currentUser.role !== 'student' ? `
-                                                    <td><span class="badge" style="background:transparent; border:1px solid #cbd5e1; color:#64748b;">${planLabel}</span></td>
-                                                    <td>
-                                                        <div style="display: flex; gap: 5px; align-items: center;">
-                                                            <button onclick="updatePaymentStatus('${s.id}', 'Pago')" class="btn-icon" title="Confirmar Pagamento" style="border: 1px solid #22c55e; background: rgba(34, 197, 94, 0.1);">
-                                                                <i data-lucide="check-circle" style="width: 14px; height: 14px; color: #22c55e;"></i>
-                                                            </button>
-                                                            <button onclick="updatePaymentStatus('${s.id}', 'Pendente')" class="btn-icon" title="Marcar como Pendente" style="border: 1px solid #ef4444; background: rgba(239, 68, 68, 0.1);">
-                                                                <i data-lucide="alert-circle" style="width: 14px; height: 14px; color: #ef4444;"></i>
-                                                            </button>
-                                                            <span class="badge" style="background: ${stBg}; color: ${stColor}; border: 1px solid ${stColor}; margin-left: 5px;">
-                                                                ${stLabel}
-                                                            </span>
-                                                        </div>
-                                                    </td>` : ''}
-                                                    <td class="actions-cell">
-                                                        <div class="actions-wrapper">
-                                                             <button class="btn-icon" style="color: var(--primary); background: rgba(37, 99, 235, 0.1);" title="${currentUser.role === 'student' ? 'Ver Meu Boletim' : 'Lançar Notas'}" onclick="renderGradeEditor('${s.id}')">
-                                                                <i data-lucide="${currentUser.role === 'student' ? 'eye' : 'edit-3'}"></i>
-                                                            </button>
-                                                            <button class="btn-icon" title="Imprimir Certificado" onclick="generateCertificate('${s.id}')">
-                                                                <i data-lucide="printer"></i>
-                                                            </button>
-                                                            ${currentUser.role !== 'student' ? `
-                                                            <button class="btn-icon" style="color: #64748b;" title="Editar Cadastro" onclick="renderEditStudent('${s.id}')">
-                                                                <i data-lucide="settings"></i>
-                                                            </button>
-                                                            <button class="btn-icon red delete-st-class" data-id="${s.id}" title="Excluir Aluno">
-                                                                <i data-lucide="trash-2"></i>
-                                                            </button>` : ''}
-                                                        </div>
-                                                    </td>
-                                                </tr>`;
+                                                        </td>
+                                                        <td>
+                                                            <div style="display: flex; flex-direction: column; font-size: 0.8rem; color: var(--text-muted);">
+                                                                <span style="display: flex; align-items: center; gap: 4px;"><i data-lucide="mail" style="width:10px;"></i> ${s.email || '-'}</span>
+                                                                <span style="display: flex; align-items: center; gap: 4px;"><i data-lucide="phone" style="width:10px;"></i> ${s.phone || '-'}</span>
+                                                            </div>
+                                                        </td>
+                                                        <td><span class="badge" style="background:transparent; border:1px solid var(--border); color:var(--text-muted); font-size: 0.75rem;">${planLabel}</span></td>
+                                                        ${currentUser.role !== 'student' ? `
+                                                        <td>
+                                                            <div style="display: flex; gap: 5px; align-items: center;">
+                                                                <button onclick="updatePaymentStatus('${s.id}', 'Pago')" class="btn-icon" title="Confirmar Pagamento" style="border: 1px solid #22c55e; background: rgba(34, 197, 94, 0.1); width: 30px; height: 30px;">
+                                                                    <i data-lucide="check-circle" style="width: 16px; height: 16px; color: #22c55e;"></i>
+                                                                </button>
+                                                                <button onclick="updatePaymentStatus('${s.id}', 'Pendente')" class="btn-icon" title="Marcar como Pendente" style="border: 1px solid #ef4444; background: rgba(239, 68, 68, 0.1); width: 30px; height: 30px;">
+                                                                    <i data-lucide="alert-circle" style="width: 16px; height: 16px; color: #ef4444;"></i>
+                                                                </button>
+                                                                <span class="badge" style="background: ${stBg}; color: ${stColor}; border: 1px solid ${stColor}; margin-left: 5px; font-size: 0.75rem;">
+                                                                    ${stLabel}
+                                                                </span>
+                                                            </div>
+                                                        </td>` : ''}
+                                                        <td class="actions-cell">
+                                                            <div class="actions-wrapper">
+                                                                 <button class="btn-icon" style="color: var(--primary); background: rgba(37, 99, 235, 0.1);" title="${currentUser.role === 'student' ? 'Ver Meu Boletim' : 'Lançar Notas'}" onclick="renderGradeEditor('${s.id}')">
+                                                                    <i data-lucide="${currentUser.role === 'student' ? 'eye' : 'edit-3'}"></i>
+                                                                </button>
+                                                                <button class="btn-icon" title="Imprimir Certificado" onclick="generateCertificate('${s.id}')">
+                                                                    <i data-lucide="printer"></i>
+                                                                </button>
+                                                                ${currentUser.role !== 'student' ? `
+                                                                <button class="btn-icon" style="color: #64748b;" title="Editar Cadastro" onclick="renderEditStudent('${s.id}')">
+                                                                    <i data-lucide="settings"></i>
+                                                                </button>
+                                                                <button class="btn-icon red delete-st-class" data-id="${s.id}" title="Excluir Aluno">
+                                                                    <i data-lucide="trash-2"></i>
+                                                                </button>` : ''}
+                                                            </div>
+                                                        </td>
+                                                    </tr>`;
                     }).join('')}
                                         </tbody>
                                     </table>
