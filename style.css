@@ -563,9 +563,14 @@ body.login-escolas-ibma .nav-sebitam-only {
     display: none !important;
 }
 
-/* Mostra itens Módulos apenas quando login é Escolas IBMA */
+/* Esconde itens Escolas IBMA quando login é SEBITAM */
 body:not(.login-escolas-ibma) .nav-escolas-ibma-only {
     display: none !important;
+}
+
+/* Garante que itens Escolas IBMA apareçam no login Escolas IBMA */
+body.login-escolas-ibma .nav-escolas-ibma-only {
+    display: flex !important;
 }
 
 .nav-item:hover,
@@ -1383,6 +1388,15 @@ body:not(.login-escolas-ibma) .nav-escolas-ibma-only {
 .btn-icon.red:hover {
     background: #fef2f2;
     color: #ef4444;
+}
+
+/* Menu de Ações - Alunos Escolas IBMA */
+.btn-acoes-trigger:hover {
+    background: var(--bg-main) !important;
+    color: var(--primary) !important;
+}
+.acoes-menu-item:hover {
+    background: rgba(var(--primary-rgb, 37, 99, 235), 0.08) !important;
 }
 
 /* Chat Styles */

@@ -5,6 +5,7 @@ const ASSETS = [
   '/main.js',
   '/manifest.json',
   '/logo.jpg',
+  '/logo-escolas-ibma.png',
   '/supabase-config.js'
 ];
 

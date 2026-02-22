@@ -352,8 +352,23 @@ document.addEventListener('DOMContentLoaded', () => {
         let userFound = false;
 
         if (loginType === 'escolas-ibma') {
-            userFound = true;
-            currentUser.role = 'student';
+            const profIbma = JSON.parse(localStorage.getItem('professores-escolas-ibma') || '[]');
+            const aluIbma = JSON.parse(localStorage.getItem('alunos-escolas-ibma') || '[]');
+            const profMatch = profIbma.find(p => (p.email || '').toLowerCase() === loginEmail);
+            const aluMatch = aluIbma.find(a => (a.email || '').toLowerCase() === loginEmail);
+            if (profMatch) {
+                userFound = true;
+                currentUser.role = 'teacher';
+                currentUser.name = profMatch.fullName || profMatch.nome || loginName;
+            } else if (aluMatch) {
+                userFound = true;
+                currentUser.role = 'student';
+                currentUser.name = aluMatch.fullName || aluMatch.nome || loginName;
+            } else {
+                userFound = true;
+                currentUser.role = 'student';
+                currentUser.name = loginName;
+            }
         } else if (loginEmail === 'edukadoshmda@gmail.com') {
             currentUser.role = 'admin';
             currentUser.name = 'Luiz Eduardo';
@@ -396,9 +411,9 @@ document.addEventListener('DOMContentLoaded', () => {
         lucide.createIcons();
         document.body.classList.toggle('login-escolas-ibma', currentUser.loginType === 'escolas-ibma');
         const overviewLabel = document.getElementById('nav-overview-label');
-        if (overviewLabel) overviewLabel.textContent = currentUser.loginType === 'escolas-ibma' ? 'Cadastro de Professores' : 'Visão Geral';
+        if (overviewLabel) overviewLabel.textContent = currentUser.loginType === 'escolas-ibma' ? 'Cadastro de Professores e Alunos' : 'Visão Geral';
         const brandText = document.getElementById('sidebar-brand-text');
-        if (brandText) brandText.textContent = currentUser.loginType === 'escolas-ibma' ? 'Escola IBMA' : 'SEBITAM';
+        if (brandText) brandText.textContent = currentUser.loginType === 'escolas-ibma' ? 'Escolas IBMA' : 'SEBITAM';
 
         if (currentUser.loginType === 'escolas-ibma') {
             await renderView('overview');
@@ -1455,7 +1470,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Expor função no escopo global
     window.printBoletim = printBoletim;
 
-    async function printFinancialReport(monthIndex, year) {
+    async function printFinancialReport(monthIndex, year, autoPrint = true) {
         console.log(`Gerando relatório financeiro: Mês ${monthIndex}, Ano ${year}`);
         const students = await dbGet('sebitam-students');
         const monthName = new Date(year, monthIndex).toLocaleString('pt-BR', { month: 'long' });
@@ -1506,7 +1521,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </head>
                 <body>
                     <div class="header">
-                        <img src="logo.jpg" class="logo">
+                        <img src="${new URL('logo.jpg', window.location.href).href}" class="logo" alt="SEBITAM">
                         <h1>Relatório Financeiro Mensal</h1>
                         <h2>Referência: ${monthNameCap} de ${year}</h2>
                     </div>
@@ -1553,7 +1568,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         Relatório gerado em ${dateStr} pelo usuário ${currentUser.name} (${currentUser.role}).<br>
                         Sistema de Gestão SEBITAM.
                     </div>
-                    <script>window.onload = () => setTimeout(() => window.print(), 500);</script>
+                    <script>var autoPrint = ${autoPrint}; window.onload = function() { if (autoPrint) setTimeout(function() { window.print(); }, 500); }</script>
                 </body>
             </html>
         `);
@@ -1743,6 +1758,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const countSt = students.length;
 
                 const professoresIbma = JSON.parse(localStorage.getItem('professores-escolas-ibma') || '[]');
+                const alunosIbma = JSON.parse(localStorage.getItem('alunos-escolas-ibma') || '[]');
                 html = `
                     <div class="welcome-card"><h1 style="color: white !important;">Olá, ${currentUser.name}!</h1></div>
                     ${currentUser.loginType === 'escolas-ibma' ? `
@@ -1751,7 +1767,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <i data-lucide="graduation-cap" style="width: 28px; height: 28px;"></i>
                         </div>
                         <div>
-                            <h2 style="margin: 0; font-size: 1.5rem; font-weight: 800; color: var(--text-main);">Cadastro de Professores Escola IBMA</h2>
+                            <h2 style="margin: 0; font-size: 1.5rem; font-weight: 800; color: var(--text-main);">Cadastro de Professores e Alunos Escolas IBMA</h2>
                             <p style="margin: 4px 0 0; font-size: 0.9rem; color: var(--text-muted);">Nome completo, Telefone e E-mail</p>
                         </div>
                     </div>
@@ -1794,41 +1810,84 @@ document.addEventListener('DOMContentLoaded', () => {
                         `).join('')}
                     </div>
 
-                    <div class="view-header" style="margin-top: 40px; display: flex; align-items: center; gap: 16px; margin-bottom: 24px;">
+                    <div class="view-header" style="margin-top: 40px; display: flex; align-items: center; gap: 16px; margin-bottom: 20px;">
                         <div style="width: 52px; height: 52px; border-radius: 14px; background: rgba(var(--primary-rgb), 0.12); color: var(--primary); display: flex; align-items: center; justify-content: center;">
-                            <i data-lucide="layers" style="width: 28px; height: 28px;"></i>
+                            <i data-lucide="user-plus" style="width: 28px; height: 28px;"></i>
                         </div>
                         <div>
-                            <h2 style="margin: 0; font-size: 1.5rem; font-weight: 800; color: var(--text-main);">Módulos Escola IBMA</h2>
-                            <p style="margin: 4px 0 0; font-size: 0.9rem; color: var(--text-muted);">Membresia, Discipulado, Batismo e Oração</p>
+                            <h2 style="margin: 0; font-size: 1.5rem; font-weight: 800; color: var(--text-main);">Cadastro de Alunos</h2>
+                            <p style="margin: 4px 0 0; font-size: 0.9rem; color: var(--text-muted);">Nome completo, Telefone, E-mail e Escola</p>
                         </div>
                     </div>
-                    <div class="modules-ibma-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 40px;">
-                        <div class="stat-card" style="height: auto; padding: 24px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 12px;">
-                            <div style="width: 48px; height: 48px; border-radius: 14px; background: rgba(var(--primary-rgb), 0.12); color: var(--primary); display: flex; align-items: center; justify-content: center;">
-                                <i data-lucide="user-check" style="width: 24px; height: 24px;"></i>
+                    <div class="form-container" style="max-width: 600px; padding: 24px; margin-bottom: 24px; background: white; border-radius: 20px; box-shadow: var(--shadow); border: 1px solid var(--border);">
+                        <form id="cadastro-alunos-ibma-form">
+                            <div class="form-group" style="margin-bottom: 16px;">
+                                <label style="font-weight: 700; font-size: 0.9rem;">Nome completo</label>
+                                <div class="input-field" style="position: relative;">
+                                    <i data-lucide="user" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); width: 18px; color: var(--text-muted);"></i>
+                                    <input type="text" name="fullName" placeholder="Nome completo" required style="width: 100%; padding: 12px 16px 12px 48px; border-radius: 10px; border: 1.5px solid var(--border);">
+                                </div>
                             </div>
-                            <span style="font-weight: 700; font-size: 1rem; color: var(--text-main);">Membresia</span>
-                        </div>
-                        <div class="stat-card" style="height: auto; padding: 24px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 12px;">
-                            <div style="width: 48px; height: 48px; border-radius: 14px; background: rgba(var(--primary-rgb), 0.12); color: var(--primary); display: flex; align-items: center; justify-content: center;">
-                                <i data-lucide="users" style="width: 24px; height: 24px;"></i>
+                            <div class="form-group" style="margin-bottom: 16px;">
+                                <label style="font-weight: 700; font-size: 0.9rem;">Telefone</label>
+                                <div class="input-field" style="position: relative;">
+                                    <i data-lucide="phone" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); width: 18px; color: var(--text-muted);"></i>
+                                    <input type="tel" name="phone" placeholder="(00) 00000-0000" required style="width: 100%; padding: 12px 16px 12px 48px; border-radius: 10px; border: 1.5px solid var(--border);">
+                                </div>
                             </div>
-                            <span style="font-weight: 700; font-size: 1rem; color: var(--text-main);">Discipulado</span>
-                        </div>
-                        <div class="stat-card" style="height: auto; padding: 24px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 12px;">
-                            <div style="width: 48px; height: 48px; border-radius: 14px; background: rgba(var(--primary-rgb), 0.12); color: var(--primary); display: flex; align-items: center; justify-content: center;">
-                                <i data-lucide="droplet" style="width: 24px; height: 24px;"></i>
+                            <div class="form-group" style="margin-bottom: 16px;">
+                                <label style="font-weight: 700; font-size: 0.9rem;">E-mail</label>
+                                <div class="input-field" style="position: relative;">
+                                    <i data-lucide="mail" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); width: 18px; color: var(--text-muted);"></i>
+                                    <input type="email" name="email" placeholder="email@exemplo.com" required style="width: 100%; padding: 12px 16px 12px 48px; border-radius: 10px; border: 1.5px solid var(--border);">
+                                </div>
                             </div>
-                            <span style="font-weight: 700; font-size: 1rem; color: var(--text-main);">Batismo</span>
-                        </div>
-                        <div class="stat-card" style="height: auto; padding: 24px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 12px;">
-                            <div style="width: 48px; height: 48px; border-radius: 14px; background: rgba(var(--primary-rgb), 0.12); color: var(--primary); display: flex; align-items: center; justify-content: center;">
-                                <i data-lucide="heart-handshake" style="width: 24px; height: 24px;"></i>
+                            <div class="form-group" style="margin-bottom: 20px;">
+                                <label style="font-weight: 700; font-size: 0.9rem;">Escola</label>
+                                <div class="escolas-selector" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px;">
+                                    <label class="escola-option" style="cursor: pointer; text-align: center;">
+                                        <input type="radio" name="escola" value="membresia" required style="display: none;">
+                                        <div class="escola-card" style="padding: 16px; border: 2px solid var(--border); border-radius: 12px; background: white; transition: all 0.25s; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                                            <i data-lucide="user-check" style="width: 20px; height: 20px; color: var(--primary);"></i>
+                                            <span style="font-weight: 600; font-size: 0.9rem; color: var(--text-main);">Membresia</span>
+                                        </div>
+                                    </label>
+                                    <label class="escola-option" style="cursor: pointer; text-align: center;">
+                                        <input type="radio" name="escola" value="discipulado" style="display: none;">
+                                        <div class="escola-card" style="padding: 16px; border: 2px solid var(--border); border-radius: 12px; background: white; transition: all 0.25s; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                                            <i data-lucide="users" style="width: 20px; height: 20px; color: var(--primary);"></i>
+                                            <span style="font-weight: 600; font-size: 0.9rem; color: var(--text-main);">Discipulado</span>
+                                        </div>
+                                    </label>
+                                    <label class="escola-option" style="cursor: pointer; text-align: center;">
+                                        <input type="radio" name="escola" value="batismo" style="display: none;">
+                                        <div class="escola-card" style="padding: 16px; border: 2px solid var(--border); border-radius: 12px; background: white; transition: all 0.25s; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                                            <i data-lucide="droplet" style="width: 20px; height: 20px; color: var(--primary);"></i>
+                                            <span style="font-weight: 600; font-size: 0.9rem; color: var(--text-main);">Batismo</span>
+                                        </div>
+                                    </label>
+                                    <label class="escola-option" style="cursor: pointer; text-align: center;">
+                                        <input type="radio" name="escola" value="maturidade" style="display: none;">
+                                        <div class="escola-card" style="padding: 16px; border: 2px solid var(--border); border-radius: 12px; background: white; transition: all 0.25s; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                                            <i data-lucide="crown" style="width: 20px; height: 20px; color: var(--primary);"></i>
+                                            <span style="font-weight: 600; font-size: 0.9rem; color: var(--text-main);">Maturidade</span>
+                                        </div>
+                                    </label>
+                                </div>
                             </div>
-                            <span style="font-weight: 700; font-size: 1rem; color: var(--text-main);">Oração</span>
-                        </div>
+                            <button type="submit" class="btn-primary" style="width: auto; padding: 12px 24px;">Adicionar Aluno</button>
+                        </form>
                     </div>
+
+                    <a href="#" class="overview-shortcut" data-view="alunos-escolas" style="display: flex; align-items: center; gap: 16px; padding: 20px; background: white; border-radius: 16px; box-shadow: var(--shadow); border: 1px solid var(--border); text-decoration: none; color: inherit; margin-top: 24px; max-width: 320px; transition: all 0.2s;">
+                        <div style="width: 52px; height: 52px; border-radius: 14px; background: rgba(var(--primary-rgb), 0.12); color: var(--primary); display: flex; align-items: center; justify-content: center;">
+                            <i data-lucide="graduation-cap" style="width: 28px; height: 28px;"></i>
+                        </div>
+                        <div>
+                            <strong style="font-size: 1.1rem;">Ver lista de Alunos</strong>
+                            <p style="margin: 4px 0 0; font-size: 0.85rem; color: var(--text-muted);">Relação por escola • Boletim e Certificado</p>
+                        </div>
+                    </a>
                     ` : ''}
                     ${currentUser.loginType !== 'escolas-ibma' ? `
                     <div class="stats-grid">
@@ -1854,8 +1913,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                     </div>
 
-                    ` : ''}
-                    ${currentUser.loginType !== 'escolas-ibma' ? `
                     <div class="view-header" style="margin-top: 32px; margin-bottom: 20px;">
                         <h2>Acesso Rápido</h2>
                     </div>
@@ -1884,43 +1941,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div class="overview-shortcut-icon"><i data-lucide="file-text"></i></div>
                             <span class="overview-shortcut-label">Normas Sebitam</span>
                         </a>
-                        <a href="#" class="overview-shortcut" data-view="mensalidades">
-                            <div class="overview-shortcut-icon"><i data-lucide="wallet"></i></div>
-                            <span class="overview-shortcut-label">Sebitam Mensalidades</span>
-                        </a>
-                        <a href="#" class="overview-shortcut" data-view="matricula-escolas">
-                            <div class="overview-shortcut-icon"><i data-lucide="school"></i></div>
-                            <span class="overview-shortcut-label">Matrícula para Escolas</span>
-                        </a>
-                    </div>
-
-                    <div class="view-header" style="margin-top: 40px; display: flex; align-items: center; gap: 16px; margin-bottom: 24px;">
-                        <div style="width: 52px; height: 52px; border-radius: 14px; background: rgba(var(--primary-rgb), 0.12); color: var(--primary); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                            <i data-lucide="trending-up" style="width: 28px; height: 28px;"></i>
-                        </div>
-                        <div>
-                            <h2 style="margin: 0; font-size: 1.5rem; font-weight: 800; color: var(--text-main);">Financeiro</h2>
-                            <p style="margin: 4px 0 0; font-size: 0.9rem; color: var(--text-muted);">Relatórios de entradas, saídas, turmas, inadimplência e gráficos</p>
-                        </div>
-                    </div>
-                    <div class="finance-reports-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 40px;">
-                        ${['Entradas', 'Saídas', 'Turmas', 'Inadimplência', 'Gráficos'].map((nome, i) => {
-                            const icons = ['arrow-down-circle', 'arrow-up-circle', 'users', 'alert-circle', 'bar-chart-3'];
-                            return `
-                            <div class="stat-card" style="height: auto; padding: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
-                                <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0;">
-                                    <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(var(--primary-rgb), 0.1); color: var(--primary); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                                        <i data-lucide="${icons[i]}" style="width: 22px; height: 22px;"></i>
-                                    </div>
-                                    <span style="font-weight: 600; font-size: 1rem; color: var(--text-main);">${nome}</span>
-                                </div>
-                                <div style="display: flex; gap: 8px;">
-                                    <button class="btn-icon overview-finance-view" data-report="${nome.toLowerCase()}" title="Visualizar" style="padding: 8px;"><i data-lucide="eye" style="width: 18px; height: 18px;"></i></button>
-                                    <button class="btn-icon overview-finance-print" data-report="${nome.toLowerCase()}" title="Imprimir" style="padding: 8px;"><i data-lucide="printer" style="width: 18px; height: 18px;"></i></button>
-                                </div>
-                            </div>
-                            `;
-                        }).join('')}
                     </div>
                     ` : ''}
                     ${currentUser.loginType !== 'escolas-ibma' ? `
@@ -2062,27 +2082,267 @@ document.addEventListener('DOMContentLoaded', () => {
                             await renderView('overview');
                         };
                     });
-                    document.querySelectorAll('.overview-finance-view').forEach(btn => {
-                        btn.onclick = () => {
+                    const formAlunosIbma = document.getElementById('cadastro-alunos-ibma-form');
+                    if (formAlunosIbma) {
+                        formAlunosIbma.onsubmit = async (e) => {
+                            e.preventDefault();
+                            const fd = new FormData(formAlunosIbma);
+                            const obj = { fullName: fd.get('fullName'), phone: fd.get('phone'), email: fd.get('email'), escola: fd.get('escola'), id: Date.now() };
+                            const list = JSON.parse(localStorage.getItem('alunos-escolas-ibma') || '[]');
+                            list.push(obj);
+                            localStorage.setItem('alunos-escolas-ibma', JSON.stringify(list));
+                            formAlunosIbma.reset();
+                            document.querySelectorAll('#cadastro-alunos-ibma-form .escola-card').forEach(c => { c.style.borderColor = 'var(--border)'; c.style.background = 'white'; });
                             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-                            const navEl = document.querySelector('.nav-item[data-view="finance"]');
-                            if (navEl) navEl.classList.add('active');
-                            renderView('finance');
+                            const navAlunos = document.querySelector('.nav-item[data-view="alunos-escolas"]');
+                            if (navAlunos) navAlunos.classList.add('active');
+                            await renderView('alunos-escolas');
                         };
-                    });
-                    document.querySelectorAll('.overview-finance-print').forEach(btn => {
-                        btn.onclick = () => {
-                            const report = btn.dataset.report || 'relatório';
-                            const printWin = window.open('', '_blank');
-                            printWin.document.write('<html><head><title>Relatório ' + report.charAt(0).toUpperCase() + report.slice(1) + ' - SEBITAM</title><style>body{font-family:sans-serif;padding:24px;}</style></head><body><h1>Relatório ' + report.charAt(0).toUpperCase() + report.slice(1) + '</h1><p>Conteúdo do relatório será gerado aqui.</p><p><em>Para imprimir o painel completo, acesse o Dashboard Financeiro pelo menu.</em></p></body></html>');
-                            printWin.document.close();
-                            printWin.focus();
-                            setTimeout(() => { printWin.print(); printWin.close(); }, 250);
+                        document.querySelectorAll('#cadastro-alunos-ibma-form .escola-option input').forEach((radio) => {
+                            const card = radio.closest('label')?.querySelector('.escola-card');
+                            if (!card) return;
+                            radio.addEventListener('change', () => {
+                                document.querySelectorAll('#cadastro-alunos-ibma-form .escola-card').forEach(c => {
+                                    c.style.borderColor = 'var(--border)';
+                                    c.style.background = 'white';
+                                });
+                                card.style.borderColor = 'var(--primary)';
+                                card.style.background = 'rgba(var(--primary-rgb), 0.05)';
+                            });
+                        });
+                    }
+                    document.querySelectorAll('.delete-aluno-ibma').forEach(btn => {
+                        btn.onclick = async () => {
+                            if (!confirm('Excluir este aluno?')) return;
+                            const list = JSON.parse(localStorage.getItem('alunos-escolas-ibma') || '[]').filter(x => String(x.id) !== String(btn.dataset.id));
+                            localStorage.setItem('alunos-escolas-ibma', JSON.stringify(list));
+                            await renderView('overview');
                         };
                     });
                     lucide.createIcons();
                 }, 0);
                 break;
+            case 'alunos-escolas': {
+                const alunosIbmaList = JSON.parse(localStorage.getItem('alunos-escolas-ibma') || '[]');
+                const professoresIbma = JSON.parse(localStorage.getItem('professores-escolas-ibma') || '[]');
+                const escolasAlunos = [
+                    { id: 'membresia', nome: 'Membresia', icon: 'user-check' },
+                    { id: 'discipulado', nome: 'Discipulado', icon: 'users' },
+                    { id: 'batismo', nome: 'Batismo', icon: 'droplet' },
+                    { id: 'maturidade', nome: 'Maturidade', icon: 'crown' }
+                ];
+                const isProfessorIbma = currentUser.loginType === 'escolas-ibma' && professoresIbma.some(p => (p.email || '').toLowerCase() === (currentUser.email || '').toLowerCase());
+                const canEditDelete = currentUser.role === 'teacher' || isProfessorIbma;
+
+                html = `
+                    <div class="view-header" style="display: flex; align-items: center; gap: 16px; margin-bottom: 28px;">
+                        <div style="width: 56px; height: 56px; border-radius: 16px; background: rgba(var(--primary-rgb), 0.12); color: var(--primary); display: flex; align-items: center; justify-content: center;">
+                            <i data-lucide="graduation-cap" style="width: 30px; height: 30px;"></i>
+                        </div>
+                        <div>
+                            <h2 style="margin: 0; font-size: 1.6rem; font-weight: 800; color: var(--text-main);">Alunos Matriculados</h2>
+                            <p style="margin: 6px 0 0; font-size: 0.95rem; color: var(--text-muted);">Relação por escola: Membresia, Discipulado, Batismo e Maturidade</p>
+                        </div>
+                    </div>
+
+                    ${escolasAlunos.map(esc => {
+                        const alunosEscola = alunosIbmaList.filter(a => (a.escola || '').toLowerCase() === esc.id);
+                        if (alunosEscola.length === 0) return '';
+                        return `
+                    <div class="turma-section" style="background: white; padding: 25px; border-radius: 15px; margin-bottom: 24px; box-shadow: var(--shadow); border: 1px solid var(--border);">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px; border-bottom: 2px solid var(--bg-main); padding-bottom: 12px;">
+                            <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(var(--primary-rgb), 0.1); color: var(--primary); display: flex; align-items: center; justify-content: center;">
+                                <i data-lucide="${esc.icon}" style="width: 22px; height: 22px;"></i>
+                            </div>
+                            <h3 style="margin: 0; color: var(--text-main); font-weight: 700;">${esc.nome}</h3>
+                            <span class="badge" style="background: var(--primary-light); color: var(--primary);">${alunosEscola.length} aluno(s)</span>
+                        </div>
+                        <div class="table-responsive" style="overflow-x: auto;">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Aluno</th>
+                                        <th>Telefone</th>
+                                        <th>E-mail</th>
+                                        <th class="text-right" style="text-align: right;">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${alunosEscola.map(a => {
+                                        const nomeCap = (a.fullName || a.nome || '-').split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+                                        return `
+                                    <tr>
+                                        <td><strong>${nomeCap}</strong></td>
+                                        <td>${a.phone || '-'}</td>
+                                        <td>${a.email || '-'}</td>
+                                        <td class="actions-cell">
+                                            <div class="acoes-aluno-wrap" style="position: relative;">
+                                                <button class="btn-acoes-trigger" type="button" title="Ações" style="width: 40px; height: 40px; border-radius: 10px; border: 1px solid var(--border); background: white; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
+                                                    <i data-lucide="more-vertical" style="width: 20px; height: 20px;"></i>
+                                                </button>
+                                                <div class="acoes-aluno-menu" style="display: none; position: absolute; right: 0; top: 100%; margin-top: 6px; background: white; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); border: 1px solid var(--border); padding: 8px; min-width: 180px; z-index: 100;">
+                                                    <button class="acoes-menu-item btn-aluno-boletim" data-id="${a.id}" style="width: 100%; display: flex; align-items: center; gap: 12px; padding: 10px 14px; border: none; background: transparent; border-radius: 8px; cursor: pointer; color: var(--text-main); font-size: 0.9rem; text-align: left; transition: background 0.2s;">
+                                                        <i data-lucide="file-text" style="width: 18px; height: 18px; color: var(--primary); flex-shrink: 0;"></i>
+                                                        <span>Boletim</span>
+                                                    </button>
+                                                    <button class="acoes-menu-item btn-aluno-certificado" data-id="${a.id}" style="width: 100%; display: flex; align-items: center; gap: 12px; padding: 10px 14px; border: none; background: transparent; border-radius: 8px; cursor: pointer; color: var(--text-main); font-size: 0.9rem; text-align: left; transition: background 0.2s;">
+                                                        <i data-lucide="award" style="width: 18px; height: 18px; color: #16a34a; flex-shrink: 0;"></i>
+                                                        <span>Certificado</span>
+                                                    </button>
+                                                    ${canEditDelete ? `
+                                                    <button class="acoes-menu-item btn-aluno-editar" data-id="${a.id}" data-nome="${(a.fullName || a.nome || '').replace(/"/g, '&quot;')}" data-phone="${(a.phone || '').replace(/"/g, '&quot;')}" data-email="${(a.email || '').replace(/"/g, '&quot;')}" data-escola="${a.escola || ''}" style="width: 100%; display: flex; align-items: center; gap: 12px; padding: 10px 14px; border: none; background: transparent; border-radius: 8px; cursor: pointer; color: var(--text-main); font-size: 0.9rem; text-align: left; transition: background 0.2s;">
+                                                        <i data-lucide="edit-3" style="width: 18px; height: 18px; color: #f59e0b; flex-shrink: 0;"></i>
+                                                        <span>Editar</span>
+                                                    </button>
+                                                    <button class="acoes-menu-item btn-aluno-excluir" data-id="${a.id}" style="width: 100%; display: flex; align-items: center; gap: 12px; padding: 10px 14px; border: none; background: transparent; border-radius: 8px; cursor: pointer; color: var(--text-main); font-size: 0.9rem; text-align: left; transition: background 0.2s;">
+                                                        <i data-lucide="trash-2" style="width: 18px; height: 18px; color: #ef4444; flex-shrink: 0;"></i>
+                                                        <span>Excluir</span>
+                                                    </button>` : ''}
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>`;
+                                    }).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>`;
+                    }).join('')}
+
+                    ${alunosIbmaList.length === 0 ? '<div style="text-align: center; padding: 40px; color: var(--text-muted); background: white; border-radius: 15px; border: 1px dashed var(--border);"><i data-lucide="users" style="width: 48px; height: 48px; margin-bottom: 16px; opacity: 0.5;"></i><p>Nenhum aluno matriculado nas escolas.</p></div>' : ''}
+                `;
+
+                setTimeout(() => {
+                    const list = JSON.parse(localStorage.getItem('alunos-escolas-ibma') || '[]');
+                    const getAluno = (id) => list.find(x => String(x.id) === String(id));
+
+                    document.querySelectorAll('.btn-acoes-trigger').forEach(trigger => {
+                        trigger.onclick = (e) => {
+                            e.stopPropagation();
+                            const menu = trigger.closest('.acoes-aluno-wrap')?.querySelector('.acoes-aluno-menu');
+                            if (!menu) return;
+                            const isOpen = menu.style.display === 'block';
+                            document.querySelectorAll('.acoes-aluno-menu').forEach(m => { m.style.display = 'none'; });
+                            menu.style.display = isOpen ? 'none' : 'block';
+                            if (!isOpen && window.lucide) lucide.createIcons();
+                        };
+                    });
+                    const closeMenus = () => document.querySelectorAll('.acoes-aluno-menu').forEach(m => { m.style.display = 'none'; });
+                    if (!window._acoesAlunoBodyListener) {
+                        window._acoesAlunoBodyListener = true;
+                        document.body.addEventListener('click', closeMenus);
+                    }
+
+                    document.querySelectorAll('.acoes-aluno-menu').forEach(menu => menu.addEventListener('click', e => e.stopPropagation()));
+                    document.querySelectorAll('.btn-aluno-boletim').forEach(btn => {
+                        btn.onclick = (e) => {
+                            e.stopPropagation();
+                            closeMenus();
+                            const a = getAluno(btn.dataset.id);
+                            if (!a) return;
+                            const w = window.open('', '_blank');
+                            if (!w) return alert('Libere os pop-ups.');
+                            const esc = escolasAlunos.find(e => e.id === (a.escola || '').toLowerCase());
+                            const logoIbmaUrl = new URL('logo-escolas-ibma.png', window.location.href).href;
+                            const modNome = (escolasAlunos.find(e=>e.id===(a.escola||'').toLowerCase())||{}).nome || a.escola || 'Membresia';
+                            const nomeAluno = (a.fullName || a.nome || '-').split(' ').map(w=>w.charAt(0).toUpperCase()+w.slice(1).toLowerCase()).join(' ');
+                            const declaroBoletim = 'Declaro para os devidos fins que o Sr.(a) ' + nomeAluno + ' concluiu com excelência o módulo ' + modNome + ' da Escola de Crescimento da IBMA.';
+                            const freq1=a.freq1!==undefined?a.freq1:'-'; const freq2=a.freq2!==undefined?a.freq2:'-'; const freq3=a.freq3!==undefined?a.freq3:'-'; const freq4=a.freq4!==undefined?a.freq4:'-';
+                            const situacaoTexto=(a.situacao==='reprovado'?'Reprovado':'Aprovado'); const situacaoClass=a.situacao==='reprovado'?'reprovado':'aprovado';
+                            const hoje = new Date().toLocaleDateString('pt-BR');
+                            const htmlBoletim = `<!DOCTYPE html><html><head><title>Boletim - ${nomeAluno}</title><link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet"><style>@page{size:A4;margin:20mm}body{font-family:'Montserrat',sans-serif;color:#1e293b;line-height:1.6;margin:0;padding:24px}.header{text-align:center;border-bottom:3px solid #1a365d;padding-bottom:20px;margin-bottom:25px}.logo{height:80px;margin-bottom:10px}h1{color:#1a365d;margin:10px 0;font-size:24px;font-weight:700;text-transform:uppercase}h2{color:#64748b;margin:5px 0;font-size:14px;font-weight:600}.student-info{background:linear-gradient(135deg,#1a365d,#2563eb);color:white;padding:20px;border-radius:12px;margin-bottom:25px;display:grid;grid-template-columns:repeat(2,1fr);gap:15px}.info-row{padding:8px 0}.info-label{font-size:11px;opacity:.9;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}.info-value{font-size:15px;font-weight:700}.declaro-box{margin:25px 0;padding:24px;background:#f8fafc;border-left:5px solid #1a365d;border-radius:0 10px 10px 0;font-size:1rem;line-height:1.7;color:#334155}.summary-box{display:grid;grid-template-columns:repeat(2,1fr);gap:15px;margin-bottom:25px}.summary-card{background:#f8fafc;border:2px solid #e2e8f0;border-radius:10px;padding:18px;text-align:center}.summary-value{font-size:24px;font-weight:800;color:#1a365d;margin-bottom:5px}.summary-label{font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.5px}table{width:100%;border-collapse:collapse;margin:20px 0;font-size:14px;border-radius:10px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.08)}th,td{border:1px solid #e2e8f0;padding:12px 14px;text-align:left}th{background:#1a365d;color:white;font-weight:600;text-transform:uppercase;font-size:12px;letter-spacing:.5px}tr:nth-child(even){background:#f8fafc}.situacao-card{margin-top:25px;padding:20px;border-radius:12px;font-weight:700;font-size:1.2rem;text-align:center;border:2px solid}.situacao-card.aprovado{background:#dcfce7;color:#166534;border-color:#22c55e}.situacao-card.reprovado{background:#fee2e2;color:#991b1b;border-color:#ef4444}.footer{margin-top:35px;padding-top:20px;border-top:2px solid #e2e8f0;display:flex;justify-content:space-between;font-size:12px;color:#64748b}@media print{body{padding:0}button{display:none}}</style></head><body><div class="header"><img src="${logoIbmaUrl}" class="logo" alt="Escolas IBMA"><h1>Boletim Escolar</h1><h2>Escolas IBMA - Escola de Crescimento - ${modNome}</h2></div><div class="student-info"><div class="info-row"><div class="info-label">Aluno</div><div class="info-value">${nomeAluno.toUpperCase()}</div></div><div class="info-row"><div class="info-label">Telefone</div><div class="info-value">${a.phone||'-'}</div></div><div class="info-row"><div class="info-label">E-mail</div><div class="info-value">${a.email||'-'}</div></div><div class="info-row"><div class="info-label">Data de Emissão</div><div class="info-value">${hoje}</div></div></div><div class="declaro-box">${declaroBoletim}</div><div class="summary-box"><div class="summary-card"><div class="summary-value">${modNome}</div><div class="summary-label">Módulo</div></div><div class="summary-card"><div class="summary-value">${situacaoTexto}</div><div class="summary-label">Situação</div></div></div><h3 style="margin:24px 0 12px;font-size:16px;color:#1a365d;font-weight:700;">Frequência (4 aulas)</h3><table><thead><tr><th>Aula</th><th>Frequência</th></tr></thead><tbody><tr><td>Aula 1</td><td>${freq1}</td></tr><tr><td>Aula 2</td><td>${freq2}</td></tr><tr><td>Aula 3</td><td>${freq3}</td></tr><tr><td>Aula 4</td><td>${freq4}</td></tr></tbody></table><div class="situacao-card ${situacaoClass}">Situação: ${situacaoTexto}</div><div class="footer"><div><strong>Emitido em:</strong> ${hoje}</div><div><strong>Assinatura:</strong> _______________________________</div></div><button onclick="window.print()" style="position:fixed;bottom:24px;right:24px;padding:12px 24px;background:#1a365d;color:white;border:none;border-radius:10px;cursor:pointer;font-weight:600;font-family:Montserrat,sans-serif;">Imprimir</button></body></html>`;
+                            w.document.write(htmlBoletim);
+                            w.document.close();
+                            setTimeout(() => w.print(), 600);
+                        };
+                    });
+
+                    document.querySelectorAll('.btn-aluno-certificado').forEach(btn => {
+                        btn.onclick = (e) => {
+                            e.stopPropagation();
+                            closeMenus();
+                            const a = getAluno(btn.dataset.id);
+                            if (!a) return;
+                            const w = window.open('', '_blank');
+                            if (!w) return alert('Libere os pop-ups.');
+                            const nome = (a.fullName || a.nome || '').split(' ').map(p => p.charAt(0).toUpperCase() + p.slice(1).toLowerCase()).join(' ');
+                            const escNome = (escolasAlunos.find(e=>e.id===(a.escola||'').toLowerCase())||{}).nome || (a.escola||'').charAt(0).toUpperCase()+(a.escola||'').slice(1) || 'Membresia';
+                            const logoUrl = new URL('logo-escolas-ibma.png', window.location.href).href;
+                            const dataCert = new Date().toLocaleDateString('pt-BR');
+                            const htmlCert = `<!DOCTYPE html><html><head><title>Certificado - ${nome}</title><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Montserrat:wght@400;600&display=swap" rel="stylesheet"><style>@page{size:A4 landscape;margin:0}body{margin:0;font-family:'Montserrat',sans-serif}.certificate{width:297mm;height:210mm;background:white;border:25px solid #1a365d;box-sizing:border-box;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:50px}.inner-border{position:absolute;top:8px;left:8px;right:8px;bottom:8px;border:5px solid #d4af37;pointer-events:none}.logo{height:120px;margin-bottom:20px}.cert-title{font-family:'Playfair Display',serif;font-size:4.5rem;color:#1a365d;margin:10px 0;text-transform:uppercase}.student-name{font-family:'Playfair Display',serif;font-size:3rem;color:#d4af37;margin:20px 0;border-bottom:2px solid #1a365d;padding:0 40px;text-align:center}.content{text-align:center;max-width:85%;font-size:1.1rem;line-height:1.8;color:#334155}.footer{margin-top:45px;width:100%;display:flex;justify-content:space-around}.sig-block{text-align:center;border-top:1px solid #1a365d;width:180px;padding-top:8px;font-size:0.85rem;color:#64748b;font-weight:600}.data-emissao{margin-top:25px;font-size:0.95rem;color:#64748b}@media print{button{display:none}}</style></head><body><div class="certificate"><div class="inner-border"></div><img src="${logoUrl}" class="logo" alt="Escolas IBMA"><h1 class="cert-title">Certificado</h1><div class="content"><p>Declaro para os devidos fins que</p><div class="student-name">${nome}</div><p>concluiu com excelência o módulo <strong>${escNome}</strong> da Escola de Crescimento da IBMA.</p><p class="data-emissao">${dataCert}</p></div><div class="footer"><div class="sig-block">PROFESSOR(A)</div><div class="sig-block">COORDENADOR(A)</div><div class="sig-block">PASTOR(A)</div></div></div><button onclick="window.print()" style="position:fixed;bottom:24px;right:24px;padding:12px 24px;background:#1a365d;color:white;border:none;border-radius:10px;cursor:pointer;font-weight:600;">Imprimir</button></body></html>`;
+                            w.document.write(htmlCert);
+                            w.document.close();
+                            setTimeout(() => w.print(), 600);
+                        };
+                    });
+
+                    document.querySelectorAll('.btn-aluno-editar').forEach(btn => {
+                        btn.onclick = (e) => {
+                            e.stopPropagation();
+                            closeMenus();
+                            const id = btn.dataset.id;
+                            const a = getAluno(id);
+                            if (!a) return;
+                            const overlay = document.createElement('div');
+                            overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
+                            overlay.innerHTML = `
+                                <div style="background:white;border-radius:16px;max-width:480px;width:100%;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+                                    <h3 style="margin:0 0 20px;font-size:1.25rem;">Editar Aluno</h3>
+                                    <form id="form-editar-aluno-ibma">
+                                        <div style="margin-bottom:12px;"><label style="font-weight:600;font-size:0.9rem;">Nome</label><input type="text" name="fullName" value="${(a.fullName||a.nome||'').replace(/"/g,'&quot;')}" style="width:100%;padding:10px 12px;border:1px solid #e2e8f0;border-radius:8px;margin-top:4px;"></div>
+                                        <div style="margin-bottom:12px;"><label style="font-weight:600;font-size:0.9rem;">Telefone</label><input type="text" name="phone" value="${(a.phone||'').replace(/"/g,'&quot;')}" style="width:100%;padding:10px 12px;border:1px solid #e2e8f0;border-radius:8px;margin-top:4px;"></div>
+                                        <div style="margin-bottom:12px;"><label style="font-weight:600;font-size:0.9rem;">E-mail</label><input type="email" name="email" value="${(a.email||'').replace(/"/g,'&quot;')}" style="width:100%;padding:10px 12px;border:1px solid #e2e8f0;border-radius:8px;margin-top:4px;"></div>
+                                        <div style="margin:20px 0 12px;font-weight:700;font-size:0.95rem;">Frequência (4 aulas)</div>
+                                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                                            <div><label style="font-size:0.85rem;">Aula 1</label><input type="text" name="freq1" value="${(a.freq1!==undefined?a.freq1:'').toString().replace(/"/g,'&quot;')}" placeholder="P ou %" style="width:100%;padding:8px 10px;border:1px solid #e2e8f0;border-radius:8px;"></div>
+                                            <div><label style="font-size:0.85rem;">Aula 2</label><input type="text" name="freq2" value="${(a.freq2!==undefined?a.freq2:'').toString().replace(/"/g,'&quot;')}" placeholder="P ou %" style="width:100%;padding:8px 10px;border:1px solid #e2e8f0;border-radius:8px;"></div>
+                                            <div><label style="font-size:0.85rem;">Aula 3</label><input type="text" name="freq3" value="${(a.freq3!==undefined?a.freq3:'').toString().replace(/"/g,'&quot;')}" placeholder="P ou %" style="width:100%;padding:8px 10px;border:1px solid #e2e8f0;border-radius:8px;"></div>
+                                            <div><label style="font-size:0.85rem;">Aula 4</label><input type="text" name="freq4" value="${(a.freq4!==undefined?a.freq4:'').toString().replace(/"/g,'&quot;')}" placeholder="P ou %" style="width:100%;padding:8px 10px;border:1px solid #e2e8f0;border-radius:8px;"></div>
+                                        </div>
+                                        <div style="margin-top:16px;"><label style="font-weight:600;font-size:0.9rem;">Situação</label>
+                                            <select name="situacao" style="width:100%;padding:10px 12px;border:1px solid #e2e8f0;border-radius:8px;margin-top:4px;">
+                                                <option value="aprovado" ${(a.situacao||'aprovado')==='aprovado'?'selected':''}>Aprovado</option>
+                                                <option value="reprovado" ${a.situacao==='reprovado'?'selected':''}>Reprovado</option>
+                                            </select>
+                                        </div>
+                                        <div style="margin-top:24px;display:flex;gap:12px;justify-content:flex-end;">
+                                            <button type="button" class="btn-cancelar-editar-aluno" style="padding:10px 20px;border:1px solid #e2e8f0;background:white;border-radius:8px;cursor:pointer;">Cancelar</button>
+                                            <button type="submit" class="btn-primary" style="padding:10px 24px;">Salvar</button>
+                                        </div>
+                                    </form>
+                                </div>`;
+                            document.body.appendChild(overlay);
+                            overlay.querySelector('.btn-cancelar-editar-aluno').onclick = () => { overlay.remove(); };
+                            overlay.querySelector('#form-editar-aluno-ibma').onsubmit = (e) => {
+                                e.preventDefault();
+                                const fd = new FormData(e.target);
+                                const novaLista = list.map(x => {
+                                    if (String(x.id) !== String(id)) return x;
+                                    return { ...x, fullName: fd.get('fullName')?.trim() || x.fullName, phone: fd.get('phone') || x.phone, email: fd.get('email') || x.email, freq1: fd.get('freq1') || undefined, freq2: fd.get('freq2') || undefined, freq3: fd.get('freq3') || undefined, freq4: fd.get('freq4') || undefined, situacao: fd.get('situacao') || 'aprovado' };
+                                });
+                                localStorage.setItem('alunos-escolas-ibma', JSON.stringify(novaLista));
+                                overlay.remove();
+                                renderView('alunos-escolas');
+                            };
+                            overlay.addEventListener('click', (ev) => { if (ev.target === overlay) overlay.remove(); });
+                        };
+                    });
+
+                    document.querySelectorAll('.btn-aluno-excluir').forEach(btn => {
+                        btn.onclick = async (e) => {
+                            e.stopPropagation();
+                            closeMenus();
+                            if (!confirm('Excluir este aluno?')) return;
+                            const novaLista = list.filter(x => String(x.id) !== String(btn.dataset.id));
+                            localStorage.setItem('alunos-escolas-ibma', JSON.stringify(novaLista));
+                            await renderView('alunos-escolas');
+                        };
+                    });
+
+                    lucide.createIcons();
+                }, 0);
+                break;
+            }
             case 'modulos-ibma': {
                 const modulosIbma = [
                     { id: 'membresia', nome: 'Membresia', icon: 'user-check', url: null },
@@ -2096,7 +2356,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <i data-lucide="layers" style="width: 30px; height: 30px;"></i>
                         </div>
                         <div>
-                            <h2 style="margin: 0; font-size: 1.6rem; font-weight: 800; color: var(--text-main);">Módulos Escola IBMA</h2>
+                            <h2 style="margin: 0; font-size: 1.6rem; font-weight: 800; color: var(--text-main);">Módulos Escolas IBMA</h2>
                             <p style="margin: 6px 0 0; font-size: 0.95rem; color: var(--text-muted);">Baixe o material de cada módulo</p>
                         </div>
                     </div>
@@ -2119,8 +2379,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const matriculas = JSON.parse(localStorage.getItem('matriculas-escolas') || '[]');
                 const escolas = [
                     { id: 'membresia', nome: 'Membresia', icon: 'user-check' },
-                    { id: 'discipulos', nome: 'Discípulos', icon: 'users' },
-                    { id: 'batismo', nome: 'Batismo', icon: 'droplet' }
+                    { id: 'discipulos', nome: 'Discípulos', icon: 'users' }
                 ];
                 html = `
                     <div class="matricula-escolas-header" style="display: flex; align-items: center; gap: 16px; margin-bottom: 32px;">
@@ -3073,11 +3332,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 const allFinanceSt = await dbGet('sebitam-students');
                 const selectedGrade = data && data.grade ? data.grade : 'all';
 
+                // Meses a partir de Fevereiro (índice 1) até o mês atual
+                const now = new Date();
+                const currentYear = now.getFullYear();
+                const currentMonthIndex = now.getMonth();
+                const monthsFromFeb = [];
+                for (let m = 1; m <= currentMonthIndex; m++) {
+                    const d = new Date(currentYear, m, 1);
+                    const name = d.toLocaleString('pt-BR', { month: 'long' });
+                    monthsFromFeb.push({ index: m, name: name.charAt(0).toUpperCase() + name.slice(1), year: currentYear });
+                }
+                if (monthsFromFeb.length === 0) {
+                    monthsFromFeb.push({ index: 1, name: 'Fevereiro', year: currentYear });
+                }
+
+                const selectedMonthIndex = data && data.month != null ? parseInt(data.month, 10) : (currentMonthIndex < 1 ? 1 : currentMonthIndex);
+                const selectedMonthData = monthsFromFeb.find(x => x.index === selectedMonthIndex) || monthsFromFeb[monthsFromFeb.length - 1];
+                const displayMonthCapitalized = selectedMonthData.name;
+
                 const finStudents = selectedGrade === 'all'
                     ? allFinanceSt
                     : allFinanceSt.filter(s => s.grade == selectedGrade);
 
-                // Definição de valores monetários por plano
                 const PRICES = { integral: 70, half: 35, scholarship: 0 };
 
                 let totalExpected = 0;
@@ -3094,28 +3370,37 @@ document.addEventListener('DOMContentLoaded', () => {
                 const numPaid = processedPayments.filter(p => p.status === 'Pago').length;
                 const numPending = processedPayments.filter(p => p.status === 'Pendente').length;
 
-                const today = new Date();
-                today.setDate(1); // Set to 1st to prevent overflow
-                // Logic: Start from February. If today is Jan, show Feb (1). Else show current month.
-                // Note: getMonth() is 0-indexed.
-                if (today.getMonth() === 0) {
-                    today.setMonth(1);
-                }
-                const displayMonth = today.toLocaleString('pt-BR', { month: 'long' });
-                const displayMonthCapitalized = displayMonth.charAt(0).toUpperCase() + displayMonth.slice(1);
-
                 html = `
-                    <div class="view-header" style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 20px;">
-                        <div>
-                            <h2>Painel Financeiro</h2>
-                            <p>Visão de recebíveis com valores monetários e filtros.</p>
+                    <div class="view-header" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 20px;">
+                        <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+                            <img src="logo.jpg" alt="SEBITAM" style="height: 64px; object-fit: contain;">
+                            <div>
+                                <h2>Painel Financeiro</h2>
+                                <p>Visão de recebíveis com valores monetários e filtros.</p>
+                            </div>
                         </div>
-                        <div style="background: white; padding: 10px 20px; border-radius: 12px; border: 1px solid var(--border); display: flex; align-items: center; gap: 10px;">
-                            <label style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">Filtrar por Turma:</label>
-                            <select id="finance-grade-filter" style="border: none; outline: none; background: transparent; font-weight: 700; color: var(--primary); cursor: pointer;">
-                                <option value="all" ${selectedGrade === 'all' ? 'selected' : ''}>Todas as Turmas</option>
-                                ${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(g => `<option value="${g}" ${selectedGrade == g ? 'selected' : ''}>Turma ${g}</option>`).join('')}
-                            </select>
+                        <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+                            <div style="background: white; padding: 10px 20px; border-radius: 12px; border: 1px solid var(--border); display: flex; align-items: center; gap: 10px;">
+                                <label style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">Mês:</label>
+                                <select id="finance-month-filter" style="border: none; outline: none; background: transparent; font-weight: 700; color: var(--primary); cursor: pointer;">
+                                    ${monthsFromFeb.map(m => `<option value="${m.index}" ${selectedMonthIndex === m.index ? 'selected' : ''}>${m.name} ${m.year}</option>`).join('')}
+                                </select>
+                            </div>
+                            <div style="background: white; padding: 10px 20px; border-radius: 12px; border: 1px solid var(--border); display: flex; align-items: center; gap: 10px;">
+                                <label style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">Turma:</label>
+                                <select id="finance-grade-filter" style="border: none; outline: none; background: transparent; font-weight: 700; color: var(--primary); cursor: pointer;">
+                                    <option value="all" ${selectedGrade === 'all' ? 'selected' : ''}>Todas</option>
+                                    ${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(g => `<option value="${g}" ${selectedGrade == g ? 'selected' : ''}>Turma ${g}</option>`).join('')}
+                                </select>
+                            </div>
+                            <div style="display: flex; gap: 8px;">
+                                <button type="button" class="btn-primary" id="finance-btn-print" style="padding: 10px 18px; display: flex; align-items: center; gap: 8px; font-size: 0.9rem;">
+                                    <i data-lucide="printer" style="width: 18px; height: 18px;"></i> Imprimir
+                                </button>
+                                <button type="button" class="btn-primary" id="finance-btn-pdf" style="padding: 10px 18px; display: flex; align-items: center; gap: 8px; font-size: 0.9rem;">
+                                    <i data-lucide="download" style="width: 18px; height: 18px;"></i> Baixar PDF
+                                </button>
+                            </div>
                         </div>
                     </div>
                     
@@ -3139,7 +3424,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div class="stat-card" style="background: white;">
                                 <div class="stat-icon" style="background: rgba(34, 197, 94, 0.1); color: #16a34a;"><i data-lucide="dollar-sign"></i></div>
                                 <div>
-                                    <div class="stat-value" style="font-size: 1.5rem;">R$ ${totalReceived.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
                                     <div class="stat-value" style="font-size: 1.5rem;">R$ ${totalReceived.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
                                     <div class="stat-label">Total Recebido (${displayMonthCapitalized})</div>
                                 </div>
@@ -3258,61 +3542,48 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                     </div>
 
-                    <div style="margin-top: 40px; background: white; padding: 25px; border-radius: 20px; box-shadow: var(--shadow); border: 1px solid var(--border);">
-                        <div class="view-header" style="margin-bottom: 20px;">
-                            <h3 style="display: flex; align-items: center; gap: 10px; font-weight: 700;">
-                                <i data-lucide="file-text" style="color: var(--primary);"></i> Relatórios Mensais
-                            </h3>
-                            <p>Gere e imprima relatórios financeiros detalhados por mês.</p>
-                        </div>
-                        <div class="table-container">
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>Mês</th>
-                                        <th>Ano</th>
-                                        <th>Status do Relatório</th>
-                                        <th class="text-right">Ações</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${Array.from({ length: 12 }, (_, i) => {
-                    const date = new Date(new Date().getFullYear(), i, 1);
-                    const monthName = date.toLocaleString('pt-BR', { month: 'long' });
-                    const monthNameCap = monthName.charAt(0).toUpperCase() + monthName.slice(1);
-                    const year = date.getFullYear();
-                    const isPastOrCurrent = i <= new Date().getMonth();
-
-                    return `
-                                            <tr>
-                                                <td style="font-weight: 600;">${monthNameCap}</td>
-                                                <td>${year}</td>
-                                                <td>
-                                                    <span class="badge" style="background: ${isPastOrCurrent ? 'rgba(34, 197, 94, 0.1)' : 'rgba(241, 245, 249, 1)'}; color: ${isPastOrCurrent ? '#16a34a' : '#64748b'}; border: 1px solid ${isPastOrCurrent ? '#22c55e' : '#cbd5e1'};">
-                                                        ${isPastOrCurrent ? 'Disponível' : 'Futuro'}
-                                                    </span>
-                                                </td>
-                                                <td class="actions-cell">
-                                                    <button class="btn-icon" title="Imprimir Relatório" onclick="printFinancialReport(${i}, ${year})" style="color: var(--primary); background: rgba(37, 99, 235, 0.1);">
-                                                        <i data-lucide="printer"></i>
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        `;
-                }).join('')}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
                 `;
 
 
                 setTimeout(() => {
                     if (typeof Chart === 'undefined') return;
 
-                    const filter = document.getElementById('finance-grade-filter');
-                    if (filter) {
-                        filter.onchange = (e) => renderView('finance', { grade: e.target.value });
+                    const gradeFilter = document.getElementById('finance-grade-filter');
+                    if (gradeFilter) {
+                        gradeFilter.onchange = (e) => {
+                            const monthEl = document.getElementById('finance-month-filter');
+                            const month = monthEl ? monthEl.value : selectedMonthIndex;
+                            renderView('finance', { grade: e.target.value, month: month });
+                        };
+                    }
+
+                    const monthFilter = document.getElementById('finance-month-filter');
+                    if (monthFilter) {
+                        monthFilter.onchange = (e) => {
+                            const gradeEl = document.getElementById('finance-grade-filter');
+                            const grade = gradeEl ? gradeEl.value : selectedGrade;
+                            renderView('finance', { grade: grade, month: e.target.value });
+                        };
+                    }
+
+                    const btnPrint = document.getElementById('finance-btn-print');
+                    if (btnPrint) {
+                        btnPrint.onclick = async () => {
+                            const mEl = document.getElementById('finance-month-filter');
+                            const monthIdx = mEl ? parseInt(mEl.value, 10) : selectedMonthIndex;
+                            const year = currentYear;
+                            await printFinancialReport(monthIdx, year, true);
+                        };
+                    }
+
+                    const btnPdf = document.getElementById('finance-btn-pdf');
+                    if (btnPdf) {
+                        btnPdf.onclick = async () => {
+                            const mEl = document.getElementById('finance-month-filter');
+                            const monthIdx = mEl ? parseInt(mEl.value, 10) : selectedMonthIndex;
+                            const year = currentYear;
+                            await printFinancialReport(monthIdx, year, false);
+                        };
                     }
 
                     const ctxPayments = document.getElementById('paymentsChart');
