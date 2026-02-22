@@ -668,6 +668,60 @@ body {
     font-size: 0.9rem;
 }
 
+/* Overview Shortcuts Grid */
+.overview-shortcuts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.overview-shortcut {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 12px;
+    background: var(--bg-card);
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+    text-decoration: none;
+    color: var(--text-main);
+    min-height: 120px;
+}
+
+.overview-shortcut:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.overview-shortcut-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: rgba(var(--primary-rgb), 0.1);
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+}
+
+.overview-shortcut:hover .overview-shortcut-icon {
+    background: rgba(var(--primary-rgb), 0.2);
+}
+
+.overview-shortcut-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-align: center;
+    line-height: 1.3;
+}
+
 /* Forms & Registration */
 .form-container {
     max-width: 800px;
@@ -928,6 +982,20 @@ body {
         top: 0;
         z-index: 100;
         width: 100%;
+    }
+
+    .overview-shortcuts-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    .overview-shortcut {
+        padding: 16px 8px;
+        min-height: 100px;
+    }
+
+    .overview-shortcut-label {
+        font-size: 0.75rem;
     }
 
     /* Menu Toggle Button */

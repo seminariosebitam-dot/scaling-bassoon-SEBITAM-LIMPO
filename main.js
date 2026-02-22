@@ -1741,6 +1741,43 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                     </div>
 
+                    <div class="view-header" style="margin-top: 32px; margin-bottom: 20px;">
+                        <h2>Acesso Rápido</h2>
+                    </div>
+                    <div class="overview-shortcuts-grid">
+                        <a href="#" class="overview-shortcut" data-view="users">
+                            <div class="overview-shortcut-icon"><i data-lucide="users"></i></div>
+                            <span class="overview-shortcut-label">Gestão de Usuários</span>
+                        </a>
+                        <a href="#" class="overview-shortcut" data-view="didatico">
+                            <div class="overview-shortcut-icon"><i data-lucide="book-open"></i></div>
+                            <span class="overview-shortcut-label">Didático Professores e Alunos</span>
+                        </a>
+                        <a href="#" class="overview-shortcut" data-view="enrollment">
+                            <div class="overview-shortcut-icon"><i data-lucide="user-plus"></i></div>
+                            <span class="overview-shortcut-label">Cadastro (Alunos, Profs, Adm, Sec)</span>
+                        </a>
+                        <a href="#" class="overview-shortcut" data-view="classes">
+                            <div class="overview-shortcut-icon"><i data-lucide="clipboard-list"></i></div>
+                            <span class="overview-shortcut-label">Alunos</span>
+                        </a>
+                        <a href="https://drive.google.com/drive/folders/1bHiOrFojPoQOcaTerk23vi-y8jtKwTd5" target="_blank" rel="noopener noreferrer" class="overview-shortcut overview-shortcut-external">
+                            <div class="overview-shortcut-icon"><i data-lucide="image"></i></div>
+                            <span class="overview-shortcut-label">Fotos & Vídeos</span>
+                        </a>
+                        <a href="#" class="overview-shortcut" data-view="institucional">
+                            <div class="overview-shortcut-icon"><i data-lucide="building-2"></i></div>
+                            <span class="overview-shortcut-label">Sebitam Institucional</span>
+                        </a>
+                        <a href="#" class="overview-shortcut" data-view="termo">
+                            <div class="overview-shortcut-icon"><i data-lucide="file-text"></i></div>
+                            <span class="overview-shortcut-label">Normas Sebitam</span>
+                        </a>
+                        <a href="#" class="overview-shortcut" data-view="mensalidades">
+                            <div class="overview-shortcut-icon"><i data-lucide="wallet"></i></div>
+                            <span class="overview-shortcut-label">Sebitam Mensalidades</span>
+                        </a>
+                    </div>
 
                     <div class="view-header" style="margin-top: 40px;">
                         <h2>Corpo Administrativo e Docente</h2>
@@ -1835,6 +1872,22 @@ document.addEventListener('DOMContentLoaded', () => {
                             const key = type === 'teacher' ? 'sebitam-teachers' : type === 'admin' ? 'sebitam-admins' : 'sebitam-secretaries';
                             await dbDeleteItem(key, id);
                             await renderView('overview');
+                        };
+                    });
+                    document.querySelectorAll('.overview-shortcut[data-view]').forEach(el => {
+                        el.onclick = async (e) => {
+                            e.preventDefault();
+                            const view = el.getAttribute('data-view');
+                            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+                            const navEl = document.querySelector('.nav-item[data-view="' + view + '"]');
+                            if (navEl) navEl.classList.add('active');
+                            const sidebar = document.getElementById('sidebar');
+                            const overlay = document.getElementById('sidebar-overlay');
+                            if (window.innerWidth <= 768 && sidebar && overlay) {
+                                sidebar.classList.remove('active');
+                                overlay.classList.remove('active');
+                            }
+                            await renderView(view);
                         };
                     });
                     lucide.createIcons();
