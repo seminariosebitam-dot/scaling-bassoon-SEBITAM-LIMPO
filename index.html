@@ -68,6 +68,11 @@
                         </div>
 
                         <button type="submit" class="btn-primary">Acessar Sistema</button>
+
+                        <button type="button" id="install-app-btn" class="btn-install-app" title="Instalar como app no celular ou computador" style="display: none;">
+                            <i data-lucide="smartphone"></i>
+                            <span>Instalar App SEBITAM</span>
+                        </button>
                     </form>
 
                 </div>
@@ -112,6 +117,10 @@
                     <a href="#" class="nav-item nav-sebitam-only" data-view="finance">
                         <i data-lucide="wallet"></i>
                         <span>Financeiro</span>
+                    </a>
+                    <a href="#" class="nav-item" id="pwa-install-nav" data-action="install-pwa" style="display: none;">
+                        <i data-lucide="smartphone"></i>
+                        <span>Instalar App</span>
                     </a>
                 </nav>
                 <div class="sidebar-footer">
@@ -194,9 +203,10 @@
     </div>
 
     <!-- PWA Install Banner -->
-    <div id="pwa-install-banner" style="display: none; position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--primary, #0f172a); color: white; padding: 14px 24px; border-radius: 50px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); z-index: 9999; cursor: pointer; font-weight: 600; font-size: 0.95rem; align-items: center; gap: 10px;">
-        <i data-lucide="download" style="width: 20px; height: 20px;"></i>
+    <div id="pwa-install-banner" class="pwa-install-banner">
+        <i data-lucide="download"></i>
         <span>Instalar App SEBITAM</span>
+        <button type="button" id="pwa-banner-close" class="pwa-banner-close" aria-label="Fechar">×</button>
     </div>
 
     <!-- Supabase Configuration -->
@@ -216,20 +226,85 @@
             });
         }
 
-        // PWA - Botão Instalar (quando o app for instalável)
+        // PWA - Instalador
         let deferredPrompt;
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+
+        function showInstallBanner() {
+            const banner = document.getElementById('pwa-install-banner');
+            const navItem = document.getElementById('pwa-install-nav');
+            if (banner && !localStorage.getItem('pwa-install-dismissed') && !isStandalone) {
+                banner.classList.add('pwa-visible');
+                banner.onclick = (e) => {
+                    if (e.target.closest('.pwa-banner-close')) return;
+                    if (deferredPrompt) {
+                        deferredPrompt.prompt();
+                        deferredPrompt.userChoice.then(() => {
+                            banner.classList.remove('pwa-visible');
+                            localStorage.setItem('pwa-install-dismissed', '1');
+                        });
+                    } else {
+                        // iOS ou navegador sem suporte: instruções
+                        alert('Para instalar no celular:\n\n• iPhone: Toque em Compartilhar e depois em "Adicionar à Tela de Início"\n• Android: Toque no menu (⋮) e escolha "Instalar app" ou "Adicionar à tela inicial"');
+                    }
+                };
+                document.getElementById('pwa-banner-close')?.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    banner.classList.remove('pwa-visible');
+                    localStorage.setItem('pwa-install-dismissed', '1');
+                });
+                if (navItem) navItem.style.display = 'flex';
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+            }
+        }
+
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
-            const banner = document.getElementById('pwa-install-banner');
-            if (banner && !localStorage.getItem('pwa-install-dismissed')) {
-                banner.style.display = 'flex';
-                banner.onclick = () => {
-                    deferredPrompt.prompt();
-                    deferredPrompt.userChoice.then(() => { banner.style.display = 'none'; localStorage.setItem('pwa-install-dismissed', '1'); });
-                };
-                if (typeof lucide !== 'undefined') lucide.createIcons();
+            showInstallBanner();
+        });
+
+        // Mostrar opção "Instalar App" no menu (visível quando não está instalado)
+        if (!isStandalone && document.getElementById('pwa-install-nav')) {
+            const nav = document.getElementById('pwa-install-nav');
+            nav.style.display = 'flex';
+            nav.addEventListener('click', (e) => {
+                e.preventDefault();
+                doInstallApp();
+            });
+        }
+
+        function doInstallApp() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((result) => {
+                    if (result.outcome === 'accepted') {
+                        document.getElementById('pwa-install-banner')?.classList.remove('pwa-visible');
+                        localStorage.setItem('pwa-install-dismissed', '1');
+                    }
+                });
+            } else {
+                const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+                const msg = isIOS
+                    ? 'Para instalar o App SEBITAM no iPhone/iPad:\n\n1. Toque no ícone Compartilhar (quadrado com seta)\n2. Role e toque em "Adicionar à Tela de Início"\n3. Toque em "Adicionar"'
+                    : 'Para instalar o App SEBITAM:\n\n• Android: Toque no menu (⋮) no canto superior direito e escolha "Instalar app" ou "Adicionar à tela inicial"\n• Desktop: Procure o ícone de instalação na barra de endereço (⊕)';
+                alert(msg);
             }
+        }
+
+        // Botão Instalar na tela de login (só mostra se não está instalado)
+        const installBtn = document.getElementById('install-app-btn');
+        if (installBtn && !isStandalone) {
+            installBtn.style.display = 'flex';
+            installBtn.addEventListener('click', () => {
+                doInstallApp();
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+            });
+        }
+
+        // Inicializar ícones após carregar (para o botão de instalar)
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => { if (typeof lucide !== 'undefined') lucide.createIcons(); }, 100);
         });
     </script>
 </body>

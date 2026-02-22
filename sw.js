@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sebitam-v1';
+const CACHE_NAME = 'sebitam-v2';
 const ASSETS = [
   '/index.html',
   '/style.css',

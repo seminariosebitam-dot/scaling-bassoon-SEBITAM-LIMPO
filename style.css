@@ -159,11 +159,22 @@ body {
     margin-bottom: 32px;
 }
 
-.main-logo {
-    max-width: 90px;
-    height: auto;
+.logo-area {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     margin-bottom: 16px;
-    border-radius: 8px;
+    padding: 8px;
+}
+
+.main-logo {
+    width: 100%;
+    max-width: 120px;
+    height: auto;
+    max-height: 120px;
+    object-fit: contain;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
 }
 
 .seminar-name {
@@ -433,6 +444,33 @@ body {
     background-color: var(--primary-dark);
     transform: translateY(-2px);
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.btn-install-app {
+    width: 100%;
+    padding: 14px 16px;
+    background: transparent;
+    color: var(--primary);
+    border: 2px solid var(--primary);
+    border-radius: var(--radius);
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.btn-install-app i {
+    width: 20px;
+    height: 20px;
+}
+
+.btn-install-app:hover {
+    background: rgba(var(--primary-rgb), 0.08);
 }
 
 /* Theme Toggle */
@@ -2130,4 +2168,60 @@ body.user-role-student .delete-st-class {
     .view-header h2 {
         font-size: 1.4rem !important;
     }
+}
+
+/* PWA Install Banner */
+.pwa-install-banner {
+    display: none;
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--primary, #0f172a);
+    color: white;
+    padding: 14px 20px 14px 24px;
+    border-radius: 50px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
+    z-index: 9999;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.95rem;
+    align-items: center;
+    gap: 10px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.pwa-install-banner:hover {
+    transform: translateX(-50%) translateY(-2px);
+    box-shadow: 0 6px 28px rgba(0, 0, 0, 0.3);
+}
+
+.pwa-install-banner i {
+    width: 20px;
+    height: 20px;
+}
+
+.pwa-install-banner.pwa-visible {
+    display: flex !important;
+}
+
+.pwa-banner-close {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 4px;
+    transition: background 0.2s;
+}
+
+.pwa-banner-close:hover {
+    background: rgba(255, 255, 255, 0.3);
 }
