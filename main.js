@@ -1779,8 +1779,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         </a>
                     </div>
 
-                    <div class="view-header" style="margin-top: 40px;">
-                        <h2>Corpo Administrativo e Docente</h2>
+                    <div class="corpo-docente-header" style="margin-top: 40px; display: flex; align-items: center; gap: 16px; margin-bottom: 24px;">
+                        <div class="corpo-docente-icon" style="width: 52px; height: 52px; border-radius: 14px; background: rgba(var(--primary-rgb), 0.12); color: var(--primary); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <i data-lucide="graduation-cap" style="width: 28px; height: 28px;"></i>
+                        </div>
+                        <div>
+                            <h2 style="margin: 0; font-size: 1.5rem; font-weight: 800; color: var(--text-main);">Corpo Docente Sebitam</h2>
+                            <p style="margin: 4px 0 0; font-size: 0.9rem; color: var(--text-muted);">Administradores, Secretaria e Professores</p>
+                        </div>
                     </div>
 
                     <div class="staff-contacts-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 40px;">
