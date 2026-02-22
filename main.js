@@ -1893,6 +1893,35 @@ document.addEventListener('DOMContentLoaded', () => {
                             <span class="overview-shortcut-label">Matrícula para Escolas</span>
                         </a>
                     </div>
+
+                    <div class="view-header" style="margin-top: 40px; display: flex; align-items: center; gap: 16px; margin-bottom: 24px;">
+                        <div style="width: 52px; height: 52px; border-radius: 14px; background: rgba(var(--primary-rgb), 0.12); color: var(--primary); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <i data-lucide="trending-up" style="width: 28px; height: 28px;"></i>
+                        </div>
+                        <div>
+                            <h2 style="margin: 0; font-size: 1.5rem; font-weight: 800; color: var(--text-main);">Financeiro</h2>
+                            <p style="margin: 4px 0 0; font-size: 0.9rem; color: var(--text-muted);">Relatórios de entradas, saídas, turmas, inadimplência e gráficos</p>
+                        </div>
+                    </div>
+                    <div class="finance-reports-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 40px;">
+                        ${['Entradas', 'Saídas', 'Turmas', 'Inadimplência', 'Gráficos'].map((nome, i) => {
+                            const icons = ['arrow-down-circle', 'arrow-up-circle', 'users', 'alert-circle', 'bar-chart-3'];
+                            return `
+                            <div class="stat-card" style="height: auto; padding: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                                <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0;">
+                                    <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(var(--primary-rgb), 0.1); color: var(--primary); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                        <i data-lucide="${icons[i]}" style="width: 22px; height: 22px;"></i>
+                                    </div>
+                                    <span style="font-weight: 600; font-size: 1rem; color: var(--text-main);">${nome}</span>
+                                </div>
+                                <div style="display: flex; gap: 8px;">
+                                    <button class="btn-icon overview-finance-view" data-report="${nome.toLowerCase()}" title="Visualizar" style="padding: 8px;"><i data-lucide="eye" style="width: 18px; height: 18px;"></i></button>
+                                    <button class="btn-icon overview-finance-print" data-report="${nome.toLowerCase()}" title="Imprimir" style="padding: 8px;"><i data-lucide="printer" style="width: 18px; height: 18px;"></i></button>
+                                </div>
+                            </div>
+                            `;
+                        }).join('')}
+                    </div>
                     ` : ''}
                     ${currentUser.loginType !== 'escolas-ibma' ? `
                     <div class="corpo-docente-header" style="margin-top: 40px; display: flex; align-items: center; gap: 16px; margin-bottom: 24px;">
@@ -2031,6 +2060,24 @@ document.addEventListener('DOMContentLoaded', () => {
                             const list = JSON.parse(localStorage.getItem('professores-escolas-ibma') || '[]').filter(x => String(x.id) !== String(btn.dataset.id));
                             localStorage.setItem('professores-escolas-ibma', JSON.stringify(list));
                             await renderView('overview');
+                        };
+                    });
+                    document.querySelectorAll('.overview-finance-view').forEach(btn => {
+                        btn.onclick = () => {
+                            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+                            const navEl = document.querySelector('.nav-item[data-view="finance"]');
+                            if (navEl) navEl.classList.add('active');
+                            renderView('finance');
+                        };
+                    });
+                    document.querySelectorAll('.overview-finance-print').forEach(btn => {
+                        btn.onclick = () => {
+                            const report = btn.dataset.report || 'relatório';
+                            const printWin = window.open('', '_blank');
+                            printWin.document.write('<html><head><title>Relatório ' + report.charAt(0).toUpperCase() + report.slice(1) + ' - SEBITAM</title><style>body{font-family:sans-serif;padding:24px;}</style></head><body><h1>Relatório ' + report.charAt(0).toUpperCase() + report.slice(1) + '</h1><p>Conteúdo do relatório será gerado aqui.</p><p><em>Para imprimir o painel completo, acesse o Dashboard Financeiro pelo menu.</em></p></body></html>');
+                            printWin.document.close();
+                            printWin.focus();
+                            setTimeout(() => { printWin.print(); printWin.close(); }, 250);
                         };
                     });
                     lucide.createIcons();
