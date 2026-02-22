@@ -4,6 +4,7 @@
   "description": "Sistema de gestão institucional e teológica para o SEBITAM.",
   "main": "main.js",
   "scripts": {
+    "start": "npx serve .",
     "test": "echo \"Error: no test specified\" && exit 1",
     "mobile:build": "node build-mobile.js",
     "mobile:sync": "npm run mobile:build && npx cap sync"

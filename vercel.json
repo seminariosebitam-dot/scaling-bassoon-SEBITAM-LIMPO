@@ -9,20 +9,21 @@
   "headers": [
     {
       "source": "/(.*).html",
-      "headers": [
-        {
-          "key": "Content-Type",
-          "value": "text/html; charset=UTF-8"
-        }
-      ]
+      "headers": [{"key": "Content-Type", "value": "text/html; charset=UTF-8"}]
     },
     {
       "source": "/",
+      "headers": [{"key": "Content-Type", "value": "text/html; charset=UTF-8"}]
+    },
+    {
+      "source": "/manifest.json",
+      "headers": [{"key": "Content-Type", "value": "application/manifest+json"}]
+    },
+    {
+      "source": "/sw.js",
       "headers": [
-        {
-          "key": "Content-Type",
-          "value": "text/html; charset=UTF-8"
-        }
+        {"key": "Content-Type", "value": "application/javascript"},
+        {"key": "Service-Worker-Allowed", "value": "/"}
       ]
     }
   ]

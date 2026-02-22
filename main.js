@@ -14,7 +14,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // State
     let currentUser = {
         role: 'admin',
-        name: 'Administrador'
+        name: 'Administrador',
+        loginType: 'sebitam'
     };
     // Navigation History
     let viewHistory = [];
@@ -322,30 +323,42 @@ document.addEventListener('DOMContentLoaded', () => {
     // Inicialmente, manter o tema preto para o login
     setLoginTheme();
 
+    // Login Type Selector
+    const loginTypeInput = document.getElementById('login-type');
+    document.querySelectorAll('.login-type-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.login-type-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            if (loginTypeInput) loginTypeInput.value = btn.dataset.loginType;
+            if (window.lucide) lucide.createIcons();
+        });
+    });
+
     // Login Logic
     loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const loginEmail = document.getElementById('login-email').value.trim().toLowerCase();
         const loginName = document.getElementById('login-name').value.trim();
+        const loginType = (document.getElementById('login-type') || {}).value || 'sebitam';
 
         if (!loginEmail || !loginName) {
             alert('Por favor, preencha todos os campos.');
             return;
         }
 
-        // Armazenar email do usuário
         currentUser.email = loginEmail;
         currentUser.name = loginName;
-
+        currentUser.loginType = loginType;
         let userFound = false;
 
-        // 1. Verificar Super Admin
-        if (loginEmail === 'edukadoshmda@gmail.com') {
+        if (loginType === 'escolas-ibma') {
+            userFound = true;
+            currentUser.role = 'student';
+        } else if (loginEmail === 'edukadoshmda@gmail.com') {
             currentUser.role = 'admin';
             currentUser.name = 'Luiz Eduardo';
             userFound = true;
         } else {
-            // 2. Buscar em todas as tabelas do banco de dados
             try {
                 const tables = [
                     { key: 'sebitam-admins', role: 'admin' },
@@ -381,8 +394,15 @@ document.addEventListener('DOMContentLoaded', () => {
         dashboardScreen.classList.add('active');
         applySavedTheme();
         lucide.createIcons();
+        document.body.classList.toggle('login-escolas-ibma', currentUser.loginType === 'escolas-ibma');
+        const overviewLabel = document.getElementById('nav-overview-label');
+        if (overviewLabel) overviewLabel.textContent = currentUser.loginType === 'escolas-ibma' ? 'Cadastro de Professores' : 'Visão Geral';
+        const brandText = document.getElementById('sidebar-brand-text');
+        if (brandText) brandText.textContent = currentUser.loginType === 'escolas-ibma' ? 'Escola IBMA' : 'SEBITAM';
 
-        if (userFound) {
+        if (currentUser.loginType === 'escolas-ibma') {
+            await renderView('overview');
+        } else if (userFound) {
             console.log(`Usuário conhecido (${currentUser.role}) logado - Indo para Visão Geral`);
             await renderView('overview');
         } else {
@@ -397,6 +417,12 @@ document.addEventListener('DOMContentLoaded', () => {
         dashboardScreen.classList.remove('active');
         loginScreen.classList.add('active');
         setLoginTheme();
+        currentUser.loginType = 'sebitam';
+        document.body.classList.remove('login-escolas-ibma');
+        const overviewLabel = document.getElementById('nav-overview-label');
+        if (overviewLabel) overviewLabel.textContent = 'Visão Geral';
+        const brandText = document.getElementById('sidebar-brand-text');
+        if (brandText) brandText.textContent = 'SEBITAM';
         // Clear all role-specific classes from body
         document.body.classList.remove('user-role-admin', 'user-role-secretary', 'user-role-teacher', 'user-role-student');
 
@@ -487,7 +513,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Remove all previous role classes from body
         document.body.classList.remove('user-role-admin', 'user-role-secretary', 'user-role-teacher', 'user-role-student');
-        // Add current role class
         document.body.classList.add(`user-role-${role}`);
 
         // Re-trigger lucide to ensure icons show on updated elements
@@ -1688,8 +1713,6 @@ document.addEventListener('DOMContentLoaded', () => {
         currentView = view;
         currentData = data;
 
-
-
         // Header Back Button Logic
         const headBackBtn = document.getElementById('back-btn');
         const headMenuBtn = document.getElementById('menu-toggle');
@@ -1708,6 +1731,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const contentBody = document.getElementById('dynamic-content');
         let html = '';
+        if (view === 'escolas-ibma') {
+            view = 'overview';
+        }
         switch (view) {
             case 'overview':
                 const students = await dbGet('sebitam-students');
@@ -1716,8 +1742,95 @@ document.addEventListener('DOMContentLoaded', () => {
                 const listSecs = await dbGet('sebitam-secretaries');
                 const countSt = students.length;
 
+                const professoresIbma = JSON.parse(localStorage.getItem('professores-escolas-ibma') || '[]');
                 html = `
                     <div class="welcome-card"><h1 style="color: white !important;">Olá, ${currentUser.name}!</h1></div>
+                    ${currentUser.loginType === 'escolas-ibma' ? `
+                    <div class="view-header" style="margin-top: 32px; display: flex; align-items: center; gap: 16px; margin-bottom: 20px;">
+                        <div style="width: 52px; height: 52px; border-radius: 14px; background: rgba(var(--primary-rgb), 0.12); color: var(--primary); display: flex; align-items: center; justify-content: center;">
+                            <i data-lucide="graduation-cap" style="width: 28px; height: 28px;"></i>
+                        </div>
+                        <div>
+                            <h2 style="margin: 0; font-size: 1.5rem; font-weight: 800; color: var(--text-main);">Cadastro de Professores Escola IBMA</h2>
+                            <p style="margin: 4px 0 0; font-size: 0.9rem; color: var(--text-muted);">Nome completo, Telefone e E-mail</p>
+                        </div>
+                    </div>
+                    <div class="form-container" style="max-width: 600px; padding: 24px; margin-bottom: 24px; background: white; border-radius: 20px; box-shadow: var(--shadow); border: 1px solid var(--border);">
+                        <form id="cadastro-professores-ibma-form">
+                            <div class="form-group" style="margin-bottom: 16px;">
+                                <label style="font-weight: 700; font-size: 0.9rem;">Nome completo</label>
+                                <div class="input-field" style="position: relative;">
+                                    <i data-lucide="user" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); width: 18px; color: var(--text-muted);"></i>
+                                    <input type="text" name="fullName" placeholder="Nome completo" required style="width: 100%; padding: 12px 16px 12px 48px; border-radius: 10px; border: 1.5px solid var(--border);">
+                                </div>
+                            </div>
+                            <div class="form-group" style="margin-bottom: 16px;">
+                                <label style="font-weight: 700; font-size: 0.9rem;">Telefone</label>
+                                <div class="input-field" style="position: relative;">
+                                    <i data-lucide="phone" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); width: 18px; color: var(--text-muted);"></i>
+                                    <input type="tel" name="phone" placeholder="(00) 00000-0000" required style="width: 100%; padding: 12px 16px 12px 48px; border-radius: 10px; border: 1.5px solid var(--border);">
+                                </div>
+                            </div>
+                            <div class="form-group" style="margin-bottom: 20px;">
+                                <label style="font-weight: 700; font-size: 0.9rem;">E-mail</label>
+                                <div class="input-field" style="position: relative;">
+                                    <i data-lucide="mail" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); width: 18px; color: var(--text-muted);"></i>
+                                    <input type="email" name="email" placeholder="email@exemplo.com" required style="width: 100%; padding: 12px 16px 12px 48px; border-radius: 10px; border: 1.5px solid var(--border);">
+                                </div>
+                            </div>
+                            <button type="submit" class="btn-primary" style="width: auto; padding: 12px 24px;">Adicionar</button>
+                        </form>
+                    </div>
+                    <div class="staff-contacts-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 40px;">
+                        ${professoresIbma.length === 0 ? '<p style="color: var(--text-muted); grid-column: 1/-1;">Nenhum professor cadastrado.</p>' : professoresIbma.map(p => `
+                        <div class="stat-card" style="height: auto; padding: 20px; display: flex; justify-content: space-between; align-items: flex-start;">
+                            <div>
+                                <div style="font-weight: 600; font-size: 1rem; color: var(--text-main); margin-bottom: 8px;">${p.fullName || p.nome || '-'}</div>
+                                <div style="font-size: 0.9rem; color: var(--primary); display: flex; align-items: center; gap: 6px; margin-bottom: 4px;"><i data-lucide="phone" style="width: 14px; height: 14px;"></i> ${p.phone || '-'}</div>
+                                <div style="font-size: 0.9rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px;"><i data-lucide="mail" style="width: 14px; height: 14px;"></i> ${p.email || '-'}</div>
+                            </div>
+                            <button class="btn-icon red delete-professor-ibma" data-id="${p.id}" title="Excluir" style="padding: 6px;"><i data-lucide="trash-2" style="width: 14px; height: 14px;"></i></button>
+                        </div>
+                        `).join('')}
+                    </div>
+
+                    <div class="view-header" style="margin-top: 40px; display: flex; align-items: center; gap: 16px; margin-bottom: 24px;">
+                        <div style="width: 52px; height: 52px; border-radius: 14px; background: rgba(var(--primary-rgb), 0.12); color: var(--primary); display: flex; align-items: center; justify-content: center;">
+                            <i data-lucide="layers" style="width: 28px; height: 28px;"></i>
+                        </div>
+                        <div>
+                            <h2 style="margin: 0; font-size: 1.5rem; font-weight: 800; color: var(--text-main);">Módulos Escola IBMA</h2>
+                            <p style="margin: 4px 0 0; font-size: 0.9rem; color: var(--text-muted);">Membresia, Discipulado, Batismo e Oração</p>
+                        </div>
+                    </div>
+                    <div class="modules-ibma-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 40px;">
+                        <div class="stat-card" style="height: auto; padding: 24px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 12px;">
+                            <div style="width: 48px; height: 48px; border-radius: 14px; background: rgba(var(--primary-rgb), 0.12); color: var(--primary); display: flex; align-items: center; justify-content: center;">
+                                <i data-lucide="user-check" style="width: 24px; height: 24px;"></i>
+                            </div>
+                            <span style="font-weight: 700; font-size: 1rem; color: var(--text-main);">Membresia</span>
+                        </div>
+                        <div class="stat-card" style="height: auto; padding: 24px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 12px;">
+                            <div style="width: 48px; height: 48px; border-radius: 14px; background: rgba(var(--primary-rgb), 0.12); color: var(--primary); display: flex; align-items: center; justify-content: center;">
+                                <i data-lucide="users" style="width: 24px; height: 24px;"></i>
+                            </div>
+                            <span style="font-weight: 700; font-size: 1rem; color: var(--text-main);">Discipulado</span>
+                        </div>
+                        <div class="stat-card" style="height: auto; padding: 24px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 12px;">
+                            <div style="width: 48px; height: 48px; border-radius: 14px; background: rgba(var(--primary-rgb), 0.12); color: var(--primary); display: flex; align-items: center; justify-content: center;">
+                                <i data-lucide="droplet" style="width: 24px; height: 24px;"></i>
+                            </div>
+                            <span style="font-weight: 700; font-size: 1rem; color: var(--text-main);">Batismo</span>
+                        </div>
+                        <div class="stat-card" style="height: auto; padding: 24px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 12px;">
+                            <div style="width: 48px; height: 48px; border-radius: 14px; background: rgba(var(--primary-rgb), 0.12); color: var(--primary); display: flex; align-items: center; justify-content: center;">
+                                <i data-lucide="heart-handshake" style="width: 24px; height: 24px;"></i>
+                            </div>
+                            <span style="font-weight: 700; font-size: 1rem; color: var(--text-main);">Oração</span>
+                        </div>
+                    </div>
+                    ` : ''}
+                    ${currentUser.loginType !== 'escolas-ibma' ? `
                     <div class="stats-grid">
                         <div class="stat-card">
                             <div class="stat-icon"><i data-lucide="users"></i></div>
@@ -1741,6 +1854,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                     </div>
 
+                    ` : ''}
+                    ${currentUser.loginType !== 'escolas-ibma' ? `
                     <div class="view-header" style="margin-top: 32px; margin-bottom: 20px;">
                         <h2>Acesso Rápido</h2>
                     </div>
@@ -1765,10 +1880,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div class="overview-shortcut-icon"><i data-lucide="image"></i></div>
                             <span class="overview-shortcut-label">Fotos & Vídeos</span>
                         </a>
-                        <a href="#" class="overview-shortcut" data-view="institucional">
-                            <div class="overview-shortcut-icon"><i data-lucide="building-2"></i></div>
-                            <span class="overview-shortcut-label">Sebitam Institucional</span>
-                        </a>
                         <a href="#" class="overview-shortcut" data-view="termo">
                             <div class="overview-shortcut-icon"><i data-lucide="file-text"></i></div>
                             <span class="overview-shortcut-label">Normas Sebitam</span>
@@ -1777,8 +1888,13 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div class="overview-shortcut-icon"><i data-lucide="wallet"></i></div>
                             <span class="overview-shortcut-label">Sebitam Mensalidades</span>
                         </a>
+                        <a href="#" class="overview-shortcut" data-view="matricula-escolas">
+                            <div class="overview-shortcut-icon"><i data-lucide="school"></i></div>
+                            <span class="overview-shortcut-label">Matrícula para Escolas</span>
+                        </a>
                     </div>
-
+                    ` : ''}
+                    ${currentUser.loginType !== 'escolas-ibma' ? `
                     <div class="corpo-docente-header" style="margin-top: 40px; display: flex; align-items: center; gap: 16px; margin-bottom: 24px;">
                         <div class="corpo-docente-icon" style="width: 52px; height: 52px; border-radius: 14px; background: rgba(var(--primary-rgb), 0.12); color: var(--primary); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
                             <i data-lucide="graduation-cap" style="width: 28px; height: 28px;"></i>
@@ -1866,6 +1982,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                         </div>
                     </div>
+                    ` : ''}
                 `;
                 setTimeout(() => {
                     document.querySelectorAll('.delete-staff-ov').forEach(b => {
@@ -1896,9 +2013,173 @@ document.addEventListener('DOMContentLoaded', () => {
                             await renderView(view);
                         };
                     });
+                    const formProfIbma = document.getElementById('cadastro-professores-ibma-form');
+                    if (formProfIbma) {
+                        formProfIbma.onsubmit = async (e) => {
+                            e.preventDefault();
+                            const fd = new FormData(formProfIbma);
+                            const obj = { fullName: fd.get('fullName'), phone: fd.get('phone'), email: fd.get('email'), id: Date.now() };
+                            const list = JSON.parse(localStorage.getItem('professores-escolas-ibma') || '[]');
+                            list.push(obj);
+                            localStorage.setItem('professores-escolas-ibma', JSON.stringify(list));
+                            await renderView('overview');
+                        };
+                    }
+                    document.querySelectorAll('.delete-professor-ibma').forEach(btn => {
+                        btn.onclick = async () => {
+                            if (!confirm('Excluir este professor?')) return;
+                            const list = JSON.parse(localStorage.getItem('professores-escolas-ibma') || '[]').filter(x => String(x.id) !== String(btn.dataset.id));
+                            localStorage.setItem('professores-escolas-ibma', JSON.stringify(list));
+                            await renderView('overview');
+                        };
+                    });
                     lucide.createIcons();
                 }, 0);
                 break;
+            case 'modulos-ibma': {
+                const modulosIbma = [
+                    { id: 'membresia', nome: 'Membresia', icon: 'user-check', url: null },
+                    { id: 'discipulado', nome: 'Discipulado', icon: 'users', url: null },
+                    { id: 'batismo', nome: 'Batismo', icon: 'droplet', url: null },
+                    { id: 'oracao', nome: 'Oração', icon: 'heart-handshake', url: null }
+                ];
+                html = `
+                    <div class="view-header" style="display: flex; align-items: center; gap: 16px; margin-bottom: 32px;">
+                        <div style="width: 56px; height: 56px; border-radius: 16px; background: rgba(var(--primary-rgb), 0.12); color: var(--primary); display: flex; align-items: center; justify-content: center;">
+                            <i data-lucide="layers" style="width: 30px; height: 30px;"></i>
+                        </div>
+                        <div>
+                            <h2 style="margin: 0; font-size: 1.6rem; font-weight: 800; color: var(--text-main);">Módulos Escola IBMA</h2>
+                            <p style="margin: 6px 0 0; font-size: 0.95rem; color: var(--text-muted);">Baixe o material de cada módulo</p>
+                        </div>
+                    </div>
+                    <div class="modules-download-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px;">
+                        ${modulosIbma.map(m => `
+                        <div class="stat-card" style="height: auto; padding: 28px; display: flex; flex-direction: column; align-items: center; gap: 16px; text-align: center;">
+                            <div style="width: 64px; height: 64px; border-radius: 18px; background: rgba(var(--primary-rgb), 0.12); color: var(--primary); display: flex; align-items: center; justify-content: center;">
+                                <i data-lucide="${m.icon}" style="width: 32px; height: 32px;"></i>
+                            </div>
+                            <h3 style="margin: 0; font-size: 1.2rem; font-weight: 700; color: var(--text-main);">${m.nome}</h3>
+                            ${m.url ? `<a href="${m.url}" target="_blank" rel="noopener noreferrer" class="btn-primary" style="width: 100%; padding: 14px; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; font-size: 0.95rem;"><i data-lucide="download"></i> Baixar Material</a>` : `<span class="btn-primary" style="width: 100%; padding: 14px; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.95rem; opacity: 0.7; cursor: default;"><i data-lucide="download"></i> Baixar Material</span>`}
+                        </div>
+                        `).join('')}
+                    </div>
+                `;
+                setTimeout(() => lucide.createIcons(), 0);
+                break;
+            }
+            case 'matricula-escolas': {
+                const matriculas = JSON.parse(localStorage.getItem('matriculas-escolas') || '[]');
+                const escolas = [
+                    { id: 'membresia', nome: 'Membresia', icon: 'user-check' },
+                    { id: 'discipulos', nome: 'Discípulos', icon: 'users' },
+                    { id: 'batismo', nome: 'Batismo', icon: 'droplet' }
+                ];
+                html = `
+                    <div class="matricula-escolas-header" style="display: flex; align-items: center; gap: 16px; margin-bottom: 32px;">
+                        <div style="width: 56px; height: 56px; border-radius: 16px; background: rgba(var(--primary-rgb), 0.12); color: var(--primary); display: flex; align-items: center; justify-content: center;">
+                            <i data-lucide="school" style="width: 30px; height: 30px;"></i>
+                        </div>
+                        <div>
+                            <h2 style="margin: 0; font-size: 1.6rem; font-weight: 800; color: var(--text-main);">Matrícula para Escolas</h2>
+                            <p style="margin: 6px 0 0; font-size: 0.95rem; color: var(--text-muted);">Inscreva-se em uma das escolas da IBMA</p>
+                        </div>
+                    </div>
+                    <div class="form-container" style="max-width: 700px; padding: 35px; background: white; border-radius: 24px; box-shadow: var(--shadow); border: 1px solid var(--border); margin-bottom: 40px;">
+                        <form id="matricula-escolas-form">
+                            <div class="form-group" style="margin-bottom: 20px;">
+                                <label style="font-weight: 700; color: var(--text-main); margin-bottom: 8px; display: block; font-size: 0.9rem;">Nome completo</label>
+                                <div class="input-field" style="position: relative;">
+                                    <i data-lucide="user" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); width: 18px; color: var(--text-muted);"></i>
+                                    <input type="text" name="fullName" placeholder="Seu nome completo" required style="width: 100%; padding: 14px 14px 14px 48px; border-radius: 12px; border: 1.5px solid var(--border); background: white;">
+                                </div>
+                            </div>
+                            <div class="form-group" style="margin-bottom: 20px;">
+                                <label style="font-weight: 700; color: var(--text-main); margin-bottom: 8px; display: block; font-size: 0.9rem;">Telefone</label>
+                                <div class="input-field" style="position: relative;">
+                                    <i data-lucide="phone" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); width: 18px; color: var(--text-muted);"></i>
+                                    <input type="tel" name="phone" placeholder="(00) 00000-0000" required style="width: 100%; padding: 14px 14px 14px 48px; border-radius: 12px; border: 1.5px solid var(--border); background: white;">
+                                </div>
+                            </div>
+                            <div class="form-group" style="margin-bottom: 24px;">
+                                <label style="font-weight: 700; color: var(--text-main); margin-bottom: 8px; display: block; font-size: 0.9rem;">E-mail</label>
+                                <div class="input-field" style="position: relative;">
+                                    <i data-lucide="mail" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); width: 18px; color: var(--text-muted);"></i>
+                                    <input type="email" name="email" placeholder="seu@email.com" required style="width: 100%; padding: 14px 14px 14px 48px; border-radius: 12px; border: 1.5px solid var(--border); background: white;">
+                                </div>
+                            </div>
+                            <div class="form-group" style="margin-bottom: 28px;">
+                                <label style="font-weight: 700; color: var(--text-main); margin-bottom: 12px; display: block; font-size: 0.9rem;">Escola</label>
+                                <div class="escolas-selector" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+                                    ${escolas.map(e => `
+                                        <label class="escola-option" style="cursor: pointer; text-align: center;">
+                                            <input type="radio" name="escola" value="${e.id}" required style="display: none;">
+                                            <div class="escola-card" style="padding: 20px; border: 2px solid var(--border); border-radius: 16px; background: white; transition: all 0.25s; display: flex; flex-direction: column; align-items: center; gap: 10px;">
+                                                <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(var(--primary-rgb), 0.1); color: var(--primary); display: flex; align-items: center; justify-content: center;">
+                                                    <i data-lucide="${e.icon}" style="width: 22px; height: 22px;"></i>
+                                                </div>
+                                                <span style="font-weight: 600; font-size: 0.95rem; color: var(--text-main);">${e.nome}</span>
+                                            </div>
+                                        </label>
+                                    `).join('')}
+                                </div>
+                            </div>
+                            <button type="submit" class="btn-primary" style="width: 100%; padding: 16px; font-size: 1rem;">Enviar Matrícula</button>
+                        </form>
+                    </div>
+                    <div class="view-header" style="margin-top: 24px;">
+                        <h3 style="font-size: 1.2rem;">Matrículas recentes</h3>
+                    </div>
+                    <div class="table-container" style="max-width: 900px;">
+                        <table class="data-table">
+                            <thead><tr><th>Nome</th><th>Telefone</th><th>E-mail</th><th>Escola</th><th>Ações</th></tr></thead>
+                            <tbody>
+                                ${matriculas.length === 0 ? '<tr><td colspan="5" style="text-align: center; padding: 24px; color: var(--text-muted);">Nenhuma matrícula cadastrada.</td></tr>' :
+                                matriculas.slice().reverse().slice(0, 50).map(m => `
+                                    <tr data-matricula-id="${m.id}">
+                                        <td>${m.fullName || m.nome || '-'}</td>
+                                        <td>${m.phone || '-'}</td>
+                                        <td>${m.email || '-'}</td>
+                                        <td>${(escolas.find(e => e.id === m.escola) || {}).nome || m.escola || '-'}</td>
+                                        <td>
+                                            <div class="matricula-actions" style="display: flex; gap: 8px; align-items: center;">
+                                                <button class="btn-icon matricula-btn-boletim" data-id="${m.id}" title="Visualizar boletim"><i data-lucide="file-text"></i></button>
+                                                <button class="btn-icon matricula-btn-historico" data-id="${m.id}" title="Histórico"><i data-lucide="history"></i></button>
+                                                <button class="btn-icon matricula-btn-editar" data-id="${m.id}" title="Editar"><i data-lucide="edit-3"></i></button>
+                                                <button class="btn-icon red matricula-btn-excluir" data-id="${m.id}" title="Excluir"><i data-lucide="trash-2"></i></button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+                setTimeout(() => {
+                    document.querySelectorAll('.escola-option input').forEach((radio, i) => {
+                        const card = radio.closest('label').querySelector('.escola-card');
+                        radio.addEventListener('change', () => {
+                            document.querySelectorAll('.escola-card').forEach(c => {
+                                c.style.borderColor = 'var(--border)';
+                                c.style.background = 'white';
+                            });
+                            if (card) { card.style.borderColor = 'var(--primary)'; card.style.background = 'rgba(var(--primary-rgb), 0.05)'; }
+                        });
+                    });
+                    document.getElementById('matricula-escolas-form').onsubmit = async (e) => {
+                        e.preventDefault();
+                        const fd = new FormData(e.target);
+                        const obj = { fullName: fd.get('fullName'), phone: fd.get('phone'), email: fd.get('email'), escola: fd.get('escola'), id: Date.now() };
+                        const list = JSON.parse(localStorage.getItem('matriculas-escolas') || '[]');
+                        list.push(obj);
+                        localStorage.setItem('matriculas-escolas', JSON.stringify(list));
+                        alert('Matrícula enviada com sucesso!');
+                        await renderView('matricula-escolas');
+                    };
+                    lucide.createIcons();
+                }, 0);
+                break;
+            }
             case 'enrollment':
                 const activeType = data && data.type ? data.type : 'student';
                 html = `
@@ -2347,7 +2628,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <button class="tab-btn ${subView === 'modules' ? 'active' : ''}" data-tab="modules">Módulos do Curso</button>
                         <button class="tab-btn ${subView === 'prod-teo' ? 'active' : ''}" data-tab="prod-teo">Produção Teológica (PDF)</button>
                         <button class="tab-btn ${subView === 'trabalhos' ? 'active' : ''}" data-tab="trabalhos">Trabalhos Alunos</button>
-                        <button class="tab-btn ${subView === 'material-prof' ? 'active' : ''}" data-tab="material-prof">Material Professores</button>
+                        <button class="tab-btn ${subView === 'material-prof' ? 'active' : ''}" data-tab="material-prof"><i data-lucide="book-text" style="width: 16px; height: 16px; margin-right: 6px; vertical-align: -2px;"></i>Material Professores</button>
                     </div>
                 `;
 
@@ -2381,7 +2662,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const links = {
                         'prod-teo': { url: 'https://drive.google.com/drive/folders/110x1MEaHbcaY7wOpIduiTobnt7Smeggj', title: 'Produção Teológica (PDF)', icon: 'book-marked' },
                         'trabalhos': { url: 'https://drive.google.com/drive/folders/1HXSZPrzEdqbZiVtHmVcRwN3dODs1qASS', title: 'Trabalhos Alunos', icon: 'folder-kanban' },
-                        'material-prof': { url: 'https://drive.google.com/drive/folders/1xQbSx_GCR9IqF3k-d7ESNJ8S2C4UcrIF', title: 'Material Professores', icon: 'graduation-cap' }
+                        'material-prof': { url: 'https://drive.google.com/drive/folders/1xQbSx_GCR9IqF3k-d7ESNJ8S2C4UcrIF', title: 'Material Professores', icon: 'book-text' }
                     };
                     const activeLink = links[subView];
                     html += `

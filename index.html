@@ -8,6 +8,12 @@
     <title>SEBITAM</title>
     <meta name="description"
         content="Plataforma educacional SEBITAM - Gestão para administradores, professores e alunos.">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="SEBITAM">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="logo.jpg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -32,9 +38,24 @@
                             <img src="logo.jpg" alt="SEBITAM Logo" class="main-logo">
                         </div>
                         <h2 class="welcome-title">Seja bem vindo</h2>
+                        <p class="login-subtitle">Escolha o tipo de acesso</p>
+                    </div>
+
+                    <div class="login-type-selector">
+                        <button type="button" class="login-type-btn active" data-login-type="sebitam">
+                            <i data-lucide="graduation-cap"></i>
+                            <span>Login SEBITAM</span>
+                            <small>Seminário e Matrículas</small>
+                        </button>
+                        <button type="button" class="login-type-btn" data-login-type="escolas-ibma">
+                            <i data-lucide="church"></i>
+                            <span>Login Escolas IBMA</span>
+                            <small>Membresia, Discipulado, Batismo</small>
+                        </button>
                     </div>
 
                     <form id="login-form">
+                        <input type="hidden" id="login-type" name="loginType" value="sebitam">
                         <div class="input-group">
                             <div class="input-field">
                                 <i data-lucide="mail"></i>
@@ -58,7 +79,7 @@
             <div id="sidebar-overlay" class="sidebar-overlay"></div>
             <aside class="sidebar" id="sidebar">
                 <div class="sidebar-header">
-                    <span class="sidebar-logo-text">SEBITAM</span>
+                    <span class="sidebar-logo-text" id="sidebar-brand-text">SEBITAM</span>
                     <button id="sidebar-close" class="sidebar-close-btn"
                         style="display: none; background: transparent; border: none; color: white; cursor: pointer;">
                         <i data-lucide="x"></i>
@@ -67,42 +88,11 @@
                 <nav class="sidebar-nav">
                     <a href="#" class="nav-item active" data-view="overview">
                         <i data-lucide="layout-dashboard"></i>
-                        <span>Visão Geral</span>
+                        <span id="nav-overview-label">Visão Geral</span>
                     </a>
-                    <a href="#" class="nav-item access-admin access-secretary access-teacher" data-view="users">
-                        <i data-lucide="users"></i>
-                        <span>Gestão de Usuários</span>
-                    </a>
-                    <a href="#" class="nav-item" data-view="didatico">
-                        <i data-lucide="book-open"></i>
-                        <span>Didático Professores e Alunos</span>
-                    </a>
-                    <a href="#" class="nav-item access-admin access-secretary access-teacher" data-view="enrollment">
-                        <i data-lucide="user-plus"></i>
-                        <span>Cadastro (Alunos, Profs, Adm, Sec)</span>
-                    </a>
-                    <a href="#" class="nav-item access-admin access-secretary access-teacher access-student"
-                        data-view="classes">
-                        <i data-lucide="clipboard-list"></i>
-                        <span>Alunos</span>
-                    </a>
-                    <a href="https://drive.google.com/drive/folders/1bHiOrFojPoQOcaTerk23vi-y8jtKwTd5" target="_blank"
-                        class="nav-item external-nav">
-                        <i data-lucide="image"></i>
-                        <span>Fotos & Vídeos</span>
-                    </a>
-                    <a href="#" class="nav-item" data-view="institucional">
-                        <i data-lucide="scroll"></i>
-                        <span>Sebitam Institucional</span>
-                    </a>
-                    <a href="#" class="nav-item" data-view="termo">
-                        <i data-lucide="scroll"></i>
-                        <span>Normas Sebitam</span>
-                    </a>
-                    <a href="#" class="nav-item access-admin access-secretary access-teacher access-student"
-                        data-view="mensalidades">
-                        <i data-lucide="wallet"></i>
-                        <span>Sebitam Mensalidades</span>
+                    <a href="#" class="nav-item nav-escolas-ibma-only" data-view="modulos-ibma">
+                        <i data-lucide="layers"></i>
+                        <span>Módulos</span>
                     </a>
                     <a href="#" class="nav-item" data-view="themes">
                         <i data-lucide="palette"></i>
@@ -201,6 +191,12 @@
         </section>
     </div>
 
+    <!-- PWA Install Banner -->
+    <div id="pwa-install-banner" style="display: none; position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--primary, #0f172a); color: white; padding: 14px 24px; border-radius: 50px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); z-index: 9999; cursor: pointer; font-weight: 600; font-size: 0.95rem; align-items: center; gap: 10px;">
+        <i data-lucide="download" style="width: 20px; height: 20px;"></i>
+        <span>Instalar App SEBITAM</span>
+    </div>
+
     <!-- Supabase Configuration -->
     <script src="supabase-config.js"></script>
 
@@ -208,6 +204,31 @@
     <script>
         // Initialize Lucide icons
         lucide.createIcons();
+
+        // PWA - Registrar Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').then(() => {
+                    console.log('PWA: Service Worker registrado.');
+                }).catch((err) => console.warn('PWA: Erro ao registrar SW:', err));
+            });
+        }
+
+        // PWA - Botão Instalar (quando o app for instalável)
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            const banner = document.getElementById('pwa-install-banner');
+            if (banner && !localStorage.getItem('pwa-install-dismissed')) {
+                banner.style.display = 'flex';
+                banner.onclick = () => {
+                    deferredPrompt.prompt();
+                    deferredPrompt.userChoice.then(() => { banner.style.display = 'none'; localStorage.setItem('pwa-install-dismissed', '1'); });
+                };
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+            }
+        });
     </script>
 </body>
 
